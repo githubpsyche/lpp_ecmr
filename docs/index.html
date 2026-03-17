@@ -219,17 +219,7 @@ window.Quarto = {
   <li><a href="#model-comparison" id="toc-model-comparison" class="nav-link" data-scroll-target="#model-comparison"><span class="header-section-number">4.1</span> Model Comparison</a></li>
   <li><a href="#benchmark-fits" id="toc-benchmark-fits" class="nav-link" data-scroll-target="#benchmark-fits"><span class="header-section-number">4.2</span> Benchmark Fits</a></li>
   </ul></li>
-  <li><a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix"><span class="header-section-number">5</span> Appendix</a>
-  <ul class="collapse">
-  <li><a href="#lpp-by-item-type-and-recall-status" id="toc-lpp-by-item-type-and-recall-status" class="nav-link" data-scroll-target="#lpp-by-item-type-and-recall-status"><span class="header-section-number">5.1</span> LPP by Item Type and Recall Status</a></li>
-  <li><a href="#recall-rate-by-early-lpp" id="toc-recall-rate-by-early-lpp" class="nav-link" data-scroll-target="#recall-rate-by-early-lpp"><span class="header-section-number">5.2</span> Recall Rate by Early LPP</a></li>
-  <li><a href="#alternative-fitting-approaches-considered" id="toc-alternative-fitting-approaches-considered" class="nav-link" data-scroll-target="#alternative-fitting-approaches-considered"><span class="header-section-number">5.3</span> Alternative Fitting Approaches Considered</a>
-  <ul class="collapse">
-  <li><a href="#simulation-based-estimates-of-set-likelihood" id="toc-simulation-based-estimates-of-set-likelihood" class="nav-link" data-scroll-target="#simulation-based-estimates-of-set-likelihood"><span class="header-section-number">5.3.1</span> Simulation-Based Estimates of Set Likelihood</a></li>
-  <li><a href="#mean-squared-error-over-summary-statistics" id="toc-mean-squared-error-over-summary-statistics" class="nav-link" data-scroll-target="#mean-squared-error-over-summary-statistics"><span class="header-section-number">5.3.2</span> Mean Squared Error Over Summary Statistics</a></li>
-  </ul></li>
-  <li><a href="#justification-for-pure-main-effects-model" id="toc-justification-for-pure-main-effects-model" class="nav-link" data-scroll-target="#justification-for-pure-main-effects-model"><span class="header-section-number">5.4</span> Justification for Pure Main Effects Model</a></li>
-  </ul></li>
+  
   <li><a href="#partial-references" id="toc-partial-references" class="nav-link" data-scroll-target="#partial-references"><span class="header-section-number">6</span> Partial References</a></li>
   </ul>
 </nav>
@@ -916,8 +906,24 @@ Figure&nbsp;12: Simulated benchmarks for the Emotion + LPP (interaction) model. 
 <p>In the Emotion-only simulations, the model captures much of the emotional enhancement of memory in the Category-SPC but shows little separation between recalled and unrecalled negative items in Early LPP. This pattern indicates that emotion labels alone can reproduce the overall category advantage without explaining LPP-linked recall differences. In the Emotion + LPP (main effects) simulations, the model fits both summary statistics but assigns a larger recalled–unrecalled difference for neutral items and a smaller difference for negative items. This pattern suggests that a single LPP slope captures the overall association while misallocating the emotion-specific separation. In the Emotion + LPP (interaction) simulations, the Category-SPC preserves emotional enhancement of memory and the Early LPP panel shows a clearer emotion-dependent separation between recalled and unrecalled items. Together these benchmarks indicate that combining emotion and LPP with an interaction provides the most faithful account of both the category-level advantage and the emotion-specific LPP–recall pattern.</p>
 </section>
 </section>
-<section id="appendix" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Appendix</h1>
+
+<section id="partial-references" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Partial References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-friendly1982toronto" class="csl-entry" role="listitem">
+Friendly, Michael, Patricia E Franklin, David Hoffman, and David C Rubin. 1982. <span>“The Toronto Word Pool: Norms for Imagery, Concreteness, Orthographic Variables, and Grammatical Usage for 1,080 Words.”</span> <em>Behavior Research Methods &amp; Instrumentation</em> 14 (4): 375–99.
+</div>
+<div id="ref-healey2014memory" class="csl-entry" role="listitem">
+Healey, M Karl, and Michael J Kahana. 2014. <span>“Is Memory Search Governed by Universal Principles or Idiosyncratic Strategies?”</span> <em>Journal of Experimental Psychology: General</em> 143 (2): 575.
+</div>
+<div id="ref-storn1997differential" class="csl-entry" role="listitem">
+Storn, Rainer, and Kenneth Price. 1997. <span>“Differential Evolution–a Simple and Efficient Heuristic for Global Optimization over Continuous Spaces.”</span> <em>Journal of Global Optimization</em> 11 (4): 341–59.
+</div>
+</div>
+</section>
+
+<div id="quarto-appendix" class="default"><section id="appendix" class="level1 appendix" data-number="5"><h2 class="anchored quarto-appendix-heading"><span class="header-section-number">5</span> Appendix</h2><div class="quarto-appendix-contents">
+
 <section id="lpp-by-item-type-and-recall-status" class="level2" data-number="5.1">
 <h2 data-number="5.1" class="anchored" data-anchor-id="lpp-by-item-type-and-recall-status"><span class="header-section-number">5.1</span> LPP by Item Type and Recall Status</h2>
 <div id="fig-amplitude_by_cat_by_recalled" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -994,23 +1000,7 @@ A_i \propto (\text{cue–trace similarity}_i \times S_i)^\tau,
 \]</span></p>
 <p>followed by normalization across items. Importantly a sensitivity parameter <span class="math inline">\(\tau &gt; 1\)</span> introduces nonlinear competition: items with higher activation get disproportionately favored during recall. If Emotion and LPP each contribute linearly to these ingredients (for instance, adding to the learning rate and to the cue–trace match), then the product contains an interaction term even when the encoding rule itself includes only main effects. In other words, nonlinear cue-dependent competition can generate an effective LPP × emotion dependence in recall probabilities even without an explicit interaction term in the learning-rate equation. This observation makes it a modeling question, not a foregone conclusion, whether the interaction term estimated by the GMM must be present at encoding or can arise as a side-effect of retrieved-context dynamics. Together, these comparisons address the core question without introducing additional structural variants.</p>
 </section>
-</section>
-<section id="partial-references" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Partial References</h1>
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
-<div id="ref-friendly1982toronto" class="csl-entry" role="listitem">
-Friendly, Michael, Patricia E Franklin, David Hoffman, and David C Rubin. 1982. <span>“The Toronto Word Pool: Norms for Imagery, Concreteness, Orthographic Variables, and Grammatical Usage for 1,080 Words.”</span> <em>Behavior Research Methods &amp; Instrumentation</em> 14 (4): 375–99.
-</div>
-<div id="ref-healey2014memory" class="csl-entry" role="listitem">
-Healey, M Karl, and Michael J Kahana. 2014. <span>“Is Memory Search Governed by Universal Principles or Idiosyncratic Strategies?”</span> <em>Journal of Experimental Psychology: General</em> 143 (2): 575.
-</div>
-<div id="ref-storn1997differential" class="csl-entry" role="listitem">
-Storn, Rainer, and Kenneth Price. 1997. <span>“Differential Evolution–a Simple and Efficient Heuristic for Global Optimization over Continuous Spaces.”</span> <em>Journal of Global Optimization</em> 11 (4): 341–59.
-</div>
-</div>
-</section>
-
-</main>
+</div></section></div></main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {

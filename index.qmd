@@ -218,6 +218,7 @@ It also yields a cleaner comparison across emotion-only, LPP main-effects, and L
 We denote temporal context as $c^T$, with item features $f_i$.
 The matrix $M^{FC}$ binds item features to temporal context, and $M^{CF}$ binds temporal context to item features.
 
+:::: {#tbl-ecmr-parameters}
 | Symbol | Name | Description |
 |------------------------|------------------------|------------------------|
 | $c^T$ | temporal context | Recency-weighted summary of prior items. |
@@ -240,7 +241,8 @@ The matrix $M^{FC}$ binds item features to temporal context, and $M^{CF}$ binds 
 | $\kappa_{EL}$ | LPP interaction scale | Slope for LPP-by-emotion interaction. |
 | $\lambda_{EL}$ | LPP interaction threshold | Centering offset for the interaction term. |
 
-: Parameters and structures specifying eCMR. {#tbl-ecmr-parameters}
+Parameters and structures specifying eCMR.
+::::
 
 Temporal context uses the standard CMR pre-experimental initializations:
 
@@ -438,6 +440,7 @@ Estimated parameters are broadly similar across variants, so the key evidence co
 @tbl-talmi-parameter-estimates reports mean parameter estimates with 95% t-based confidence intervals.
 Termination parameters are omitted because the fitting procedure does not include a stopping mechanism.
 
+:::: {#tbl-talmi-parameter-estimates tbl-colwidths="[34,22,22,22]"}
 | Parameter | Emotion + LPP (main effects) | Emotion + LPP (interaction) | Emotion-only |
 |------------------|------------------|------------------|------------------|
 | fitness | 210.26 +/- 16.34 | 209.65 +/- 16.24 | 211.74 +/- 16.38 |
@@ -456,17 +459,20 @@ Termination parameters are omitted because the fitting procedure does not includ
 | lpp inter scale | 0.00 +/- 0.00 | 53.95 +/- 11.17 | 0.00 +/- 0.00 |
 | lpp inter threshold | 0.00 +/- 0.00 | -0.90 +/- 0.98 | 0.00 +/- 0.00 |
 
-: Parameter estimates and fit summaries for TalmiEEG model variants (mean +/- 95% t-based CI across participants). {#tbl-talmi-parameter-estimates tbl-colwidths="\[34,22,22,22\]"}
+Parameter estimates and fit summaries for TalmiEEG model variants (mean +/- 95% t-based CI across participants).
+::::
 
 @tbl-talmi-delta-aic reports pairwise delta AIC values used in the comparisons above.
 
+:::: {#tbl-talmi-delta-aic tbl-colwidths="[34,22,22,22]"}
 |   | Emotion + LPP (main effects) | Emotion + LPP (interaction) | Emotion-only |
 |------------------|------------------|------------------|------------------|
 | Emotion + LPP (main effects) | NA | 1.12 \[0.13, 2.11\] | -2.86 \[-4.14, -1.57\] |
 | Emotion + LPP (interaction) | -1.12 \[-2.11, -0.13\] | NA | -3.98 \[-5.71, -2.25\] |
 | Emotion-only | 2.86 \[1.57, 4.14\] | 3.98 \[2.25, 5.71\] | NA |
 
-: Pairwise delta AIC (row minus column; mean \[95% t-based CI\]). {#tbl-talmi-delta-aic tbl-colwidths="\[34,22,22,22\]"}
+Pairwise delta AIC (row minus column; mean \[95% t-based CI\]).
+::::
 
 ## Benchmark Fits
 
@@ -520,7 +526,7 @@ This pattern suggests that a single LPP slope captures the overall association w
 In the Emotion + LPP (interaction) simulations, the Category-SPC preserves emotional enhancement of memory and the Early LPP panel shows a clearer emotion-dependent separation between recalled and unrecalled items.
 Together these benchmarks indicate that combining emotion and LPP with an interaction provides the most faithful account of both the category-level advantage and the emotion-specific LPP–recall pattern.
 
-# Appendix
+# Appendix {.appendix}
 
 ## LPP by Item Type and Recall Status
 

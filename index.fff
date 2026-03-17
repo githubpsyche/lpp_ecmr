@@ -7,10 +7,10 @@ item type from reference materials (LEFT) and from the present dataset
 (RIGHT).}
 
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/daw_meeting_slide5.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/daw_meeting_slide5.png}}\end{minipage}%
 %
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/analyses/reference_catspc.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/analyses/reference_catspc.png}}\end{minipage}%
 
 \end{figure*}
 \efloatseparator
@@ -23,10 +23,10 @@ item type from reference materials (LEFT) and from the present dataset
 Early window (LEFT), Late window (RIGHT).}
 
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/analyses/cat_lpp_spc_EarlyLPP.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/analyses/cat_lpp_spc_EarlyLPP.png}}\end{minipage}%
 %
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/analyses/cat_lpp_spc_LateLPP.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/analyses/cat_lpp_spc_LateLPP.png}}\end{minipage}%
 
 \end{figure*}
 \efloatseparator
@@ -40,16 +40,16 @@ item type: Early LPP (TOP row) and Late LPP (BOTTOM row), split by
 NEGATIVE items (LEFT) and NEUTRAL items (RIGHT).}
 
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/analyses/cat_lpp_by_recall_EarlyLPP_Negative.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/analyses/cat_lpp_by_recall_EarlyLPP_Negative.png}}\end{minipage}%
 %
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/analyses/cat_lpp_by_recall_EarlyLPP_Neutral.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/analyses/cat_lpp_by_recall_EarlyLPP_Neutral.png}}\end{minipage}%
 \newline
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/analyses/cat_lpp_by_recall_LateLPP_Negative.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/analyses/cat_lpp_by_recall_LateLPP_Negative.png}}\end{minipage}%
 %
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/analyses/cat_lpp_by_recall_LateLPP_Neutral.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/analyses/cat_lpp_by_recall_LateLPP_Neutral.png}}\end{minipage}%
 
 \end{figure*}
 \efloatseparator
@@ -63,7 +63,7 @@ item type. CIs omitted for clarity; data pooled across participants.}
 
 \centering{
 
-\includegraphics{results/figures/cat_lpp_by_recall.png}
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/cat_lpp_by_recall.png}}
 
 }
 
@@ -80,10 +80,10 @@ with 95\% CIs).}
 \centering{
 
 \begin{longtable*}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4143}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2571}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2429}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0857}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.4143}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2571}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2429}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0857}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Contrast
@@ -121,7 +121,7 @@ and their interaction.}
 
 \centering{
 
-\includegraphics{results/figures/reference_gmm.png}
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/reference_gmm.png}}
 
 }
 
@@ -139,10 +139,10 @@ The conditional co-recall curve reproduces the short-lag advantage
 observed in the lag-CRP despite not using recall order information.}
 
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/analyses/peers_lagcrp.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/analyses/peers_lagcrp.png}}\end{minipage}%
 %
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/analyses/peers_condcorec_by_lag.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/analyses/peers_condcorec_by_lag.png}}\end{minipage}%
 
 \end{figure*}
 \efloatseparator
@@ -158,7 +158,7 @@ of recalled items in this paradigm.}
 
 \centering{
 
-\includegraphics{results/figures/analyses/zarubin_condcorec_by_lag.png}
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/analyses/zarubin_condcorec_by_lag.png}}
 
 }
 
@@ -177,10 +177,10 @@ by recall status and item type, with lines following the legend labels
 omitted for clarity.}
 
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/analyses/reference_catspc.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/analyses/reference_catspc.png}}\end{minipage}%
 %
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/cat_lpp_by_recall.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/cat_lpp_by_recall.png}}\end{minipage}%
 
 \end{figure*}
 \efloatseparator
@@ -198,10 +198,10 @@ labels (recalled/unrecalled negative and recalled/unrecalled neutral)
 and CIs omitted.}
 
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/fitting/TalmiEEG_EEGEmotionOnly_50_set_likelihood_fixed_term_best_of_3_cat_spc.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/fitting/TalmiEEG_EEGEmotionOnly_50_set_likelihood_fixed_term_best_of_3_cat_spc.png}}\end{minipage}%
 %
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/fitting/TalmiEEG_EEGEmotionOnly_50_set_likelihood_fixed_term_best_of_3_cat_lpp_by_recall.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/fitting/TalmiEEG_EEGEmotionOnly_50_set_likelihood_fixed_term_best_of_3_cat_lpp_by_recall.png}}\end{minipage}%
 
 \end{figure*}
 \efloatseparator
@@ -219,10 +219,10 @@ legend labels (recalled/unrecalled negative and recalled/unrecalled
 neutral) and CIs omitted.}
 
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/fitting/TalmiEEG_EEGMainEffects_50_set_likelihood_fixed_term_best_of_3_cat_spc.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/fitting/TalmiEEG_EEGMainEffects_50_set_likelihood_fixed_term_best_of_3_cat_spc.png}}\end{minipage}%
 %
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/fitting/TalmiEEG_EEGMainEffects_50_set_likelihood_fixed_term_best_of_3_cat_lpp_by_recall.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/fitting/TalmiEEG_EEGMainEffects_50_set_likelihood_fixed_term_best_of_3_cat_lpp_by_recall.png}}\end{minipage}%
 
 \end{figure*}
 \efloatseparator
@@ -240,9 +240,9 @@ with lines following the legend labels (recalled/unrecalled negative and
 recalled/unrecalled neutral) and CIs omitted.}
 
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/fitting/TalmiEEG_EEGMainEffectsPlusInteraction_50_set_likelihood_fixed_term_best_of_3_cat_spc.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/fitting/TalmiEEG_EEGMainEffectsPlusInteraction_50_set_likelihood_fixed_term_best_of_3_cat_spc.png}}\end{minipage}%
 %
 \begin{minipage}{0.50\linewidth}
-\includegraphics{results/figures/fitting/TalmiEEG_EEGMainEffectsPlusInteraction_50_set_likelihood_fixed_term_best_of_3_cat_lpp_by_recall.png}\end{minipage}%
+\pandocbounded{\includegraphics[keepaspectratio]{results/figures/fitting/TalmiEEG_EEGMainEffectsPlusInteraction_50_set_likelihood_fixed_term_best_of_3_cat_lpp_by_recall.png}}\end{minipage}%
 
 \end{figure*}
