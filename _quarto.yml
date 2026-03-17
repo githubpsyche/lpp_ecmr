@@ -19,6 +19,8 @@ format:
     nocorrespondence: true
     donotrepeattitle: true
     draftfirst: true
+    header-includes:
+      - \usepackage{soul}
     filters:
       - abstract-section
   apaquarto-docx:

@@ -1,4 +1,26 @@
-/.quarto/
-/.venv/
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
 
+# Jupyter
+.ipynb_checkpoints/
+
+# Quarto
+.quarto/
 **/*.quarto_ipynb
+_freeze/
+
+# Editor
+.vscode/
+.luarc.json
+
+# OS
+.DS_Store
+
+# Project
+simulations/
+
+/.quarto/
