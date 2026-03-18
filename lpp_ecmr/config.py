@@ -174,7 +174,7 @@ SINGLE_CONTEXT_MODELS = [
     {
         "enabled": False,
         "model_name": "EEGStrength",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_strength.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_strength.make_factory",
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
@@ -193,7 +193,7 @@ SINGLE_CONTEXT_MODELS = [
     {
         "enabled": False,
         "model_name": "EEGStrengthMultiplicative",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_strength.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_strength.make_factory",
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
@@ -222,7 +222,7 @@ SINGLE_CONTEXT_MODELS = [
     {
         "enabled": False,
         "model_name": "EEGEmotionOnly",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_cmr.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_cmr.make_factory",
         "parameters": {
             "fixed": {
                 **_NO_STOP_FIXED,
@@ -236,7 +236,7 @@ SINGLE_CONTEXT_MODELS = [
     {
         "enabled": False,
         "model_name": "EEGEmotionOnlyMultiplicative",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_cmr.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_cmr.make_factory",
         "parameters": {
             "fixed": {
                 **_NO_STOP_FIXED,
@@ -250,7 +250,7 @@ SINGLE_CONTEXT_MODELS = [
     {
         "enabled": False,
         "model_name": "EEGLPPOnly",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_cmr.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_cmr.make_factory",
         "parameters": {
             "fixed": {
                 **_NO_STOP_FIXED,
@@ -270,7 +270,7 @@ SINGLE_CONTEXT_MODELS = [
     {
         "enabled": True,
         "model_name": "EEGLPPParsimonious",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_cmr.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_cmr.make_factory",
         "parameters": {
             "fixed": {
                 **_NO_STOP_FIXED,
@@ -290,7 +290,7 @@ SINGLE_CONTEXT_MODELS = [
     {
         "enabled": False,
         "model_name": "EEGLPPExponentOnly",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_cmr.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_cmr.make_factory",
         "parameters": {
             "fixed": {
                 **_NO_STOP_FIXED,
@@ -312,7 +312,7 @@ SINGLE_CONTEXT_MODELS = [
     {
         "enabled": False,
         "model_name": "EEGMainEffects",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_cmr.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_cmr.make_factory",
         "parameters": {
             "fixed": {
                 **_NO_STOP_FIXED,
@@ -331,7 +331,7 @@ SINGLE_CONTEXT_MODELS = [
     {
         "enabled": False,
         "model_name": "EEGMainEffectsPlusInteraction",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_cmr.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_cmr.make_factory",
         "parameters": {
             "fixed": {
                 **_NO_STOP_FIXED,
@@ -350,7 +350,7 @@ SINGLE_CONTEXT_MODELS = [
     {
         "enabled": False,
         "model_name": "EEGEmotionLPPExponentPlusInteraction",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_cmr.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_cmr.make_factory",
         "parameters": {
             "fixed": {
                 **_NO_STOP_FIXED,
@@ -372,7 +372,7 @@ SINGLE_CONTEXT_MODELS = [
     {
         "enabled": False,
         "model_name": "EEGTwoLayerMainEffects",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_ecmr.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_ecmr.make_factory",
         "parameters": {
             "fixed": {
                 **_NO_STOP_FIXED,
@@ -391,7 +391,7 @@ SINGLE_CONTEXT_MODELS = [
     {
         "enabled": False,
         "model_name": "EEGTwoLayerInteraction",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_ecmr.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_ecmr.make_factory",
         "parameters": {
             "fixed": {
                 **_NO_STOP_FIXED,
@@ -417,7 +417,7 @@ ECMR_MODELS = [
     {
         "enabled": False,
         "model_name": "eCMREmotionOnly",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_full_ecmr.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_full_ecmr.make_factory",
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
@@ -433,7 +433,7 @@ ECMR_MODELS = [
     {
         "enabled": False,
         "model_name": "eCMRMainEffects",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_full_ecmr.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_full_ecmr.make_factory",
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
@@ -454,7 +454,7 @@ ECMR_MODELS = [
     {
         "enabled": False,
         "model_name": "eCMRInteraction",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_full_ecmr.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_full_ecmr.make_factory",
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
@@ -475,7 +475,7 @@ ECMR_MODELS = [
     {
         "enabled": False,
         "model_name": "eCMREmotionTimesLPP",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_full_ecmr.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_full_ecmr.make_factory",
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
@@ -496,7 +496,7 @@ ECMR_MODELS = [
     {
         "enabled": True,
         "model_name": "eCMREmotionTimesLPPBroad",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_full_ecmr.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_full_ecmr.make_factory",
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
@@ -518,7 +518,7 @@ ECMR_MODELS = [
     {
         "enabled": True,
         "model_name": "eCMREmotionBroad",
-        "make_factory_path": "jaxcmr.models_eeg.eeg_full_ecmr.make_factory",
+        "make_factory_path": "lpp_ecmr.models.eeg_full_ecmr.make_factory",
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
