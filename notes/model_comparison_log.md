@@ -56,7 +56,7 @@ Not addressed in this pass. This is an inherent property of the evaluation metri
 
 ### 8: Parsimonious fix — eCMR Emo×LPP model
 
-Created a new model variant (`eCMREmotionTimesLPP` in `render_model_fitting_ecmr.ipynb`) that directly maps the GLMM finding: LPP predicts recall specifically for emotional items, with no effect on neutral items. The φ_emot construction reduces to:
+Created a new model variant (`eCMREmotionTimesLPP` in `render_model_fitting_full_ecmr.ipynb`) that directly maps the GLMM finding: LPP predicts recall specifically for emotional items, with no effect on neutral items. The φ_emot construction reduces to:
 
 ```python
 phi_emot = emotion_scale * is_emotional + lpp_inter_scale * lpp_centered * is_emotional
@@ -109,7 +109,7 @@ Within each LPP condition the parameter count is identical, so AIC differences a
 
 ### 11: CMR+LPP — can LPP replace category labels?
 
-Tested whether LPP operating through the temporal pathway alone (single-context architecture, no `is_emotional` anywhere) can approach eCMR's performance. Model: `EEGLPPParsimonious` in `render_model_fitting.ipynb`, using `eeg_cmr.make_factory` with `lpp_main_scale` free and `lpp_main_threshold` fixed to 0 (k=10, matching eCMR).
+Tested whether LPP operating through the temporal pathway alone (single-context architecture, no `is_emotional` anywhere) can approach eCMR's performance. Model: `EEGLPPParsimonious` in `render_model_fitting_single_context.ipynb`, using `eeg_cmr.make_factory` with `lpp_main_scale` free and `lpp_main_threshold` fixed to 0 (k=10, matching eCMR).
 
 **Motivation.** If the LPP is truly an ideal index of emotional processing, category labels should be redundant — LPP amplitude alone should carry enough information to reproduce the emotional recall advantage. Testing this requires removing category labels entirely (including the emotional context layer, which uses `is_emotional` for source features and pole assignment). The single-context architecture is the cleanest test.
 
