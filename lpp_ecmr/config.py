@@ -75,24 +75,55 @@ BASE_PARAMS = {
         {
             "target": "jaxcmr.analyses.cat_spc.plot_cat_spc",
             "figure_suffix": "cat_spc",
-            "kwargs": {"category_field": "condition"},
+            "kwargs": {
+                "category_field": "condition",
+                "category_values": [1, 2],
+                "labels": ["Negative", "Neutral"],
+            },
+            "ylim": [0.2, 0.8],
+            "color_cycle": ["red", "black"],
         },
         {
-            "target": "jaxcmr.analyses.cat_lpp_spc.plot_cat_lpp_spc",
-            "figure_suffix": "cat_lpp_spc",
-            "kwargs": {"lpp_field": "EarlyLPP"},
+            "target": "jaxcmr.analyses.cat_lpp_by_recall.plot_cat_lpp_by_recall",
+            "figure_suffix": "cat_lpp_by_recall_NEGATIVE_EARLYLPP",
+            "kwargs": {
+                "category_field": "condition",
+                "labels": ["Recalled", "Unrecalled"],
+                "category_value": 1,
+                "contrast_name": "Negative",
+                "lpp_field": "EarlyLPP",
+            },
+            "ylim": [-0.6, 2.2],
+        },
+        {
+            "target": "jaxcmr.analyses.cat_lpp_by_recall.plot_cat_lpp_by_recall",
+            "figure_suffix": "cat_lpp_by_recall_NEUTRAL_EARLYLPP",
+            "kwargs": {
+                "category_field": "condition",
+                "labels": ["Recalled", "Unrecalled"],
+                "category_value": 2,
+                "contrast_name": "Neutral",
+                "lpp_field": "EarlyLPP",
+            },
+            "ylim": [-0.6, 2.2],
         },
         {
             "target": "jaxcmr.analyses.cat_lpp_by_recall.plot_cat_lpp_by_recall",
             "figure_suffix": "cat_lpp_by_recall",
             "kwargs": {
                 "category_field": "condition",
-                "category_value": 1,
+                "labels": [
+                    "Recalled Negative",
+                    "Unrecalled Negative",
+                    "Recalled Neutral",
+                    "Unrecalled Neutral",
+                ],
+                "category_value": [2, 1, 4, 3],
+                "contrast_name": "Condition x Recall",
                 "lpp_field": "EarlyLPP",
-                "contrast_name": "NEGATIVE_EARLYLPP",
+                "exclude_ci": True,
             },
-            "ylim": [-0.1, 1.5],
-            "color_cycle": ["C2", "C3"],
+            "ylim": [-0.6, 2.2],
         },
     ],
 }
@@ -103,8 +134,6 @@ ECMR_BASE_PARAMS = {
     "base_run_tag": "50_set_likelihood",
     "component_paths": {
         **BASE_PARAMS["component_paths"],
-        "emotion_mfc_create_fn": "jaxcmr.components.linear_memory.init_mfc",
-        "emotion_mcf_create_fn": "jaxcmr.components.linear_memory.init_mcf",
     },
 }
 
@@ -141,8 +170,6 @@ CV_ECMR_BASE_PARAMS = {
     "base_run_tag": "50_set_likelihood",
     "component_paths": {
         **CV_BASE_PARAMS["component_paths"],
-        "emotion_mfc_create_fn": "jaxcmr.components.linear_memory.init_mfc",
-        "emotion_mcf_create_fn": "jaxcmr.components.linear_memory.init_mcf",
     },
 }
 

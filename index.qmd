@@ -28,7 +28,8 @@ Within this framework, emotional Context-Maintenance and Retrieval [@talmi2019re
 The first mechanism captures emotional similarity among items; the second captures preferential attention to emotional stimuli.
 The basis for emotional similarity is that people process emotional experiences differently than neutral ones in terms of appraisal [@sander2005systems], attention [@pourtois2013brain], physiology [@stephens2010autonomic] and feelings.
 Because emotional items share these processing characteristics, they are more similar to one another than to neutral items [@riberto2022neural].
-Emotionality is represented as a source context dimension. Emotional items share a common emotional source context and neutral items share a distinct neutral source context, so that recalling an item from either category promotes further recall of items from the same category.
+Emotionality is represented as a source context dimension. 
+Emotional items share a common emotional source context and neutral items share a distinct neutral source context, so that recalling an item from either category promotes further recall of items from the same category.
 This feature is used not only to describe which items are similar to each other, but also to model the cognitive repercussions of their unique features.
 
 It is known that emotional items enjoy preferential processing during encoding [@pourtois2013brain; @schupp2006emotion; @anderson2005affective; @mackay2004emotion].
@@ -42,7 +43,7 @@ In this project, our aim was to examine the suitability of the LPP for neuro-cog
 We pursued this aim in three steps: by establishing individual-level reliability of the LPP under memory-experiment conditions, by testing whether LPP variation predicts emotional memory, and by investigating how best to incorporate the neural measure into the model.
 
 The LPP is broadly characterised as reflecting affective stimulus significance [@hajcak2020significance; @olofsson2008affective], and its emotional modulation has been observed at the group level across a range of stimuli and presentation durations.
-However, to constrain individual participants' model parameters, the LPP must also differentiate emotional from neutral processing at the individual level.
+However, for the LPP to serve as a useful candidate marker of emotional encoding, it must also differentiate emotional from neutral processing at the individual level.
 Recently, @schupp2021case examined individual-level sensitivity to emotional content using a case-by-case approach across three studies with different emotional stimulus categories.
 They observed that the LPP was larger for high- compared to low-arousing stimuli in 98% of individual-level tests, and a complementary specificity analysis confirmed that this effect was driven by emotional content rather than low-level stimulus differences.
 Because eCMR attributes the emotional encoding advantage to preferential processing during study, and the LPP is sensitive to the enhanced processing of motivationally significant stimuli, these findings motivate testing whether LPP variation can usefully constrain $\Phi_{\text{emot}}$.
@@ -72,20 +73,22 @@ At the within-subject level, individuals may recall best those specific lists wh
 The dissociation between within- and between-subject effects in ERPs was recently demonstrated for the left parietal old-new effect, where robust within-subject effects were observed despite null between-subject effects [@macleod2017left].
 Although the emotional modulation of the LPP shows good internal consistency [@moran2013psychometric] and is reliable within individuals across testing sessions [@weinberg2021emotion], it is unknown whether this reliability extends to predicting memory differences.
 If trial-level LPP variation tracks encoding-related processing relevant to $\Phi_{\text{emot}}$, the model predicts a positive association between the emotional modulation of the LPP and the emotional recall advantage, at the within-subject level, the between-subjects level, or both (Figure 1).
-<!-- FIXME: should reference the figure using quarto's scheme for cross references.  -->
+<!-- FIXME: should reference the figure using quarto's scheme for cross references. But for now, the true Figure 1 doesn't exist yet so this remains as a placeholder. -->
 
 In addition, we wanted to investigate whether the relation between the LPP and emotion enhanced memory is better captured on the single-trial level or when averaged over all the items in a list to decide at what level we should add the LPP to the eCMR.
 It could for example be that the LPP is too noisy at the single-trial level to be useful, or that the loss of variability in LPP amplitude between items after averaging leads to a weaker relationship between the LPP and emotion enhanced memory.
 It was therefore important to examine at what level the relationship between the LPP and subsequent memory is stronger to inform our modelling decisions.
 
-Finally, we used these results to constrain a process model of memory encoding and retrieval.
+Establishing that the LPP is a reliable and behaviorally relevant signal at the individual and trial level is a necessary precondition for using it as a model input.
+The question of whether it actually improves model predictions was tested separately at the population level.
+We used these results to constrain a process model of memory encoding and retrieval.
 CMR captures temporal-context encoding and retrieval but has no emotion mechanism, and so provides a floor.
 CMR+LPP tests whether the LPP can serve as a substitute for category labels: it uses the same single-context architecture as CMR but scales encoding strength by trial-level LPP amplitude without any emotional context dynamics.
 eCMR adds an emotional context layer and emotion-modulated encoding strength, using only category labels.
 LPP-eCMR translates the emotion-specific LPP effect identified by the GLMM into the model's per-item encoding-strength term.
-The comparison tests whether trial-level LPP can substitute for category labels, whether embedding the LPP in a mechanistic retrieval model improves prediction beyond what category labels alone provide, and whether the resulting model generates qualitatively distinct predictions about neural-behavioral relationships.
-<!-- FIXME: this above sentence seems overlong/overcomplex -->
-Because the cognitive model is fit to each participant independently, it can reveal whether the LPP's contribution to prediction is consistent across individuals or concentrated in a subset.
+The comparison tests whether trial-level LPP can substitute for category labels and whether embedding the LPP in a mechanistic retrieval model improves prediction beyond what category labels alone provide.
+We also examine whether the resulting model generates qualitatively distinct predictions about neural-behavioral relationships.
+We assess each model's population-level predictive validity using pooled fits and examine subject-wise fits secondarily to characterize individual heterogeneity.
 
 The four models cross two dimensions: the presence or absence of an emotional context layer (which uses category labels to distinguish emotional from neutral items) and the use of trial-level LPP to modulate encoding strength.
 CMR+LPP and eCMR share the same parameter count ($k = 10$), differing only in whether emotional memory is driven by a continuous neural signal or categorical source features.
@@ -112,7 +115,6 @@ The first two pictures were used as fillers to control for primacy effects and w
 The pictures were selected from the International Affective Picture System [@lang2005international], the Geneva Affective Picture Database [@danglauser2011geneva], the Emotional Picture Set [@wessa2010emopics], the image pool of @talmi2007contribution and Google Images.
 The pictures were either of negative valence or neutral valence.
 The neutral condition was divided into semantically unrelated and semantically related neutral pictures in the original study, but they were collapsed in this secondary data analysis to increase the number of trials in the neutral condition.
-<!-- FIXME: the handling of semantically related and unrelated items should be addressed and justified in our cognitive modeling sections too. -->
 
 ### Procedure
 
@@ -304,13 +306,15 @@ $$A_{i} = \left(M^{CF}c^{T}\right)_{i} + \left(M^{CF}_{emot}c^{E}\right)_{i}$$
 $$P(i) = \frac{A_{i}^{\tau_{c}}}{\sum_{k}^{}A_{k}^{\tau_{c}}}$$
 
 After recall, the retrieved item's context is reinstated in both pathways via $M^{FC}$ and $M^{FC}_{emot}$, each integrated with drift rate $\beta_{rec}$.
-To simplify model evaluation, we omit an explicit termination mechanism; instead, we match each trial's observed output length during simulation.
-Model evaluation thus focuses on predicting the composition of recall sets across trials.
+We omit an explicit termination mechanism and instead match each trial's observed output length during simulation.
+Conditioning on observed output length isolates the model's predictions about which items are recalled from predictions about how many, which is appropriate because our primary behavioral outcomes and benchmarks target item selection rather than stopping behavior.
 <!-- FIXME: need to either motivate this to depart from this approach. For now, focus on motivating the decision and leave this comment instead of removing so I can reconsider later. -->
 
 ### Model Variants
 
 We compare four models that cross two factors: the emotional context architecture (absent vs. present) and the information source for encoding modulation (LPP vs. category labels).
+The model architecture represents a binary emotional-vs-neutral distinction and does not capture within-neutral semantic substructure.
+Semantically related and unrelated neutral items were therefore collapsed (see Materials), which may compress theoretically meaningful within-neutral variation.
 Let $e_{i}$ be an indicator that equals 1 for emotional items and 0 for neutral items, and let $L_{i}$ denote the trial-mean-centered Early LPP amplitude for item $i$.
 
 The base model, CMR ($k = 9$), includes temporal context only.
@@ -355,13 +359,18 @@ We therefore approximate $P\left( S_{t} \mid \theta \right)$ by Monte Carlo samp
 Because the factorial factor does not depend on $\theta$, we maximize the (unscaled) mean permutation likelihood $\frac{1}{K}\sum_{k}^{}P\left( r_{k} \mid \theta \right)$, which is proportional to the set likelihood and yields identical fits and $\Delta$AIC comparisons.
 
 We maximize the objective with differential evolution [@storn1997differential].
-Because the optimizer is stochastic, we run three independent fits per participant and model variant and retain the best-performing fit.
+Because the optimizer is stochastic, we run three independent fits per model variant and retain the best-performing fit.
 We compare models using AIC computed from the approximate set log-likelihood.
-For nested model pairs, we floor the child model's per-subject NLL at the parent model's value to correct for occasional optimizer failures that would otherwise violate the nesting guarantee.
-In addition to AIC weights and pairwise $\Delta$AIC, we report Bayesian model selection [BMS; @stephan2009bayesian] with protected exceedance probabilities [@rigoux2014bayesian] to characterize population-level model frequencies.
-We judge a pairwise $\Delta$AIC advantage as reliable when its 95% CI excludes zero.
-For BMS, an exceedance probability above .95 provides strong evidence that one model is the most frequent in the population; values near chance ($1/M$ for $M$ models) indicate that the data do not distinguish models at the population level.
-We then assess qualitative adequacy by simulating each fitted model on the study lists while matching each trial's observed output length and plotting the benchmark summaries.
+
+The primary model comparisons use pooled fits, in which a single shared parameter vector is fit to all 342 trials across 38 subjects.
+Pooled fits target population-level predictive validity.
+They also avoid the small-sample problem that arises in subject-wise fits: with only 9 trials per subject and 9--11 free parameters, the standard AICc correction [@burnham2002model] is unavailable because $n \le k+1$.
+Subject-wise (no-pooling) fits are reported secondarily to characterize heterogeneity.
+They answer a different question from pooled fits rather than the same question at different noise levels [@gelman2006data].
+For nested model pairs in the subject-wise analysis, we floor the child model's per-subject NLL at the parent model's value to correct for occasional optimizer failures that would otherwise violate the nesting guarantee.
+Pairwise $\Delta$AIC with 95% CIs are reported for the key subject-wise contrasts.
+
+We assess qualitative adequacy by simulating each fitted model on the study lists while matching each trial's observed output length and plotting benchmark summaries.
 This set-likelihood approach evaluates models on their ability to reproduce the full recalled sets, providing a stringent test of mechanistic hypotheses.
 
 ## Results
@@ -450,51 +459,60 @@ Based on this, we will use single-trial data from the early LPP time window to c
 
 ### eCMR Model Comparison
 
-@tbl-comparison summarizes the four-model comparison.
-We first tested whether eCMR's emotional context layer and encoding-strength modulation improve prediction over CMR's temporal-context baseline.
-eCMR achieved strictly lower negative log-likelihood (NLL) than CMR for 89.5% of participants.
-By AIC, this advantage was reliable, with mean $\Delta$AIC (CMR $-$ eCMR) = 4.06 [1.36, 6.77] and the CI excluding zero.
-Bayesian model selection assigned CMR an exceedance probability of .009 and an expected frequency of .175 (@tbl-comparison), confirming that the dual-context mechanism captures meaningful structure in emotional recall beyond temporal dynamics alone.
+<!-- FIXME: I don't know if I like empty space between this higher-level heading and the next heading before we start presenting content. -->
 
-We next asked whether the LPP alone can account for emotional memory effects.
-CMR+LPP achieved lower NLL than CMR for 65.8% of participants, but this improvement did not offset the AIC penalty for the additional parameter: mean $\Delta$AIC (CMR $-$ CMR+LPP) = 0.33 [$-0.77$, 1.44], with the CI including zero.
-BMS assigned CMR+LPP an expected frequency of .089 and an exceedance probability below .001 (@tbl-comparison).
-The LPP carries some information about which items will be recalled, but too little per subject for one additional parameter to clear the AIC bar.
+#### Pooled Analysis
 
-The critical comparison pits the LPP against category labels at equal parameter cost ($k = 10$).
-eCMR achieved lower NLL than CMR+LPP for 68.4% of participants.
-Mean $\Delta$AIC (CMR+LPP $-$ eCMR) = 3.73 [1.23, 6.22] and the CI excludes zero; the median $\Delta$AIC = 1.52 [0.18, 2.86] also excludes zero.
-At equal parameter cost, category labels embedded in the emotional context architecture captured substantially more variance than trial-level LPP operating through the temporal pathway.
+@tbl-pooled summarizes the primary pooled model comparison, in which a single parameter vector per model was fit to all 342 trials.
+eCMR dominated both single-context models ($\Delta$AIC = 67.26 over CMR, 51.46 over CMR+LPP), confirming that the dual-context mechanism captures meaningful structure in emotional recall beyond temporal dynamics alone.
+CMR+LPP improved on CMR ($\Delta$AIC = 15.80), indicating that the LPP carries a population-level signal about encoding strength even without an emotional context layer.
+However, the LPP alone cannot substitute for category labels: at equal parameter cost ($k = 10$), eCMR substantially outperformed CMR+LPP.
 
-Turning to the LPP constraint, LPP-eCMR achieved strictly lower NLL than eCMR for 73.7% of participants, with the remainder tied after nesting flooring.
-By aggregate AIC weights, LPP-eCMR was strongly favored ($w$ = .997 vs .003; @tbl-comparison), and Bayesian model selection also favored LPP-eCMR (exceedance probability = .721 vs .269).
+LPP-eCMR achieved the best fit overall, improving on eCMR by $\Delta$AIC = 34.16.
+Supplementing category labels with trial-level LPP improved pooled predictive fit.
 
-This aggregate advantage was not uniform across individuals.
-The mean per-subject $\Delta$AIC (eCMR $-$ LPP-eCMR) was 0.30 [$-0.70$, 1.29], consistent with practical equivalence, and the median was $-1.21$ [$-2.36$, $-0.06$], indicating that the typical participant's NLL improvement did not offset the penalty for the additional parameter.
-Protected exceedance probabilities confirmed this heterogeneity, remaining at chance (.250 each).
-Together, these results indicate that a subset of participants benefit substantially from the LPP term — enough to dominate the aggregate — while for the remainder the LPP adds little beyond what category labels already capture.
+:::: {#tbl-pooled}
+| Model    | $k$ |    $-$LL   |    AIC     | $\Delta$AIC |
+|:---------|:---:|:----------:|:----------:|:-----------:|
+| CMR      |  9  |  8317.75   |  16653.51  |  +101.42    |
+| CMR+LPP  | 10  |  8308.85   |  16637.71  |  +85.62     |
+| eCMR     | 10  |  8283.13   |  16586.25  |  +34.16     |
+| LPP-eCMR | 11  |  8265.05   |  16552.09  |  0 (best)   |
 
-In sum, the emotional context architecture is essential (CMR $<$ eCMR), the LPP cannot replace it (CMR+LPP $\approx$ CMR $\ll$ eCMR), and supplementing category labels with the LPP yields a genuine aggregate fit advantage concentrated among participants for whom the LPP carries the most information about subsequent recall.
-
-:::: {#tbl-comparison}
-| Model    | $k$ | Mean NLL ($\pm$ SE) |   AIC$w$    | BMS $r$ | BMS XP |
-|:---------|:---:|:-------------------:|:-----------:|:-------:|:------:|
-| CMR      |  9  | 215.01 $\pm$ 15.63  | $\approx$ 0 |  .175   |  .009  |
-| CMR+LPP  | 10  | 213.84 $\pm$ 15.73  | $\approx$ 0 |  .089   | <.001  |
-| eCMR     | 10  | 211.98 $\pm$ 16.31  |    .003     |  .328   |  .269  |
-| LPP-eCMR | 11  | 210.83 $\pm$ 16.46  |    .997     |  .407   |  .721  |
-
-Model comparison summary. $k$ = free parameters; NLL = negative log-likelihood (mean $\pm$ SE across 38 participants); AIC$w$ = aggregate AIC weight; BMS $r$ = expected model frequency; BMS XP = exceedance probability.
+Pooled model comparison. $k$ = free parameters; $-$LL = negative log-likelihood for a single shared parameter vector fit to all 342 trials across 38 subjects; $\Delta$AIC relative to best model.
 ::::
 
-We assessed qualitative adequacy with two benchmark diagnostics (@fig-catspc; @fig-lpp-recall).
+#### Subject-Wise Analysis
+
+Separate subject-wise (no-pooling) fits were also examined.
+Because each subject contributed only 9 lists for models with 9--11 free parameters, these comparisons are methodologically fragile and are not treated as the primary inferential basis; they are reported to characterize heterogeneity.
+Nesting flooring was required for 23 of 152 subject--model entries.
+
+:::: {#tbl-comparison}
+| Model    | $k$ | Mean NLL ($\pm$ SE) |
+|:---------|:---:|:-------------------:|
+| CMR      |  9  | 215.01 $\pm$ 15.63  |
+| CMR+LPP  | 10  | 213.84 $\pm$ 15.73  |
+| eCMR     | 10  | 211.98 $\pm$ 16.31  |
+| LPP-eCMR | 11  | 210.83 $\pm$ 16.46  |
+
+Subject-wise model comparison. $k$ = free parameters; NLL = negative log-likelihood (mean $\pm$ SE across 38 participants).
+::::
+
+The broad ordering of models was similar, but the LPP-related gains were weak and heterogeneous at the subject level.
+eCMR outperformed CMR (mean $\Delta$AIC = 4.06 [1.36, 6.77]).
+However, mean $\Delta$AIC was 0.33 [$-0.77$, 1.44] for CMR+LPP over CMR and 0.30 [$-0.70$, 1.29] for LPP-eCMR over eCMR, with both CIs including zero.
+
+#### Qualitative Diagnostics
+
+We assessed qualitative adequacy with two benchmark diagnostics (@fig-empirical; @fig-catspc; @fig-lpp-recall).
 The first targets the emotional enhancement of memory established in the Behavioural Results.
 Category-specific serial position curves (@fig-catspc) show that CMR, which lacks an emotional context layer, predicts nearly identical recall for negative and neutral items.
 CMR+LPP produces a faint separation because LPP amplitude correlates weakly with emotional category, but the effect is far weaker than what the emotional context architecture achieves.
 Both eCMR and LPP-eCMR reproduce the empirical separation: their shared emotional context ensures that negative items promote one another's recall, lifting the negative SPC above the neutral baseline.
 
 A second diagnostic targets the LPP–recall link established in the EEG Results.
-Despite aggregate AIC indistinguishability between eCMR and LPP-eCMR, the models make qualitatively different predictions about an untrained summary statistic.
+The two models also make different predictions about an untrained neural-behavioral summary statistic.
 Empirically, recalled emotional items had higher Early LPP amplitudes than unrecalled emotional items; no such difference existed for neutral items, consistent with the GLMM.
 eCMR cannot reproduce this pattern: it assigns identical encoding strength to all emotional items regardless of their LPP amplitude, so simulated LPP distributions for recalled and unrecalled emotional items overlap.
 Both CMR+LPP and LPP-eCMR reproduce the separation, since both use LPP to modulate encoding strength.
@@ -503,37 +521,43 @@ The critical difference is that only LPP-eCMR also captures the category-level r
 This outcome reflects genuine generalization since the models are fit to set likelihood, not to the recalled-versus-unrecalled LPP statistic.
 LPP-eCMR captures a mechanistic link (LPP $\rightarrow$ encoding strength $\rightarrow$ recall probability) that produces the observed neural-behavioral association as a consequence of its architecture, while also reproducing the categorical emotional memory advantage.
 
-The LPP thus carries real information about emotional encoding strength, as demonstrated by CMR+LPP and LPP-eCMR reproducing the LPP-by-recall pattern that CMR and eCMR cannot.
-However, the LPP alone is not a substitute for category labels: it cannot reproduce the categorical recall advantage, and its per-subject signal is small relative to the AIC cost of one parameter.
-The value of incorporating trial-level neural measures is not in replacing existing model structure or uniformly improving fit.
-It is in characterizing which individuals benefit from the neural constraint and in generating mechanistic predictions that were not used as fitting targets.
+The LPP thus improves pooled predictive fit and generates mechanistic predictions that were not used as fitting targets.
+However, it does not substitute for the emotional context architecture: CMR+LPP remains far behind eCMR, and subject-wise gains are small and heterogeneous under current data constraints.
+The value of incorporating trial-level neural measures lies in the population-level predictive improvement and in generating qualitatively distinct predictions about neural-behavioral relationships.
 
-::: {#fig-catspc layout-ncol="3"}
+::: {#fig-empirical layout-ncol=2}
+
 ![](figures/analyses/reference_catspc.png)
 
-![](figures/fitting/TalmiEEG_WeirdCMRNoStop_50_set_likelihood_fixed_term_best_of_3_cat_spc.png)
+![](figures/analyses/cat_lpp_by_recall_EarlyLPP_Negative.png)
 
-![](figures/fitting/TalmiEEG_EEGLPPParsimonious_50_set_likelihood_fixed_term_best_of_3_cat_spc.png)
-
-![](figures/fitting/TalmiEEG_eCMREmotionOnly_20260309_50_set_likelihood_best_of_3_cat_spc.png)
-
-![](figures/fitting/TalmiEEG_eCMREmotionTimesLPP_20260309_50_set_likelihood_best_of_3_cat_spc.png)
-
-Category-specific serial position curves. Top row: empirical data, CMR, CMR+LPP. Bottom row: eCMR, LPP-eCMR. CMR predicts nearly identical curves; CMR+LPP produces a faint separation via indirect LPP–category correlation; eCMR and LPP-eCMR reproduce the full negative-above-neutral separation.
+Empirical benchmark diagnostics. Left: category-specific serial position curves showing the negative-above-neutral recall advantage. Right: Early LPP amplitude by recall status for negative items showing the recalled/unrecalled separation.
 :::
 
-::: {#fig-lpp-recall layout-ncol="3"}
-![](figures/analyses/cat_lpp_by_recall_EarlyLPP_Negative.png){height="1.3in"}
+::: {#fig-catspc layout-ncol=2}
 
-![](figures/fitting/TalmiEEG_WeirdCMRNoStop_50_set_likelihood_fixed_term_best_of_3_cat_lpp_by_recall_NEGATIVE_EARLYLPP.png){height="1.3in"}
+![](figures/fitting/TalmiEEG_WeirdCMRNoStop_group_level_best_of_3_cat_spc_sim.png)
 
-![](figures/fitting/TalmiEEG_EEGLPPParsimonious_50_set_likelihood_fixed_term_best_of_3_cat_lpp_by_recall_NEGATIVE_EARLYLPP.png){height="1.3in"}
+![](figures/fitting/TalmiEEG_EEGLPPParsimonious_group_level_best_of_3_cat_spc_sim.png)
 
-![](figures/fitting/TalmiEEG_eCMREmotionOnly_20260309_50_set_likelihood_best_of_3_cat_lpp_by_recall_NEGATIVE_EARLYLPP.png){height="1.3in"}
+![](figures/fitting/TalmiEEG_eCMREmotionOnly_group_level_best_of_3_cat_spc_sim.png)
 
-![](figures/fitting/TalmiEEG_eCMREmotionTimesLPP_20260309_50_set_likelihood_best_of_3_cat_lpp_by_recall_NEGATIVE_EARLYLPP.png){height="1.3in"}
+![](figures/fitting/TalmiEEG_eCMREmotionTimesLPP_group_level_best_of_3_cat_spc_sim.png)
 
-Early LPP amplitude by recall status for negative items. Top row: empirical data, CMR, CMR+LPP. Bottom row: eCMR, LPP-eCMR. CMR+LPP and LPP-eCMR both reproduce the recalled/unrecalled separation; CMR and eCMR cannot.
+Simulated category-specific serial position curves. Top: CMR (left), CMR+LPP (right). Bottom: eCMR (left), LPP-eCMR (right). CMR predicts nearly identical curves; CMR+LPP produces a faint separation via indirect LPP-category correlation; eCMR and LPP-eCMR reproduce the full negative-above-neutral separation (compare @fig-empirical).
+:::
+
+::: {#fig-lpp-recall layout-ncol=2}
+
+![](figures/fitting/TalmiEEG_WeirdCMRNoStop_group_level_best_of_3_cat_lpp_by_recall_NEGATIVE_EARLYLPP_sim.png)
+
+![](figures/fitting/TalmiEEG_EEGLPPParsimonious_group_level_best_of_3_cat_lpp_by_recall_NEGATIVE_EARLYLPP_sim.png)
+
+![](figures/fitting/TalmiEEG_eCMREmotionOnly_group_level_best_of_3_cat_lpp_by_recall_NEGATIVE_EARLYLPP_sim.png)
+
+![](figures/fitting/TalmiEEG_eCMREmotionTimesLPP_group_level_best_of_3_cat_lpp_by_recall_NEGATIVE_EARLYLPP_sim.png)
+
+Simulated Early LPP amplitude by recall status for negative items. Top: CMR (left), CMR+LPP (right). Bottom: eCMR (left), LPP-eCMR (right). CMR+LPP and LPP-eCMR reproduce the recalled/unrecalled separation; CMR and eCMR cannot (compare @fig-empirical).
 :::
 
 ## Discussion

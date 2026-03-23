@@ -1,0 +1,218 @@
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{fig-1}Early LPP ERP waveforms (400--1000 ms)}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{figures/media/image1.png}}
+
+}
+
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{fig-2}Early LPP topography and ERP differences}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{figures/media/image2.png}}
+
+}
+
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{fig-3}Late LPP ERP waveforms (1000--2000 ms)}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{figures/media/image3.png}}
+
+}
+
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{fig-4}Global ERP analysis: cluster summary}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{figures/media/image4.png}}
+
+}
+
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{fig-5}Global ERP analysis: detailed cluster results}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{figures/media/image5.png}}
+
+}
+
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{fig-6}Bootstrap reliability of the emotional LPP effect}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{figures/media/image6.png}}
+
+}
+
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{fig-7}Between-subjects LPP--memory correlation overview}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{figures/media/image7.png}}
+
+}
+
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{fig-8}Early LPP between-subjects scatter plot}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{figures/media/image8.png}}
+
+}
+
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{fig-9}Late LPP between-subjects scatter plot}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{figures/media/image9.png}}
+
+}
+
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{fig-10}Within-subjects LPP--memory correlation}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{figures/media/image10.png}}
+
+}
+
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{fig-empirical}Empirical benchmark diagnostics. Left:
+category-specific serial position curves showing the
+negative-above-neutral recall advantage. Right: Early LPP amplitude by
+recall status for negative items showing the recalled/unrecalled
+separation.}
+
+\begin{minipage}{0.50\linewidth}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/analyses/reference_catspc.png}}\end{minipage}%
+%
+\begin{minipage}{0.50\linewidth}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/analyses/cat_lpp_by_recall_EarlyLPP_Negative.png}}\end{minipage}%
+
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{fig-catspc}Simulated category-specific serial position
+curves. Top: CMR (left), CMR+LPP (right). Bottom: eCMR (left), LPP-eCMR
+(right). CMR predicts nearly identical curves; CMR+LPP produces a faint
+separation via indirect LPP-category correlation; eCMR and LPP-eCMR
+reproduce the full negative-above-neutral separation (compare
+Figure~\ref{fig-empirical}).}
+
+\begin{minipage}{0.50\linewidth}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/fitting/TalmiEEG_WeirdCMRNoStop_group_level_best_of_3_cat_spc_sim.png}}\end{minipage}%
+%
+\begin{minipage}{0.50\linewidth}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/fitting/TalmiEEG_EEGLPPParsimonious_group_level_best_of_3_cat_spc_sim.png}}\end{minipage}%
+\newline
+\begin{minipage}{0.50\linewidth}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/fitting/TalmiEEG_eCMREmotionOnly_group_level_best_of_3_cat_spc_sim.png}}\end{minipage}%
+%
+\begin{minipage}{0.50\linewidth}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/fitting/TalmiEEG_eCMREmotionTimesLPP_group_level_best_of_3_cat_spc_sim.png}}\end{minipage}%
+
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{fig-lpp-recall}Simulated Early LPP amplitude by recall
+status for negative items. Top: CMR (left), CMR+LPP (right). Bottom:
+eCMR (left), LPP-eCMR (right). CMR+LPP and LPP-eCMR reproduce the
+recalled/unrecalled separation; CMR and eCMR cannot (compare
+Figure~\ref{fig-empirical}).}
+
+\begin{minipage}{0.50\linewidth}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/fitting/TalmiEEG_WeirdCMRNoStop_group_level_best_of_3_cat_lpp_by_recall_NEGATIVE_EARLYLPP_sim.png}}\end{minipage}%
+%
+\begin{minipage}{0.50\linewidth}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/fitting/TalmiEEG_EEGLPPParsimonious_group_level_best_of_3_cat_lpp_by_recall_NEGATIVE_EARLYLPP_sim.png}}\end{minipage}%
+\newline
+\begin{minipage}{0.50\linewidth}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/fitting/TalmiEEG_eCMREmotionOnly_group_level_best_of_3_cat_lpp_by_recall_NEGATIVE_EARLYLPP_sim.png}}\end{minipage}%
+%
+\begin{minipage}{0.50\linewidth}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/fitting/TalmiEEG_eCMREmotionTimesLPP_group_level_best_of_3_cat_lpp_by_recall_NEGATIVE_EARLYLPP_sim.png}}\end{minipage}%
+
+\end{figure*}
