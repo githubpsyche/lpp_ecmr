@@ -19,7 +19,7 @@
 
 ## Templates
 
-Templates are reusable notebook bodies that the source notebooks parameterize. Current template coverage includes categorized SPC/LPP analyses, cross-validation, and parameter shifting.
+Templates are reusable notebook bodies that the source notebooks parameterize. Current project-local template coverage includes categorized SPC/LPP analyses and cross-validation. Parameter shifting now renders from the central `jaxcmr` template.
 
 ## Rendered prefixes
 
