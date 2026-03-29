@@ -99,10 +99,10 @@ The steps below are what you repeat each time you want to fit models on the clus
 
 ### 1. Generate rendered notebooks locally
 
-The orchestrator notebooks read from the registries and generate one per-subject fitting notebook per enabled model (16 models × 38 subjects = 608 notebooks). With `prepare_only=True` (the default), they write notebooks to `analyses/rendered/` without executing them. Set `prepare_only=False` to execute fits locally and sequentially instead.
+The orchestrator notebooks read from the registries and generate per-subject fitting notebooks plus per-model simulation notebooks. With `prepare_only=True` (the default), they write to `analyses/rendered/` without executing. Set `prepare_only=False` to execute fits locally and sequentially instead.
 
 ```bash
-cd /path/to/lpp_ecmr
+cd ~/workspace/lpp_ecmr
 papermill analyses/render_model_fitting_single_context.ipynb analyses/render_model_fitting_single_context.ipynb --progress-bar
 papermill analyses/render_model_fitting_full_ecmr.ipynb analyses/render_model_fitting_full_ecmr.ipynb --progress-bar
 papermill analyses/render_model_fitting_strength.ipynb analyses/render_model_fitting_strength.ipynb --progress-bar
@@ -165,24 +165,33 @@ This submits one Slurm array job with one task per per-subject notebook. Each ta
 
 Setting `SBATCH_SENTINEL` triggers an automatic post-fit pipeline after all fitting jobs succeed: it merges partial fits (`scripts/merge_partials.py`) and submits the simulation notebooks. Omit `SBATCH_SENTINEL` to handle post-fit steps manually.
 
-Runs are stored under the project at `~/workspace/lpp_ecmr/runs/`. To check progress:
+Runs are stored under the project at `~/workspace/lpp_ecmr/runs/`.
+
+### 5. Monitoring
+
+From anywhere inside the project:
+
+```bash
+~/workspace/sbatch/check_run.sh
+```
+
+This finds the newest run and shows the Slurm job ID and task counts by state (completed/running/pending/failed). Use `-v` for per-task detail with copy-pasteable notebook paths.
+
+To check a specific run:
 
 ```bash
 ~/workspace/sbatch/check_run.sh ~/workspace/lpp_ecmr/runs/<run_id>
 ```
 
-This shows the status and full notebook path for each task — paths are copy-pasteable.
-
-Other useful commands:
+Check if the post-fit sentinel is queued:
 
 ```bash
-ls -t ~/workspace/lpp_ecmr/runs/ | head -1              # newest run directory
-squeue -u "$USER"                                        # running jobs
+squeue -u "$USER" | grep post-fit
 ```
 
 Logs land in `runs/<run_id>/logs/`.
 
-### 5. After everything completes
+### 6. After everything completes
 
 If you used `SBATCH_SENTINEL`, the merge and simulation steps run automatically. You'll get an email when the full pipeline finishes (fitting → merge → simulation).
 
@@ -195,7 +204,7 @@ cd ~/workspace/sbatch
 ./submit_notebooks.sh ~/workspace/lpp_ecmr/analyses/rendered "simulation_*.ipynb"
 ```
 
-### 6. Pull results and run comparisons locally
+### 7. Pull results and run comparisons locally
 
 ```bash
 rsync -av <cluster>:~/workspace/lpp_ecmr/fits/ fits/
