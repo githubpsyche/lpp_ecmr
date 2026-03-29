@@ -145,7 +145,9 @@ source ~/workspace/cluster_env.sh
 cd ~/workspace/lpp_ecmr
 
 # Manual — pick a small notebook (Strength variants are fastest)
-jupyter execute analyses/rendered/fitting_TalmiEEG_Strength_50_set_likelihood_fixed_term_best_of_3.ipynb
+papermill analyses/rendered/fitting_TalmiEEG_Strength_50_set_likelihood_fixed_term_best_of_3.ipynb \
+  analyses/rendered/fitting_TalmiEEG_Strength_50_set_likelihood_fixed_term_best_of_3.ipynb \
+  --progress-bar
 ```
 
 Then a single Slurm job:
