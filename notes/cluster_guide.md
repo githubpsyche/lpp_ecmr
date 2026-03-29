@@ -22,14 +22,11 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 source "$HOME/.local/bin/env"
 ```
 
-Add to your shell startup so future sessions see it:
+Add to `.bashrc` so future sessions see it:
 
 ```bash
-# bash
 echo 'source "$HOME/.local/bin/env"' >> "$HOME/.bashrc"
-
-# or zsh
-echo 'source "$HOME/.local/bin/env"' >> "$HOME/.zshrc"
+source "$HOME/.bashrc"
 ```
 
 ### 4. Clone repos
@@ -54,9 +51,8 @@ The relevant account is `TALMI-SL3-CPU`. The sbatch scripts use this account and
 The venv lives outside the repos so it can serve multiple projects.
 
 ```bash
-mkdir -p "$HOME/workspace/.venvs"
-uv venv "$HOME/workspace/.venvs/jaxcmr-cluster" --python 3.12
-source "$HOME/workspace/.venvs/jaxcmr-cluster/bin/activate"
+uv venv "$HOME/workspace/.venv" --python 3.12
+source "$HOME/workspace/.venv/bin/activate"
 ```
 
 ### 7. Install packages
@@ -79,7 +75,7 @@ This script is sourced by Slurm jobs and by manual sessions.
 ```bash
 cat > "$HOME/workspace/cluster_env.sh" <<'EOF'
 source "$HOME/.local/bin/env"
-source "$HOME/workspace/.venvs/jaxcmr-cluster/bin/activate"
+source "$HOME/workspace/.venv/bin/activate"
 EOF
 
 chmod +x "$HOME/workspace/cluster_env.sh"
@@ -87,9 +83,7 @@ chmod +x "$HOME/workspace/cluster_env.sh"
 
 ## First verification
 
-Before using Slurm, verify the environment works interactively.
-
-### Import check
+Verify the environment works by checking that both packages import:
 
 ```bash
 source "$HOME/workspace/cluster_env.sh"
@@ -97,45 +91,7 @@ python -c "import jaxcmr; print(jaxcmr.__file__)"
 python -c "import lpp_ecmr; print(lpp_ecmr.__file__)"
 ```
 
-### Manual notebook execution
-
-Pick a small rendered notebook and run it by hand. This confirms the environment, data paths, and template machinery all work before introducing Slurm.
-
-```bash
-source "$HOME/workspace/cluster_env.sh"
-cd "$HOME/workspace/lpp_ecmr"
-ls analyses/rendered/fitting_*.ipynb | head -3  # see what's available
-jupyter execute analyses/rendered/<pick_a_small_one>.ipynb
-```
-
-Strength model notebooks are the fastest (k=3-7, finishes in minutes).
-
-## Slurm smoke test
-
-Submit one notebook as a single Slurm job.
-
-```bash
-mkdir -p "$HOME/workspace/sbatch/runs"
-cd "$HOME/workspace/sbatch"
-
-sbatch \
-  --output runs/smoke_%j.out \
-  --error runs/smoke_%j.err \
-  run_notebook.sbatch \
-  "$HOME/workspace/lpp_ecmr/analyses/rendered/<pick_a_small_one>.ipynb"
-```
-
-Check it:
-
-```bash
-squeue -u "$USER"
-
-# After completion:
-cat runs/smoke_<jobid>.out
-cat runs/smoke_<jobid>.err
-```
-
-If this works, the full chain is verified: Slurm launches the job, activates the environment, and executes a notebook on a compute node.
+The manual notebook execution and Slurm smoke tests come later, after rendered notebooks have been generated locally and transferred to the cluster (see "Recurring workflow" below).
 
 ---
 
@@ -182,7 +138,32 @@ rsync -av analyses/rendered/ <cluster>:~/workspace/lpp_ecmr/analyses/rendered/
 
 If code in `jaxcmr` or `lpp_ecmr` has changed, pull both repos on the cluster. The editable installs pick up changes automatically.
 
-### 3. Submit all fitting notebooks
+### 3. Smoke test (first time or after environment changes)
+
+Before batch submission, verify a notebook runs manually, then via Slurm:
+
+```bash
+source ~/workspace/cluster_env.sh
+cd ~/workspace/lpp_ecmr
+
+# Manual — pick a small notebook (Strength variants are fastest)
+jupyter execute analyses/rendered/fitting_TalmiEEG_Strength_50_set_likelihood_fixed_term_best_of_3.ipynb
+```
+
+Then a single Slurm job:
+
+```bash
+cd ~/workspace/sbatch
+sbatch \
+  --output runs/smoke_%j.out \
+  --error runs/smoke_%j.err \
+  run_notebook.sbatch \
+  ~/workspace/lpp_ecmr/analyses/rendered/fitting_TalmiEEG_Strength_50_set_likelihood_fixed_term_best_of_3.ipynb
+```
+
+Check with `squeue -u "$USER"`, then inspect `runs/smoke_<jobid>.out` and `.err`. Once this works, the full chain is verified. Skip this step on subsequent runs if nothing has changed in the environment.
+
+### 4. Submit all fitting notebooks
 
 ```bash
 cd ~/workspace/sbatch
@@ -204,7 +185,7 @@ squeue -u "$USER"                  # job status
 
 Logs land in `runs/<run_id>/logs/`.
 
-### 4. After fits complete
+### 5. After fits complete
 
 Each fitting notebook writes outputs to the lpp_ecmr project root:
 
