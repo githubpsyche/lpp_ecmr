@@ -172,7 +172,7 @@ cd ~/workspace/sbatch
   "fitting_*.ipynb"
 ```
 
-This submits one Slurm array job with one task per notebook. Each task gets 1 CPU, 4GB memory, and a 4-hour walltime. The default throttle is 100 concurrent tasks.
+This submits one Slurm array job with one task per notebook. Each task gets 1 CPU, 4GB memory, and a 12-hour walltime. The default throttle is 100 concurrent tasks.
 
 Runs are stored under the project at `~/workspace/lpp_ecmr/runs/`. To check progress:
 
@@ -219,12 +219,9 @@ papermill analyses/render_model_comparison_include_termination.ipynb analyses/re
 
 ## Walltime
 
-The default walltime is 4 hours per task (`sbatch/run_notebook.sbatch`). This is sufficient for most models on TalmiEEG (38 subjects, `best_of=3`). Strength models finish in minutes; CMR variants in under an hour; eCMR variants may take 1-3 hours depending on parameter count.
+The default walltime is 12 hours per task (`sbatch/run_notebook.sbatch`), which is the SL3 maximum. Strength models finish in minutes; CMR variants in under an hour; eCMR variants may take 1-3 hours depending on parameter count.
 
-If a model exceeds the walltime:
-
-- Increase walltime in `run_notebook.sbatch` (SL3 max is 12 hours)
-- Split into per-subject notebooks using the `subject_indices` parameter in the fitting template (see `repfr/scripts/generate_render_notebooks.py` for the pattern, and `repfr/scripts/merge_partials.py` for recombining the partial results)
+If a model exceeds the walltime, split into per-subject notebooks using the `subject_indices` parameter in the fitting template (see `repfr/scripts/generate_render_notebooks.py` for the pattern, and `repfr/scripts/merge_partials.py` for recombining the partial results).
 
 ## Email notifications
 
