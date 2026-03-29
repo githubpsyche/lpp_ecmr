@@ -58,15 +58,13 @@ source "$HOME/workspace/.venv/bin/activate"
 ### 7. Install packages
 
 ```bash
-cd "$HOME/workspace/jaxcmr"
-uv pip install -e '.[dev]'
+cd "$HOME/workspace"
+uv pip install -e "jaxcmr[dev]"
 uv pip install jupyter nbclient pandas
-
-cd "$HOME/workspace/lpp_ecmr"
-uv pip install -e .
+uv pip install -e lpp_ecmr
 ```
 
-`lpp_ecmr`'s `pyproject.toml` declares `jaxcmr` as a local editable dependency via `uv.sources`. Since `jaxcmr` is already installed and lives at `../jaxcmr`, this resolves automatically.
+Run these from `~/workspace/` (not from inside a project directory). If uv detects a `pyproject.toml` in the current directory it may try to create a project-local `.venv` instead of using the shared one.
 
 ### 8. Create an environment activation script
 
