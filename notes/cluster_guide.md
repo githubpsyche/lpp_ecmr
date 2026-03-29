@@ -60,7 +60,7 @@ source "$HOME/workspace/.venv/bin/activate"
 ```bash
 cd "$HOME/workspace"
 uv pip install -e "jaxcmr[dev]"
-uv pip install jupyter nbclient pandas
+uv pip install jupyter nbclient pandas papermill
 uv pip install -e lpp_ecmr
 ```
 
