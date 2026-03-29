@@ -151,16 +151,19 @@ sbatch \
 
 Check with `squeue -u "$USER"`, then inspect `~/workspace/lpp_ecmr/runs/smoke_<jobid>.out` and `.err`. A single-subject Strength fit should finish in under a minute. Skip this step on subsequent runs if nothing has changed in the environment.
 
-### 4. Submit all fitting notebooks
+### 4. Submit fitting notebooks
 
 ```bash
 cd ~/workspace/sbatch
-./submit_notebooks.sh \
+SBATCH_SENTINEL=~/workspace/lpp_ecmr/scripts/post_fit.sh \
+  ./submit_notebooks.sh \
   ~/workspace/lpp_ecmr/analyses/rendered \
   "fitting_*.ipynb"
 ```
 
-This submits one Slurm array job with one task per notebook. Each task gets 1 CPU, 4GB memory, and a 12-hour walltime. The default throttle is 100 concurrent tasks.
+This submits one Slurm array job with one task per per-subject notebook. Each task gets 1 CPU, 4GB memory, and a 12-hour walltime. The default throttle is 100 concurrent tasks.
+
+Setting `SBATCH_SENTINEL` triggers an automatic post-fit pipeline after all fitting jobs succeed: it merges partial fits (`scripts/merge_partials.py`) and submits the simulation notebooks. Omit `SBATCH_SENTINEL` to handle post-fit steps manually.
 
 Runs are stored under the project at `~/workspace/lpp_ecmr/runs/`. To check progress:
 
@@ -179,28 +182,28 @@ squeue -u "$USER"                                        # running jobs
 
 Logs land in `runs/<run_id>/logs/`.
 
-### 5. Merge partial fits
+### 5. After everything completes
 
-Each per-subject notebook writes a partial JSON to `fits/` (e.g. `fits/TalmiEEG_CMR_50_set_likelihood_fixed_term_best_of_3_sub0.json`). After all jobs complete, merge them into per-model JSONs:
+If you used `SBATCH_SENTINEL`, the merge and simulation steps run automatically. You'll get an email when the full pipeline finishes (fitting → merge → simulation).
+
+To run manually instead (or if the sentinel wasn't set):
 
 ```bash
 cd ~/workspace/lpp_ecmr
 python scripts/merge_partials.py
+cd ~/workspace/sbatch
+./submit_notebooks.sh ~/workspace/lpp_ecmr/analyses/rendered "simulation_*.ipynb"
 ```
 
-This produces one merged `fits/<model_stem>.json` per model, combining all 38 subjects.
-
-### 6. Simulate and generate figures
-
-With merged fits in place, run simulation notebooks that load the merged JSONs, simulate, and produce comparison figures. These can run on the cluster or locally.
-
-Pull merged fits locally first:
+### 6. Pull results and run comparisons locally
 
 ```bash
 rsync -av <cluster>:~/workspace/lpp_ecmr/fits/ fits/
+rsync -av <cluster>:~/workspace/lpp_ecmr/simulations/ simulations/
+rsync -av <cluster>:~/workspace/lpp_ecmr/figures/fitting/ figures/fitting/
 ```
 
-Then run simulation + analysis locally:
+Then run group-level and comparison analyses:
 
 ```bash
 papermill analyses/render_model_fitting_group_level.ipynb analyses/render_model_fitting_group_level.ipynb --progress-bar
