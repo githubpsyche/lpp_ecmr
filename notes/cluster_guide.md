@@ -155,13 +155,13 @@ Then a single Slurm job:
 ```bash
 cd ~/workspace/sbatch
 sbatch \
-  --output runs/smoke_%j.out \
-  --error runs/smoke_%j.err \
+  --output ~/workspace/lpp_ecmr/runs/smoke_%j.out \
+  --error ~/workspace/lpp_ecmr/runs/smoke_%j.err \
   run_notebook.sbatch \
   ~/workspace/lpp_ecmr/analyses/rendered/fitting_TalmiEEG_Strength_50_set_likelihood_fixed_term_best_of_3.ipynb
 ```
 
-Check with `squeue -u "$USER"`, then inspect `runs/smoke_<jobid>.out` and `.err`. Once this works, the full chain is verified. Skip this step on subsequent runs if nothing has changed in the environment.
+Check with `squeue -u "$USER"`, then inspect `~/workspace/lpp_ecmr/runs/smoke_<jobid>.out` and `.err`. Once this works, the full chain is verified. Skip this step on subsequent runs if nothing has changed in the environment.
 
 ### 4. Submit all fitting notebooks
 
@@ -174,13 +174,13 @@ cd ~/workspace/sbatch
 
 This submits one Slurm array job with one task per notebook. Each task gets 1 CPU, 4GB memory, and a 4-hour walltime. The default throttle is 100 concurrent tasks.
 
-To check:
+Runs are stored under the project at `~/workspace/lpp_ecmr/runs/`. To check:
 
 ```bash
-ls -t runs/ | head -1              # newest run directory
-cat runs/<run_id>/manifest.txt     # which notebooks were submitted
-cat runs/<run_id>/submission.txt   # Slurm job ID
-squeue -u "$USER"                  # job status
+ls -t ~/workspace/lpp_ecmr/runs/ | head -1              # newest run directory
+cat ~/workspace/lpp_ecmr/runs/<run_id>/manifest.txt     # which notebooks were submitted
+cat ~/workspace/lpp_ecmr/runs/<run_id>/submission.txt   # Slurm job ID
+squeue -u "$USER"                                        # job status
 ```
 
 Logs land in `runs/<run_id>/logs/`.
