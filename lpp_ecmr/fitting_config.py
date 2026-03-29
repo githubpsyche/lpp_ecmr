@@ -4,6 +4,7 @@ __all__ = [
     "EPS",
     "BASE_FREE",
     "ECMR_FREE",
+    "STOP_FREE",
     "BASE_PARAMS",
     "ECMR_BASE_PARAMS",
 ]
@@ -27,6 +28,12 @@ BASE_FREE = {
 
 # eCMR adds emotion_scale to the base set
 ECMR_FREE = {**BASE_FREE, "emotion_scale": [EPS, 10.0]}
+
+# Stop parameters for termination-enabled model variants
+STOP_FREE = {
+    "stop_probability_scale": [EPS, 1.0],
+    "stop_probability_growth": [EPS, 10.0],
+}
 
 # Shared fixed parameters for models that disable stopping/context-update
 _NO_STOP_FIXED = {
@@ -63,7 +70,7 @@ BASE_PARAMS = {
         "termination_policy_create_fn": "jaxcmr.components.termination.NoStopTermination",
     },
     "sim_alg_path": "jaxcmr.simulation.simulate_study_free_recall_and_forced_stop",
-    "loss_fn_path": "jaxcmr.loss.set_permutation_likelihood.MemorySearchLikelihoodFnGenerator",
+    "loss_fn_path": "jaxcmr.loss.set_permutation_likelihood.ExcludeTerminationLikelihoodFnGenerator",
     "fit_alg_path": "jaxcmr.fitting.ScipyDE",
     "seed": 0,
     "relative_tolerance": 0.001,

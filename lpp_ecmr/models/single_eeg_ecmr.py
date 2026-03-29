@@ -1,8 +1,9 @@
-"""Plain attentional-strength memory search model.
+"""Single-context eCMR with EEG-modulated encoding strength.
 
-A minimal memory search model that uses EEG-derived encoding
-strength to modulate item recallability without the temporal
-context machinery of CMR.
+Single-context counterpart of full_eeg_ecmr. Emotion and EEG (LPP) signals
+modulate the context-to-item association (MCF) learning rate via phi_emot,
+using the same encoding formula as full eCMR but without the dual
+temporal/emotional context architecture.
 
 """
 
@@ -13,15 +14,23 @@ from jax import lax
 from jax import numpy as jnp
 from simple_pytree import Pytree
 
+import jaxcmr.components.context as TemporalContext
+import jaxcmr.components.linear_memory as LinearMemory
 from jaxcmr.components.termination import PositionalTermination
-from jaxcmr.math import exponential_primacy_decay, lb, power_scale
+from jaxcmr.math import (
+    exponential_primacy_decay,
+    lb,
+    power_scale,
+)
 from jaxcmr.typing import (
     Array,
-    Bool,
+    ContextCreateFn,
     Float,
     Float_,
+    Bool,
     Int_,
     Integer,
+    MemoryCreateFn,
     MemorySearch,
     MemorySearchModelFactory,
     RecallDataset,
@@ -30,12 +39,20 @@ from jaxcmr.typing import (
 
 
 __all__ = [
-    "StrengthSearch",
+    "CMR",
     "make_factory",
 ]
 
-class StrengthSearch(Pytree):
-    """Represents a strength-based memory search without retrieved context."""
+class CMR(Pytree):
+    """CMR model where emotion and EEG modulate core encoding strength.
+
+    Emotion (condition) and Early LPP both influence a shared scalar encoding
+    strength that scales the context–item association (`mcf`) during study.
+    By setting `lpp_inter_scale` to zero in the parameter configuration, this
+    implements a pure main-effects model (Condition and LPP). Allowing
+    `lpp_inter_scale` (and its threshold) to vary adds an explicit LPP×emotion
+    interaction at the encoding stage.
+    """
 
     def __init__(
         self,
@@ -43,22 +60,35 @@ class StrengthSearch(Pytree):
         parameters: Mapping[str, Float_],
         is_emotional: Bool[Array, " study_events"],
         lpp_centered: Float[Array, " study_events"],
+        mfc_create_fn: MemoryCreateFn = LinearMemory.init_mfc,
+        mcf_create_fn: MemoryCreateFn = LinearMemory.init_mcf,
+        context_create_fn: ContextCreateFn = TemporalContext.init,
         termination_policy_create_fn: TerminationPolicyCreateFn = PositionalTermination,
-    ):
+    ) -> None:
+        self.encoding_drift_rate = parameters["encoding_drift_rate"]
+        self.start_drift_rate = parameters["start_drift_rate"]
+        self.recall_drift_rate = parameters["recall_drift_rate"]
         self.primacy_scale = parameters["primacy_scale"]
         self.primacy_decay = parameters["primacy_decay"]
-        self.choice_sensitivity = parameters["choice_sensitivity"]
+        self.mfc_learning_rate = parameters["learning_rate"]
+        self.mcf_sensitivity = parameters["choice_sensitivity"]
         self.emotion_scale = parameters["emotion_scale"]
         self.modulate_emotion_by_primacy = parameters["modulate_emotion_by_primacy"]
+        self.learn_after_context_update = parameters["learn_after_context_update"]
         self.allow_repeated_recalls = parameters["allow_repeated_recalls"]
 
         self.item_count = list_length
-        self.is_emotional = jnp.array(is_emotional, dtype=jnp.float32)
+        self.items = jnp.eye(self.item_count)
 
         self.primacy = exponential_primacy_decay(
             jnp.arange(list_length), self.primacy_scale, self.primacy_decay
         )
+        self.context = context_create_fn(list_length)
+        self.mfc = mfc_create_fn(list_length, parameters, self.context)
+        self.mcf = mcf_create_fn(list_length, parameters, self.context)
+        self.is_emotional = jnp.array(is_emotional, dtype=jnp.float32)
 
+        # LPP transforms supporting both main effects and interaction terms.
         lpp_main_scale = parameters["lpp_main_scale"]
         lpp_main_threshold = parameters["lpp_main_threshold"]
         lpp_main_raw = lpp_main_scale * (lpp_centered - lpp_main_threshold)
@@ -74,7 +104,7 @@ class StrengthSearch(Pytree):
             + self.lpp_main
             + self.lpp_interaction
         )
-        self.strengths = jnp.zeros(self.item_count, dtype=jnp.float32)
+
         self.termination_policy = termination_policy_create_fn(list_length, parameters)
         self.recalls = jnp.zeros(self.item_count, dtype=int)
         self.recallable = jnp.zeros(self.item_count, dtype=bool)
@@ -82,32 +112,43 @@ class StrengthSearch(Pytree):
         self.recall_total = jnp.array(0, dtype=int)
         self.study_index = jnp.array(0, dtype=int)
 
-    def experience_item(self, item_index: Int_) -> "StrengthSearch":
-        """Returns model after encoding the specified item.
+    def experience_item(self, item_index: Int_) -> "CMR":
+        """Return the model after experiencing item with the specified index.
 
         Args:
-            item_index: Index of the studied item (0-indexed).
+          item_index: Index of the item to experience. 0-indexed.
         """
+        item = self.items[item_index]
+        context_input = self.mfc.probe(item)
+        new_context = self.context.integrate(context_input, self.encoding_drift_rate)
+        learning_state = lax.cond(
+            self.learn_after_context_update,
+            lambda: new_context.state,
+            lambda: self.context.state,
+        )
+
         p = self.primacy[self.study_index]
         phi_emot_i = jnp.maximum(0.0, self.phi_emot[self.study_index])
 
-        total_strength = lax.cond(
+        mcf_lr = lax.cond(
             self.modulate_emotion_by_primacy,
             lambda: p * phi_emot_i,
             lambda: p + jnp.maximum(-p, phi_emot_i),
         )
 
         return self.replace(
-            strengths=self.strengths.at[item_index].set(total_strength),
+            context=new_context,
+            mfc=self.mfc.associate(item, learning_state, self.mfc_learning_rate),
+            mcf=self.mcf.associate(learning_state, item, mcf_lr),
             recallable=self.recallable.at[item_index].set(True),
             study_index=self.study_index + 1,
         )
 
-    def experience(self, choice: Int_) -> "StrengthSearch":
+    def experience(self, choice: Int_) -> "CMR":
         """Returns model after simulating the specified study event.
 
         Args:
-            choice: Index of the studied item (1-indexed). Zero is ignored.
+            choice: the index of the item to experience (1-indexed). 0 is ignored.
         """
         return lax.cond(
             choice == 0,
@@ -115,27 +156,34 @@ class StrengthSearch(Pytree):
             lambda: self.experience_item(choice - 1),
         )
 
-    def start_retrieving(self) -> "StrengthSearch":
-        """Returns model after preparing for retrieval."""
-        return self
+    def start_retrieving(self) -> "CMR":
+        """Returns model after transitioning from study to retrieval mode."""
+        start_input = self.context.initial_state
+        start_context = self.context.integrate(start_input, self.start_drift_rate)
+        return self.replace(context=start_context)
 
-    def retrieve_item(self, item_index: Int_) -> "StrengthSearch":
-        """Returns model after recalling the specified item.
+    def retrieve_item(self, item_index: Int_) -> "CMR":
+        """Return model after simulating retrieval of item with the specified index.
 
         Args:
-            item_index: Index of the recalled item (0-indexed).
+            choice: the index of the item to retrieve (0-indexed)
         """
+        new_context = self.context.integrate(
+            self.mfc.probe(self.items[item_index]),
+            self.recall_drift_rate,
+        )
         return self.replace(
+            context=new_context,
             recalls=self.recalls.at[self.recall_total].set(item_index + 1),
             recallable=self.recallable.at[item_index].set(self.allow_repeated_recalls),
             recall_total=self.recall_total + 1,
         )
 
-    def retrieve(self, choice: Int_) -> "StrengthSearch":
-        """Returns model after simulating the specified retrieval event.
+    def retrieve(self, choice: Int_) -> "CMR":
+        """Return model after simulating the specified retrieval event.
 
         Args:
-            choice: Index of the recalled item (1-indexed) or zero to stop.
+            choice: the index of the item to retrieve (1-indexed) or 0 to stop.
         """
         return lax.cond(
             choice == 0,
@@ -144,28 +192,30 @@ class StrengthSearch(Pytree):
         )
 
     def activations(self) -> Float[Array, " item_count"]:
-        """Returns relative support for recalling each item."""
-        _activations = self.strengths * self.recallable
-        return (power_scale(_activations, self.choice_sensitivity) + lb) * self.recallable
+        """Returns relative support for retrieval of each item given model state"""
+        _activations = self.mcf.probe(self.context.state) * self.recallable
+        return (power_scale(_activations, self.mcf_sensitivity) + lb) * self.recallable
 
     def stop_probability(self) -> Float[Array, ""]:
-        """Returns probability of stopping retrieval given model state."""
+        """Returns probability of stopping retrieval given model state"""
         return self.termination_policy.stop_probability(self)
 
     def item_probability(self, item_index: Int_) -> Float[Array, ""]:
-        """Returns probability of recalling the specified item.
+        """Return the probability of retrieval of an item at the specified index.
+
+        Assumes that some items are recallable, with at least the minimum recall probability.
 
         Args:
-            item_index: Index of the recalled item (0-indexed).
+            item_index: the index of the item to retrieve.
         """
         item_activations = self.activations()
         return item_activations[item_index] / jnp.sum(item_activations)
 
     def outcome_probability(self, choice: Int_) -> Float[Array, ""]:
-        """Returns probability of the specified retrieval outcome.
+        """Return probability of the specified retrieval event.
 
         Args:
-            choice: Recall choice (1-indexed) or zero to stop.
+            choice: the index of the item to retrieve (1-indexed) or 0 to stop.
         """
         p_stop = self.stop_probability()
         return lax.cond(
@@ -179,7 +229,7 @@ class StrengthSearch(Pytree):
         )
 
     def outcome_probabilities(self) -> Float[Array, " recall_outcomes"]:
-        """Returns probabilities for stop and item recall choices."""
+        """Return the outcome probabilities of all recall events."""
         p_stop = self.stop_probability()
         item_activation = self.activations()
         item_activation_sum = jnp.sum(item_activation)
@@ -196,22 +246,12 @@ class StrengthSearch(Pytree):
 
 
 def make_factory(
-    mfc_create_fn,
-    mcf_create_fn,
-    context_create_fn,
+    mfc_create_fn: MemoryCreateFn,
+    mcf_create_fn: MemoryCreateFn,
+    context_create_fn: ContextCreateFn,
     termination_policy_create_fn: TerminationPolicyCreateFn,
 ) -> Type[MemorySearchModelFactory]:
-    """Returns a factory that builds strength-based memory search models.
-
-    Args:
-        mfc_create_fn: Unused associative-memory factory (ignored).
-        mcf_create_fn: Unused associative-memory factory (ignored).
-        context_create_fn: Unused context factory (ignored).
-        termination_policy_create_fn: Factory that creates termination policies.
-    """
-    del mfc_create_fn, mcf_create_fn, context_create_fn
-
-    class StrengthModelFactory:
+    class CMRModelFactory:
         def __init__(
             self,
             dataset: RecallDataset,
@@ -232,11 +272,14 @@ def make_factory(
                 is_emotional: Bool[Array, " study_events"],
                 lpp_centered: Float[Array, " study_events"],
             ) -> MemorySearch:
-                return StrengthSearch(
+                return CMR(
                     list_length,
                     parameters,
                     is_emotional,
                     lpp_centered,
+                    mfc_create_fn,
+                    mcf_create_fn,
+                    context_create_fn,
                     termination_policy_create_fn,
                 )
 
@@ -262,4 +305,4 @@ def make_factory(
                 self.lpp_centered[trial_index],
             )
 
-    return StrengthModelFactory
+    return CMRModelFactory
