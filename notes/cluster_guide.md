@@ -103,9 +103,9 @@ The orchestrator notebooks read from the registries, generate one parameterized 
 
 ```bash
 cd /path/to/lpp_ecmr
-jupyter execute analyses/render_model_fitting_single_context.ipynb
-jupyter execute analyses/render_model_fitting_full_ecmr.ipynb
-jupyter execute analyses/render_model_fitting_strength.ipynb
+papermill analyses/render_model_fitting_single_context.ipynb analyses/render_model_fitting_single_context.ipynb --progress-bar
+papermill analyses/render_model_fitting_full_ecmr.ipynb analyses/render_model_fitting_full_ecmr.ipynb --progress-bar
+papermill analyses/render_model_fitting_strength.ipynb analyses/render_model_fitting_strength.ipynb --progress-bar
 ```
 
 Check the output:
@@ -174,13 +174,19 @@ cd ~/workspace/sbatch
 
 This submits one Slurm array job with one task per notebook. Each task gets 1 CPU, 4GB memory, and a 4-hour walltime. The default throttle is 100 concurrent tasks.
 
-Runs are stored under the project at `~/workspace/lpp_ecmr/runs/`. To check:
+Runs are stored under the project at `~/workspace/lpp_ecmr/runs/`. To check progress:
+
+```bash
+~/workspace/sbatch/check_run.sh ~/workspace/lpp_ecmr/runs/<run_id>
+```
+
+This shows the status and full notebook path for each task — paths are copy-pasteable.
+
+Other useful commands:
 
 ```bash
 ls -t ~/workspace/lpp_ecmr/runs/ | head -1              # newest run directory
-cat ~/workspace/lpp_ecmr/runs/<run_id>/manifest.txt     # which notebooks were submitted
-cat ~/workspace/lpp_ecmr/runs/<run_id>/submission.txt   # Slurm job ID
-squeue -u "$USER"                                        # job status
+squeue -u "$USER"                                        # running jobs
 ```
 
 Logs land in `runs/<run_id>/logs/`.
@@ -204,9 +210,9 @@ rsync -av <cluster>:~/workspace/lpp_ecmr/figures/fitting/ figures/fitting/
 Then run group-level and comparison analyses locally:
 
 ```bash
-jupyter execute analyses/render_model_fitting_group_level.ipynb
-jupyter execute analyses/render_model_comparison_exclude_termination.ipynb
-jupyter execute analyses/render_model_comparison_include_termination.ipynb
+papermill analyses/render_model_fitting_group_level.ipynb analyses/render_model_fitting_group_level.ipynb --progress-bar
+papermill analyses/render_model_comparison_exclude_termination.ipynb analyses/render_model_comparison_exclude_termination.ipynb --progress-bar
+papermill analyses/render_model_comparison_include_termination.ipynb analyses/render_model_comparison_include_termination.ipynb --progress-bar
 ```
 
 ---
@@ -219,6 +225,18 @@ If a model exceeds the walltime:
 
 - Increase walltime in `run_notebook.sbatch` (SL3 max is 12 hours)
 - Split into per-subject notebooks using the `subject_indices` parameter in the fitting template (see `repfr/scripts/generate_render_notebooks.py` for the pattern, and `repfr/scripts/merge_partials.py` for recombining the partial results)
+
+## Email notifications
+
+To get emailed when jobs finish or fail, set `SBATCH_MAIL_USER` in your `~/.bashrc`:
+
+```bash
+export SBATCH_MAIL_USER="your_email@example.com"
+```
+
+`submit_notebooks.sh` picks this up automatically. If unset, no emails are sent.
+
+You get one email when the entire batch finishes, plus immediate emails for any individual task failures.
 
 ## Re-running after registry changes
 
