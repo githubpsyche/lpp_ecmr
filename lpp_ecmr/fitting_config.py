@@ -153,6 +153,14 @@ BASE_PARAMS = {
     ],
 }
 
+# Stop models add termination probability to comparison analyses
+STOP_COMPARISON_ANALYSIS_CONFIGS = BASE_PARAMS["comparison_analysis_configs"] + [
+    {
+        "target": "jaxcmr.analyses.termination_probability.plot_termination_probability",
+        "figure_suffix": "termination_probability",
+    },
+]
+
 # eCMR-specific base params (adds emotion component paths)
 ECMR_BASE_PARAMS = {
     **BASE_PARAMS,

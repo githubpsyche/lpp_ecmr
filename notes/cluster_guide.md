@@ -155,23 +155,24 @@ Check with `squeue -u "$USER"`, then inspect `~/workspace/lpp_ecmr/runs/smoke_<j
 
 ```bash
 cd ~/workspace/sbatch
-SBATCH_SENTINEL=~/workspace/lpp_ecmr/scripts/post_fit.sh \
-  ./submit_notebooks.sh \
+./submit_notebooks.sh \
+  --sentinel ~/workspace/lpp_ecmr/scripts/post_fit.sh \
   ~/workspace/lpp_ecmr/analyses/rendered \
   "fitting_*.ipynb"
 ```
 
 This submits one Slurm array job with one task per per-subject notebook. Each task gets 1 CPU, 4GB memory, and a 12-hour walltime. The default throttle is 100 concurrent tasks.
 
-Setting `SBATCH_SENTINEL` triggers an automatic post-fit pipeline after all fitting jobs succeed: it merges partial fits (`scripts/merge_partials.py`) and submits the simulation notebooks. Omit `SBATCH_SENTINEL` to handle post-fit steps manually.
+The `--sentinel` flag triggers an automatic post-fit pipeline after all fitting jobs succeed: it merges partial fits (`scripts/merge_partials.py`) and submits the simulation notebooks. Omit `--sentinel` to handle post-fit steps manually.
 
 Runs are stored under the project at `~/workspace/lpp_ecmr/runs/`.
 
 ### 5. Monitoring
 
-From anywhere inside the project:
+From inside the lpp_ecmr project directory:
 
 ```bash
+cd ~/workspace/lpp_ecmr
 ~/workspace/sbatch/check_run.sh
 ```
 

@@ -1,6 +1,6 @@
 """Full eCMR model registry for lpp_ecmr render notebooks."""
 
-from .fitting_config import ECMR_FREE, EPS, STOP_FREE, _NO_LPP_FIXED, _NO_STOP_FIXED
+from .fitting_config import ECMR_FREE, EPS, STOP_COMPARISON_ANALYSIS_CONFIGS, STOP_FREE, _NO_LPP_FIXED, _NO_STOP_FIXED
 
 __all__ = ["ECMR_MODELS"]
 
@@ -14,6 +14,15 @@ _POSITIONAL_STOP_FIELDS = {
     },
     "sim_alg_path": "jaxcmr.simulation.simulate_study_and_free_recall",
     "loss_fn_path": "jaxcmr.loss.set_permutation_likelihood.IncludeTerminationLikelihoodFnGenerator",
+    "comparison_analysis_configs": STOP_COMPARISON_ANALYSIS_CONFIGS,
+}
+
+_RATIO_STOP_FIELDS = {
+    **_POSITIONAL_STOP_FIELDS,
+    "component_paths": {
+        **_POSITIONAL_STOP_FIELDS["component_paths"],
+        "termination_policy_create_fn": "jaxcmr.components.termination.SupportRatioTermination",
+    },
 }
 
 ECMR_MODELS = [
@@ -78,6 +87,47 @@ ECMR_MODELS = [
         "model_name": "LPP_eCMR_PositionalStop",
         "make_factory_path": "lpp_ecmr.models.full_eeg_ecmr.make_factory",
         **_POSITIONAL_STOP_FIELDS,
+        "parameters": {
+            "fixed": {
+                "allow_repeated_recalls": False,
+                "learn_after_context_update": False,
+                "modulate_emotion_by_primacy": False,
+                "emotion_drift_rate": 1.0,
+                "lpp_main_scale": 0.0,
+                "lpp_main_threshold": 0.0,
+                "lpp_inter_threshold": 0.0,
+            },
+            "free": {
+                **ECMR_FREE,
+                **STOP_FREE,
+                "lpp_inter_scale": [EPS, 100.0],
+            },
+        },
+    },
+    # ── RatioStop ───────────────────────────────────────────────────
+    # eCMR emotion only + ratio termination (k=12)
+    {
+        "enabled": True,
+        "model_name": "eCMR_RatioStop",
+        "make_factory_path": "lpp_ecmr.models.full_eeg_ecmr.make_factory",
+        **_RATIO_STOP_FIELDS,
+        "parameters": {
+            "fixed": {
+                "allow_repeated_recalls": False,
+                "learn_after_context_update": False,
+                "modulate_emotion_by_primacy": False,
+                "emotion_drift_rate": 1.0,
+                **_NO_LPP_FIXED,
+            },
+            "free": {**ECMR_FREE, **STOP_FREE},
+        },
+    },
+    # eCMR + emotion-gated LPP, parsimonious + ratio termination (k=13)
+    {
+        "enabled": True,
+        "model_name": "LPP_eCMR_RatioStop",
+        "make_factory_path": "lpp_ecmr.models.full_eeg_ecmr.make_factory",
+        **_RATIO_STOP_FIELDS,
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
