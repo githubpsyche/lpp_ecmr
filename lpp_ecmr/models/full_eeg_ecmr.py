@@ -170,6 +170,7 @@ class eCMR(Pytree):
             list_length, parameters
         )
         self.recalls = jnp.zeros(self.item_count, dtype=int)
+        self.studied = jnp.zeros(self.item_count, dtype=bool)
         self.recallable = jnp.zeros(self.item_count, dtype=bool)
         self.is_active = jnp.array(True)
         self.recall_total = jnp.array(0, dtype=int)
@@ -247,6 +248,7 @@ class eCMR(Pytree):
             emotion_mcf=self.emotion_mcf.associate(
                 emot_learning_state, item, emotional_mcf_lr
             ),
+            studied=self.studied.at[item_index].set(True),
             recallable=self.recallable.at[item_index].set(True),
             study_index=self.study_index + 1,
         )

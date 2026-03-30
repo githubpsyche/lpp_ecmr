@@ -1,0 +1,214 @@
+{
+    "fixed": {
+        "allow_repeated_recalls": 0.0,
+        "learn_after_context_update": 0.0,
+        "modulate_emotion_by_primacy": 0.0,
+        "emotion_drift_rate": 1.0,
+        "lpp_main_scale": 0.0,
+        "lpp_main_threshold": 0.0,
+        "lpp_inter_threshold": 0.0
+    },
+    "free": {
+        "encoding_drift_rate": [
+            2.220446049250313e-16,
+            0.9999999999999998
+        ],
+        "start_drift_rate": [
+            2.220446049250313e-16,
+            0.9999999999999998
+        ],
+        "recall_drift_rate": [
+            2.220446049250313e-16,
+            0.9999999999999998
+        ],
+        "shared_support": [
+            2.220446049250313e-16,
+            100.0
+        ],
+        "item_support": [
+            2.220446049250313e-16,
+            100.0
+        ],
+        "learning_rate": [
+            2.220446049250313e-16,
+            0.9999999999999998
+        ],
+        "primacy_scale": [
+            2.220446049250313e-16,
+            100.0
+        ],
+        "primacy_decay": [
+            2.220446049250313e-16,
+            100.0
+        ],
+        "choice_sensitivity": [
+            2.220446049250313e-16,
+            100.0
+        ],
+        "emotion_scale": [
+            2.220446049250313e-16,
+            10.0
+        ],
+        "stop_probability_scale": [
+            2.220446049250313e-16,
+            1.0
+        ],
+        "stop_probability_growth": [
+            2.220446049250313e-16,
+            10.0
+        ],
+        "lpp_inter_scale": [
+            2.220446049250313e-16,
+            100.0
+        ]
+    },
+    "fitness": [
+        184.1334228515625
+    ],
+    "fits": {
+        "allow_repeated_recalls": [
+            0.0
+        ],
+        "learn_after_context_update": [
+            0.0
+        ],
+        "modulate_emotion_by_primacy": [
+            0.0
+        ],
+        "emotion_drift_rate": [
+            1.0
+        ],
+        "lpp_main_scale": [
+            0.0
+        ],
+        "lpp_main_threshold": [
+            0.0
+        ],
+        "lpp_inter_threshold": [
+            0.0
+        ],
+        "encoding_drift_rate": [
+            0.3907810103633551
+        ],
+        "start_drift_rate": [
+            0.3403935341875104
+        ],
+        "recall_drift_rate": [
+            0.8533856369536035
+        ],
+        "shared_support": [
+            1.8207070052096839
+        ],
+        "item_support": [
+            81.39828828525793
+        ],
+        "learning_rate": [
+            0.0790050446608197
+        ],
+        "primacy_scale": [
+            22.69044338962123
+        ],
+        "primacy_decay": [
+            6.335512729416564
+        ],
+        "choice_sensitivity": [
+            3.7146001772572745
+        ],
+        "emotion_scale": [
+            3.4757241045280054
+        ],
+        "stop_probability_scale": [
+            0.011519629275833942
+        ],
+        "stop_probability_growth": [
+            0.4322732024463951
+        ],
+        "lpp_inter_scale": [
+            1.544377257317585
+        ],
+        "subject": [
+            219
+        ]
+    },
+    "hyperparameters": {
+        "bounds": {
+            "encoding_drift_rate": [
+                2.220446049250313e-16,
+                0.9999999999999998
+            ],
+            "start_drift_rate": [
+                2.220446049250313e-16,
+                0.9999999999999998
+            ],
+            "recall_drift_rate": [
+                2.220446049250313e-16,
+                0.9999999999999998
+            ],
+            "shared_support": [
+                2.220446049250313e-16,
+                100.0
+            ],
+            "item_support": [
+                2.220446049250313e-16,
+                100.0
+            ],
+            "learning_rate": [
+                2.220446049250313e-16,
+                0.9999999999999998
+            ],
+            "primacy_scale": [
+                2.220446049250313e-16,
+                100.0
+            ],
+            "primacy_decay": [
+                2.220446049250313e-16,
+                100.0
+            ],
+            "choice_sensitivity": [
+                2.220446049250313e-16,
+                100.0
+            ],
+            "emotion_scale": [
+                2.220446049250313e-16,
+                10.0
+            ],
+            "stop_probability_scale": [
+                2.220446049250313e-16,
+                1.0
+            ],
+            "stop_probability_growth": [
+                2.220446049250313e-16,
+                10.0
+            ],
+            "lpp_inter_scale": [
+                2.220446049250313e-16,
+                100.0
+            ]
+        },
+        "num_steps": 1000,
+        "pop_size": 15,
+        "relative_tolerance": 0.001,
+        "cross_over_rate": 0.9,
+        "diff_w": 0.85,
+        "best_of": 3
+    },
+    "fit_time": 1795.1781565669953,
+    "run_tag": "50_set_likelihood_predicted_term_best_of_3",
+    "data_tag": "TalmiEEG",
+    "trial_query": "data['subject'] > -1",
+    "model": "LPP_eCMR_PositionalStop",
+    "name": "TalmiEEG_LPP_eCMR_PositionalStop_50_set_likelihood_predicted_term_best_of_3",
+    "components": {
+        "mfc_create_fn": "jaxcmr.components.linear_memory.init_mfc",
+        "mcf_create_fn": "jaxcmr.components.linear_memory.init_mcf",
+        "context_create_fn": "jaxcmr.components.context.init",
+        "termination_policy_create_fn": "jaxcmr.components.termination.PositionalTermination"
+    },
+    "fit_algorithm": "jaxcmr.fitting.ScipyDE",
+    "loss_function": "jaxcmr.loss.set_permutation_likelihood.IncludeTerminationLikelihoodFnGenerator",
+    "model_factory": "lpp_ecmr.models.full_eeg_ecmr.make_factory",
+    "embedding_path": "",
+    "emotion_feature_path": "",
+    "feature_column": "6",
+    "concat_features": "False"
+}

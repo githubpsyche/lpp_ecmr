@@ -158,7 +158,7 @@ cd ~/workspace/sbatch
 ./submit_notebooks.sh \
   --sentinel ~/workspace/lpp_ecmr/scripts/post_fit.sh \
   ~/workspace/lpp_ecmr/analyses/rendered \
-  "fitting_*.ipynb"
+  "fitting_*_sub*.ipynb"
 ```
 
 This submits one Slurm array job with one task per per-subject notebook. Each task gets 1 CPU, 4GB memory, and a 12-hour walltime. The default throttle is 100 concurrent tasks.
@@ -194,7 +194,7 @@ Logs land in `runs/<run_id>/logs/`.
 
 ### 6. After everything completes
 
-If you used `SBATCH_SENTINEL`, the merge and simulation steps run automatically. You'll get an email when the full pipeline finishes (fitting → merge → simulation).
+If you used `--sentinel`, the merge and simulation steps run automatically. You'll get an email when the full pipeline finishes (fitting → merge → simulation).
 
 To run manually instead (or if the sentinel wasn't set):
 
@@ -202,7 +202,7 @@ To run manually instead (or if the sentinel wasn't set):
 cd ~/workspace/lpp_ecmr
 python scripts/merge_partials.py
 cd ~/workspace/sbatch
-./submit_notebooks.sh ~/workspace/lpp_ecmr/analyses/rendered "simulation_*.ipynb"
+./submit_notebooks.sh ~/workspace/lpp_ecmr/analyses/rendered "fitting_*.ipynb"
 ```
 
 ### 7. Pull results and run comparisons locally
