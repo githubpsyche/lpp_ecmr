@@ -44,7 +44,7 @@ STRENGTH_MODELS = [
     # ── No stop ───────────────────────────────────────────────────────
     # Strength baseline (k=3)
     {
-        "enabled": True,
+        "enabled": False,
         "model_name": "Strength",
         "make_factory_path": "lpp_ecmr.models.eeg_strength.make_factory",
         "parameters": {
@@ -58,7 +58,7 @@ STRENGTH_MODELS = [
     },
     # Strength + broad LPP, parsimonious (k=4)
     {
-        "enabled": True,
+        "enabled": False,
         "model_name": "LPP_Strength",
         "make_factory_path": "lpp_ecmr.models.eeg_strength.make_factory",
         "parameters": {
@@ -77,7 +77,7 @@ STRENGTH_MODELS = [
     },
     # Strength + emotion (k=4)
     {
-        "enabled": True,
+        "enabled": False,
         "model_name": "Strength_Emotion",
         "make_factory_path": "lpp_ecmr.models.eeg_strength.make_factory",
         "parameters": {
@@ -93,7 +93,7 @@ STRENGTH_MODELS = [
     },
     # Strength + emotion + emotion-gated LPP, parsimonious (k=5)
     {
-        "enabled": True,
+        "enabled": False,
         "model_name": "LPP_Strength_Emotion",
         "make_factory_path": "lpp_ecmr.models.eeg_strength.make_factory",
         "parameters": {
@@ -113,7 +113,7 @@ STRENGTH_MODELS = [
     # ── PositionalStop ────────────────────────────────────────────────
     # Strength baseline + positional termination (k=5)
     {
-        "enabled": True,
+        "enabled": False,
         "model_name": "Strength_PositionalStop",
         "make_factory_path": "lpp_ecmr.models.eeg_strength.make_factory",
         **_POSITIONAL_STOP_FIELDS,
@@ -128,7 +128,7 @@ STRENGTH_MODELS = [
     },
     # Strength + broad LPP, parsimonious + positional termination (k=6)
     {
-        "enabled": True,
+        "enabled": False,
         "model_name": "LPP_Strength_PositionalStop",
         "make_factory_path": "lpp_ecmr.models.eeg_strength.make_factory",
         **_POSITIONAL_STOP_FIELDS,
@@ -149,7 +149,7 @@ STRENGTH_MODELS = [
     },
     # Strength + emotion + positional termination (k=6)
     {
-        "enabled": True,
+        "enabled": False,
         "model_name": "Strength_Emotion_PositionalStop",
         "make_factory_path": "lpp_ecmr.models.eeg_strength.make_factory",
         **_POSITIONAL_STOP_FIELDS,
@@ -167,7 +167,7 @@ STRENGTH_MODELS = [
     },
     # Strength + emotion + emotion-gated LPP, parsimonious + positional termination (k=7)
     {
-        "enabled": True,
+        "enabled": False,
         "model_name": "LPP_Strength_Emotion_PositionalStop",
         "make_factory_path": "lpp_ecmr.models.eeg_strength.make_factory",
         **_POSITIONAL_STOP_FIELDS,
@@ -189,7 +189,7 @@ STRENGTH_MODELS = [
     # ── RatioStop ──────────────────────────────────────────────────
     # Strength baseline + ratio termination (k=5)
     {
-        "enabled": True,
+        "enabled": False,
         "model_name": "Strength_RatioStop",
         "make_factory_path": "lpp_ecmr.models.eeg_strength.make_factory",
         **_RATIO_STOP_FIELDS,
@@ -204,7 +204,7 @@ STRENGTH_MODELS = [
     },
     # Strength + broad LPP, parsimonious + ratio termination (k=6)
     {
-        "enabled": True,
+        "enabled": False,
         "model_name": "LPP_Strength_RatioStop",
         "make_factory_path": "lpp_ecmr.models.eeg_strength.make_factory",
         **_RATIO_STOP_FIELDS,
@@ -225,7 +225,7 @@ STRENGTH_MODELS = [
     },
     # Strength + emotion + ratio termination (k=6)
     {
-        "enabled": True,
+        "enabled": False,
         "model_name": "Strength_Emotion_RatioStop",
         "make_factory_path": "lpp_ecmr.models.eeg_strength.make_factory",
         **_RATIO_STOP_FIELDS,
@@ -243,7 +243,7 @@ STRENGTH_MODELS = [
     },
     # Strength + emotion + emotion-gated LPP, parsimonious + ratio termination (k=7)
     {
-        "enabled": True,
+        "enabled": False,
         "model_name": "LPP_Strength_Emotion_RatioStop",
         "make_factory_path": "lpp_ecmr.models.eeg_strength.make_factory",
         **_RATIO_STOP_FIELDS,

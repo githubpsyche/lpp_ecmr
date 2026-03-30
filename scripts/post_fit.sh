@@ -16,8 +16,7 @@ export UV_NO_PROJECT=1
 echo "$(date): Merging partial fits in $PROJECT_DIR"
 python scripts/merge_partials.py
 
-echo "$(date): Cleaning up per-subject intermediates"
-rm -f "$PROJECT_DIR"/fits/*_sub*.json
+echo "$(date): Cleaning up per-subject notebooks"
 rm -f "$PROJECT_DIR"/analyses/rendered/fitting_*_sub*.ipynb
 
 echo "$(date): Submitting per-model simulation notebooks"

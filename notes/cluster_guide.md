@@ -105,7 +105,6 @@ The orchestrator notebooks read from the registries and generate per-subject fit
 cd ~/workspace/lpp_ecmr
 papermill analyses/render_model_fitting_single_context.ipynb analyses/render_model_fitting_single_context.ipynb --progress-bar
 papermill analyses/render_model_fitting_full_ecmr.ipynb analyses/render_model_fitting_full_ecmr.ipynb --progress-bar
-papermill analyses/render_model_fitting_strength.ipynb analyses/render_model_fitting_strength.ipynb --progress-bar
 papermill analyses/render_model_fitting_group_level.ipynb analyses/render_model_fitting_group_level.ipynb --progress-bar
 ```
 
