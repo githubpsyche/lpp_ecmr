@@ -1,0 +1,150 @@
+{
+    "fixed": {
+        "allow_repeated_recalls": 0.0,
+        "learn_after_context_update": 0.0
+    },
+    "free": {
+        "encoding_drift_rate": [
+            2.220446049250313e-16,
+            0.9999999999999998
+        ],
+        "start_drift_rate": [
+            2.220446049250313e-16,
+            0.9999999999999998
+        ],
+        "recall_drift_rate": [
+            2.220446049250313e-16,
+            0.9999999999999998
+        ],
+        "shared_support": [
+            2.220446049250313e-16,
+            100.0
+        ],
+        "item_support": [
+            2.220446049250313e-16,
+            100.0
+        ],
+        "learning_rate": [
+            2.220446049250313e-16,
+            0.9999999999999998
+        ],
+        "primacy_scale": [
+            2.220446049250313e-16,
+            100.0
+        ],
+        "primacy_decay": [
+            2.220446049250313e-16,
+            100.0
+        ],
+        "choice_sensitivity": [
+            2.220446049250313e-16,
+            100.0
+        ]
+    },
+    "fitness": [
+        148.10153198242188
+    ],
+    "fits": {
+        "allow_repeated_recalls": [
+            0.0
+        ],
+        "learn_after_context_update": [
+            0.0
+        ],
+        "encoding_drift_rate": [
+            0.3573252488429804
+        ],
+        "start_drift_rate": [
+            0.5383410431672938
+        ],
+        "recall_drift_rate": [
+            0.9491967124256198
+        ],
+        "shared_support": [
+            92.98368481605871
+        ],
+        "item_support": [
+            15.91835992152977
+        ],
+        "learning_rate": [
+            0.052050008135055004
+        ],
+        "primacy_scale": [
+            0.41688003458585854
+        ],
+        "primacy_decay": [
+            50.08679187397301
+        ],
+        "choice_sensitivity": [
+            50.4788528391533
+        ],
+        "subject": [
+            212
+        ]
+    },
+    "hyperparameters": {
+        "bounds": {
+            "encoding_drift_rate": [
+                2.220446049250313e-16,
+                0.9999999999999998
+            ],
+            "start_drift_rate": [
+                2.220446049250313e-16,
+                0.9999999999999998
+            ],
+            "recall_drift_rate": [
+                2.220446049250313e-16,
+                0.9999999999999998
+            ],
+            "shared_support": [
+                2.220446049250313e-16,
+                100.0
+            ],
+            "item_support": [
+                2.220446049250313e-16,
+                100.0
+            ],
+            "learning_rate": [
+                2.220446049250313e-16,
+                0.9999999999999998
+            ],
+            "primacy_scale": [
+                2.220446049250313e-16,
+                100.0
+            ],
+            "primacy_decay": [
+                2.220446049250313e-16,
+                100.0
+            ],
+            "choice_sensitivity": [
+                2.220446049250313e-16,
+                100.0
+            ]
+        },
+        "num_steps": 1000,
+        "pop_size": 15,
+        "relative_tolerance": 0.001,
+        "cross_over_rate": 0.9,
+        "diff_w": 0.85,
+        "best_of": 3
+    },
+    "fit_time": 211.23895199199615,
+    "run_tag": "50_set_likelihood_fixed_term_best_of_3",
+    "data_tag": "TalmiEEG",
+    "trial_query": "data['subject'] > -1",
+    "model": "CMR",
+    "name": "TalmiEEG_CMR_50_set_likelihood_fixed_term_best_of_3",
+    "components": {
+        "mfc_create_fn": "jaxcmr.components.linear_memory.init_mfc",
+        "mcf_create_fn": "jaxcmr.components.linear_memory.init_mcf",
+        "context_create_fn": "jaxcmr.components.context.init",
+        "termination_policy_create_fn": "jaxcmr.components.termination.NoStopTermination"
+    },
+    "fit_algorithm": "jaxcmr.fitting.ScipyDE",
+    "loss_function": "jaxcmr.loss.set_permutation_likelihood.ExcludeTerminationLikelihoodFnGenerator",
+    "model_factory": "jaxcmr.models.cmr.make_factory",
+    "embedding_path": "",
+    "emotion_feature_path": "",
+    "feature_column": "6",
+    "concat_features": "False"
+}
