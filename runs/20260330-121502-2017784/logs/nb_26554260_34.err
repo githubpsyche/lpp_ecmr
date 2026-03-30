@@ -1,4 +1,4 @@
 Input Notebook:  /home/jg2204/workspace/lpp_ecmr/analyses/rendered/fitting_TalmiEEG_CMR_50_set_likelihood_fixed_term_best_of_3_sub5.ipynb
 Output Notebook: /home/jg2204/workspace/lpp_ecmr/analyses/rendered/fitting_TalmiEEG_CMR_50_set_likelihood_fixed_term_best_of_3_sub5.ipynb
 Executing:   0%|          | 0/14 [00:00<?, ?cell/s]Executing notebook with kernel: python3
-Executing:   7%|▋         | 1/14 [00:03<00:42,  3.29s/cell]Executing:  14%|█▍        | 2/14 [00:10<01:10,  5.89s/cell]Executing:  43%|████▎     | 6/14 [00:11<00:11,  1.50s/cell]
+Executing:   7%|▋         | 1/14 [00:03<00:42,  3.29s/cell]Executing:  14%|█▍        | 2/14 [00:10<01:10,  5.89s/cell]Executing:  43%|████▎     | 6/14 [00:11<00:11,  1.50s/cell]Executing:  57%|█████▋    | 8/14 [11:56<12:36, 126.06s/cell]Executing:  71%|███████▏  | 10/14 [11:57<05:35, 83.79s/cell]Executing:  93%|█████████▎| 13/14 [12:15<00:51, 51.27s/cell]Executing: 100%|██████████| 14/14 [12:17<00:00, 52.65s/cell]

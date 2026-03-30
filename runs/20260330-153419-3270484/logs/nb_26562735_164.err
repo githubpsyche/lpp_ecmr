@@ -1,0 +1,234 @@
+Input Notebook:  /home/jg2204/workspace/lpp_ecmr/analyses/rendered/fitting_TalmiEEG_LPP_CMR_PositionalStop_50_set_likelihood_predicted_term_best_of_3_sub2.ipynb
+Output Notebook: /home/jg2204/workspace/lpp_ecmr/analyses/rendered/fitting_TalmiEEG_LPP_CMR_PositionalStop_50_set_likelihood_predicted_term_best_of_3_sub2.ipynb
+Executing:   0%|          | 0/14 [00:00<?, ?cell/s]ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+Executing notebook with kernel: python3
+Executing:   7%|▋         | 1/14 [00:02<00:36,  2.79s/cell]ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+Executing:  14%|█▍        | 2/14 [00:08<00:54,  4.56s/cell]ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+Executing:  43%|████▎     | 6/14 [00:09<00:09,  1.17s/cell]Executing:  71%|███████▏  | 10/14 [00:09<00:02,  1.53cell/s]ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+ERROR:tornado.general:Uncaught exception in ZMQStream callback
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/eventloop/zmqstream.py", line 565, in _log_error
+    f.result()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelbase.py", line 584, in shell_channel_thread_main
+    _, msg2 = self.session.feed_identities(msg, copy=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/session.py", line 998, in feed_identities
+    raise ValueError(msg)
+ValueError: DELIM not in msg_list
+Executing:  93%|█████████▎| 13/14 [00:23<00:02,  2.04s/cell]Executing: 100%|██████████| 14/14 [00:24<00:00,  1.74s/cell]

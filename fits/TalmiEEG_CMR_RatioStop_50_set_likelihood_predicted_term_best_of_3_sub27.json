@@ -1,0 +1,172 @@
+{
+    "fixed": {
+        "allow_repeated_recalls": 0.0,
+        "learn_after_context_update": 0.0
+    },
+    "free": {
+        "encoding_drift_rate": [
+            2.220446049250313e-16,
+            0.9999999999999998
+        ],
+        "start_drift_rate": [
+            2.220446049250313e-16,
+            0.9999999999999998
+        ],
+        "recall_drift_rate": [
+            2.220446049250313e-16,
+            0.9999999999999998
+        ],
+        "shared_support": [
+            2.220446049250313e-16,
+            100.0
+        ],
+        "item_support": [
+            2.220446049250313e-16,
+            100.0
+        ],
+        "learning_rate": [
+            2.220446049250313e-16,
+            0.9999999999999998
+        ],
+        "primacy_scale": [
+            2.220446049250313e-16,
+            100.0
+        ],
+        "primacy_decay": [
+            2.220446049250313e-16,
+            100.0
+        ],
+        "choice_sensitivity": [
+            2.220446049250313e-16,
+            100.0
+        ],
+        "stop_probability_scale": [
+            2.220446049250313e-16,
+            1.0
+        ],
+        "stop_probability_growth": [
+            2.220446049250313e-16,
+            10.0
+        ]
+    },
+    "fitness": [
+        240.19276428222656
+    ],
+    "fits": {
+        "allow_repeated_recalls": [
+            0.0
+        ],
+        "learn_after_context_update": [
+            0.0
+        ],
+        "encoding_drift_rate": [
+            0.1742950823105779
+        ],
+        "start_drift_rate": [
+            0.3190624981190655
+        ],
+        "recall_drift_rate": [
+            0.48182209278616206
+        ],
+        "shared_support": [
+            29.942257583137955
+        ],
+        "item_support": [
+            98.54205359557167
+        ],
+        "learning_rate": [
+            0.03192657282410244
+        ],
+        "primacy_scale": [
+            4.36139210654602
+        ],
+        "primacy_decay": [
+            74.60957368235277
+        ],
+        "choice_sensitivity": [
+            49.052087485016315
+        ],
+        "stop_probability_scale": [
+            0.002086163731831958
+        ],
+        "stop_probability_growth": [
+            1.3292183778450384
+        ],
+        "subject": [
+            232
+        ]
+    },
+    "hyperparameters": {
+        "bounds": {
+            "encoding_drift_rate": [
+                2.220446049250313e-16,
+                0.9999999999999998
+            ],
+            "start_drift_rate": [
+                2.220446049250313e-16,
+                0.9999999999999998
+            ],
+            "recall_drift_rate": [
+                2.220446049250313e-16,
+                0.9999999999999998
+            ],
+            "shared_support": [
+                2.220446049250313e-16,
+                100.0
+            ],
+            "item_support": [
+                2.220446049250313e-16,
+                100.0
+            ],
+            "learning_rate": [
+                2.220446049250313e-16,
+                0.9999999999999998
+            ],
+            "primacy_scale": [
+                2.220446049250313e-16,
+                100.0
+            ],
+            "primacy_decay": [
+                2.220446049250313e-16,
+                100.0
+            ],
+            "choice_sensitivity": [
+                2.220446049250313e-16,
+                100.0
+            ],
+            "stop_probability_scale": [
+                2.220446049250313e-16,
+                1.0
+            ],
+            "stop_probability_growth": [
+                2.220446049250313e-16,
+                10.0
+            ]
+        },
+        "num_steps": 1000,
+        "pop_size": 15,
+        "relative_tolerance": 0.001,
+        "cross_over_rate": 0.9,
+        "diff_w": 0.85,
+        "best_of": 3
+    },
+    "fit_time": 512.3835388299922,
+    "run_tag": "50_set_likelihood_predicted_term_best_of_3",
+    "data_tag": "TalmiEEG",
+    "trial_query": "data['subject'] > -1",
+    "model": "CMR_RatioStop",
+    "name": "TalmiEEG_CMR_RatioStop_50_set_likelihood_predicted_term_best_of_3",
+    "components": {
+        "mfc_create_fn": "jaxcmr.components.linear_memory.init_mfc",
+        "mcf_create_fn": "jaxcmr.components.linear_memory.init_mcf",
+        "context_create_fn": "jaxcmr.components.context.init",
+        "termination_policy_create_fn": "jaxcmr.components.termination.SupportRatioTermination"
+    },
+    "fit_algorithm": "jaxcmr.fitting.ScipyDE",
+    "loss_function": "jaxcmr.loss.set_permutation_likelihood.IncludeTerminationLikelihoodFnGenerator",
+    "model_factory": "jaxcmr.models.cmr.make_factory",
+    "embedding_path": "",
+    "emotion_feature_path": "",
+    "feature_column": "6",
+    "concat_features": "False"
+}

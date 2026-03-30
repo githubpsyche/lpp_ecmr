@@ -1,0 +1,4 @@
+Input Notebook:  /home/jg2204/workspace/lpp_ecmr/analyses/rendered/fitting_TalmiEEG_LPP_CMR_PositionalStop_50_set_likelihood_predicted_term_best_of_3_sub23.ipynb
+Output Notebook: /home/jg2204/workspace/lpp_ecmr/analyses/rendered/fitting_TalmiEEG_LPP_CMR_PositionalStop_50_set_likelihood_predicted_term_best_of_3_sub23.ipynb
+Executing:   0%|          | 0/14 [00:00<?, ?cell/s]Executing notebook with kernel: python3
+Executing:   7%|▋         | 1/14 [00:03<00:40,  3.10s/cell]Executing:  14%|█▍        | 2/14 [00:09<00:58,  4.87s/cell]Executing:  43%|████▎     | 6/14 [00:09<00:09,  1.24s/cell]Executing:  57%|█████▋    | 8/14 [36:16<38:32, 385.46s/cell]Executing:  71%|███████▏  | 10/14 [36:17<17:03, 255.85s/cell]Executing:  93%|█████████▎| 13/14 [36:32<02:30, 150.73s/cell]Executing: 100%|██████████| 14/14 [36:33<00:00, 156.66s/cell]

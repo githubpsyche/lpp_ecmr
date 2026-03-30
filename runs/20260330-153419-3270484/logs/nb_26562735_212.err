@@ -1,0 +1,98 @@
+Input Notebook:  /home/jg2204/workspace/lpp_ecmr/analyses/rendered/fitting_TalmiEEG_LPP_CMR_RatioStop_50_set_likelihood_predicted_term_best_of_3_sub29.ipynb
+Output Notebook: /home/jg2204/workspace/lpp_ecmr/analyses/rendered/fitting_TalmiEEG_LPP_CMR_RatioStop_50_set_likelihood_predicted_term_best_of_3_sub29.ipynb
+Executing:   0%|          | 0/14 [00:00<?, ?cell/s]Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel_launcher.py", line 18, in <module>
+    app.launch_new_instance()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/traitlets/config/application.py", line 1074, in launch_instance
+    app.initialize(argv)
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/traitlets/config/application.py", line 118, in inner
+    return method(app, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelapp.py", line 711, in initialize
+    self.init_sockets()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelapp.py", line 348, in init_sockets
+    self.init_iopub(context)
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelapp.py", line 382, in init_iopub
+    self.iopub_port = self._bind_socket(self.iopub_socket, self.iopub_port)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelapp.py", line 255, in _bind_socket
+    return self._try_bind_socket(s, port)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelapp.py", line 231, in _try_bind_socket
+    s.bind("tcp://%s:%i" % (self.ip, port))
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/sugar/socket.py", line 320, in bind
+    super().bind(addr)
+  File "zmq/backend/cython/_zmq.py", line 1009, in zmq.backend.cython._zmq.Socket.bind
+    _check_rc(rc)
+    ^^^^^^^^^^^
+  File "zmq/backend/cython/_zmq.py", line 190, in zmq.backend.cython._zmq._check_rc
+    raise ZMQError(errno)
+    ^^^^^^^^^^^
+zmq.error.ZMQError: Address already in use (addr='tcp://127.0.0.1:50771')
+Error occurred while starting new kernel client for kernel bf9acd75-7c25-4da9-a5a6-47e20c6e0914: Kernel didn't respond in 60 seconds
+Exception ignored in atexit callback: <bound method IPKernelApp.close of <ipykernel.kernelapp.IPKernelApp object at 0x1455deabf890>>
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/kernelapp.py", line 433, in close
+    self.context.term()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/sugar/context.py", line 264, in term
+    super().term()
+  File "zmq/backend/cython/_zmq.py", line 596, in zmq.backend.cython._zmq.Context.term
+  File "zmq/backend/cython/_zmq.py", line 179, in zmq.backend.cython._zmq._check_rc
+KeyboardInterrupt: 
+Executing:   0%|          | 0/14 [01:02<?, ?cell/s]
+Traceback (most recent call last):
+  File "/home/jg2204/workspace/.venv/bin/papermill", line 10, in <module>
+    sys.exit(papermill())
+             ^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/click/core.py", line 1485, in __call__
+    return self.main(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/click/core.py", line 1406, in main
+    rv = self.invoke(ctx)
+         ^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/click/core.py", line 1269, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/click/core.py", line 824, in invoke
+    return callback(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/click/decorators.py", line 34, in new_func
+    return f(get_current_context(), *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/papermill/cli.py", line 235, in papermill
+    execute_notebook(
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/papermill/execute.py", line 116, in execute_notebook
+    nb = papermill_engines.execute_notebook_with_engine(
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/papermill/engines.py", line 49, in execute_notebook_with_engine
+    return self.get_engine(engine_name).execute_notebook(nb, kernel_name, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/papermill/engines.py", line 371, in execute_notebook
+    cls.execute_managed_notebook(nb_man, kernel_name, log_output=log_output, **kwargs)
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/papermill/engines.py", line 443, in execute_managed_notebook
+    return PapermillNotebookClient(nb_man, **final_kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/papermill/clientwrap.py", line 43, in execute
+    with self.setup_kernel(**kwargs):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib64/python3.12/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/nbclient/client.py", line 603, in setup_kernel
+    self.start_new_kernel_client()
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib64/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/nbclient/client.py", line 566, in async_start_new_kernel_client
+    await ensure_async(self.kc.wait_for_ready(timeout=self.startup_timeout))
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_core/utils/__init__.py", line 214, in ensure_async
+    result = await obj
+             ^^^^^^^^^
+  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_client/client.py", line 208, in _async_wait_for_ready
+    raise RuntimeError("Kernel didn't respond in %d seconds" % timeout)
+RuntimeError: Kernel didn't respond in 60 seconds
