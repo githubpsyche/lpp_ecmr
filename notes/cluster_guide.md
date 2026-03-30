@@ -155,10 +155,17 @@ Check with `squeue -u "$USER"`, then inspect `~/workspace/lpp_ecmr/runs/smoke_<j
 
 ```bash
 cd ~/workspace/sbatch
+
+# Per-subject fits (parallelized across cluster)
 ./submit_notebooks.sh \
   --sentinel ~/workspace/lpp_ecmr/scripts/post_fit.sh \
   ~/workspace/lpp_ecmr/analyses/rendered \
   "fitting_*_sub*.ipynb"
+
+# Pooled fits (one fit per model, all subjects)
+./submit_notebooks.sh \
+  ~/workspace/lpp_ecmr/analyses/rendered \
+  "pooled_fitting_*.ipynb"
 ```
 
 This submits one Slurm array job with one task per per-subject notebook. Each task gets 1 CPU, 4GB memory, and a 12-hour walltime. The default throttle is 100 concurrent tasks.
@@ -216,9 +223,7 @@ rsync -av <cluster>:~/workspace/lpp_ecmr/figures/fitting/ figures/fitting/
 Then run group-level and comparison analyses:
 
 ```bash
-papermill analyses/render_model_fitting_group_level.ipynb analyses/render_model_fitting_group_level.ipynb --progress-bar
-papermill analyses/render_model_comparison_exclude_termination.ipynb analyses/render_model_comparison_exclude_termination.ipynb --progress-bar
-papermill analyses/render_model_comparison_include_termination.ipynb analyses/render_model_comparison_include_termination.ipynb --progress-bar
+papermill analyses/render_model_comparison.ipynb analyses/render_model_comparison.ipynb --progress-bar
 ```
 
 ---
