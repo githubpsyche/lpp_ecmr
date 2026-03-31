@@ -199,6 +199,14 @@ squeue -u "$USER" | grep post-fit
 
 Logs land in `runs/<run_id>/logs/`.
 
+If there are failures (transient kernel deaths are normal at ~1-2% rate), resubmit them:
+
+```bash
+~/workspace/sbatch/resubmit_failed.sh \
+  --sentinel ~/workspace/lpp_ecmr/scripts/post_fit.sh \
+  ~/workspace/lpp_ecmr/runs/<run_id>
+```
+
 ### 6. After everything completes
 
 If you used `--sentinel`, the merge and simulation steps run automatically. You'll get an email when the full pipeline finishes (fitting → merge → simulation).
