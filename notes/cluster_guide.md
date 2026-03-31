@@ -161,6 +161,10 @@ cd ~/workspace/sbatch
   --sentinel ~/workspace/lpp_ecmr/scripts/post_fit.sh \
   ~/workspace/lpp_ecmr/analyses/rendered \
   "fitting_*_sub*.ipynb"
+```
+
+```bash
+cd ~/workspace/sbatch
 
 # Pooled fits (one fit per model, all subjects)
 ./submit_notebooks.sh \
@@ -168,7 +172,7 @@ cd ~/workspace/sbatch
   "pooled_fitting_*.ipynb"
 ```
 
-This submits one Slurm array job with one task per per-subject notebook. Each task gets 1 CPU, 4GB memory, and a 12-hour walltime. The default throttle is 100 concurrent tasks.
+This submits one Slurm array job with one task per per-subject notebook. Each task gets 1 CPU, 16GB memory, and a 12-hour walltime. The default throttle is 100 concurrent tasks.
 
 The `--sentinel` flag triggers an automatic post-fit pipeline after all fitting jobs succeed: it merges partial fits (`scripts/merge_partials.py`) and submits the simulation notebooks. Omit `--sentinel` to handle post-fit steps manually.
 
