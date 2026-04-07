@@ -1,33 +1,0 @@
-Input Notebook:  /home/jg2204/workspace/lpp_ecmr/analyses/rendered/fitting_TalmiEEG_eCMR_PositionalStop_group_level_best_of_3.ipynb
-Output Notebook: /home/jg2204/workspace/lpp_ecmr/analyses/rendered/fitting_TalmiEEG_eCMR_PositionalStop_group_level_best_of_3.ipynb
-Executing:   0%|          | 0/14 [00:00<?, ?cell/s]Executing notebook with kernel: python3
-Executing:   7%|▋         | 1/14 [00:26<05:48, 26.82s/cell]Executing:  14%|█▍        | 2/14 [01:23<08:54, 44.52s/cell]Executing:  29%|██▊       | 4/14 [01:23<02:46, 16.65s/cell]Executing:  43%|████▎     | 6/14 [01:30<01:22, 10.27s/cell]Kernel died while waiting for execute reply.
-Executing:  57%|█████▋    | 8/14 [01:49<00:59,  9.94s/cell]Executing:  57%|█████▋    | 8/14 [01:49<01:21, 13.64s/cell]
-Traceback (most recent call last):
-  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/papermill/cli.py", line 235, in papermill
-    execute_notebook(
-  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/papermill/execute.py", line 116, in execute_notebook
-    nb = papermill_engines.execute_notebook_with_engine(
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/papermill/engines.py", line 49, in execute_notebook_with_engine
-    return self.get_engine(engine_name).execute_notebook(nb, kernel_name, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/papermill/engines.py", line 371, in execute_notebook
-    cls.execute_managed_notebook(nb_man, kernel_name, log_output=log_output, **kwargs)
-  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/papermill/engines.py", line 443, in execute_managed_notebook
-    return PapermillNotebookClient(nb_man, **final_kwargs).execute()
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/papermill/clientwrap.py", line 45, in execute
-    self.papermill_execute_cells()
-  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/papermill/clientwrap.py", line 72, in papermill_execute_cells
-    self.execute_cell(cell, index)
-  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
-    return loop.run_until_complete(inner)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib64/python3.12/asyncio/base_events.py", line 691, in run_until_complete
-    return future.result()
-           ^^^^^^^^^^^^^^^
-  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/nbclient/client.py", line 1009, in async_execute_cell
-    raise DeadKernelError("Kernel died") from None
-nbclient.exceptions.DeadKernelError: Kernel died
-slurmstepd: error: Detected 1 oom_kill event in StepId=26556553.batch. Some of the step tasks have been OOM Killed.

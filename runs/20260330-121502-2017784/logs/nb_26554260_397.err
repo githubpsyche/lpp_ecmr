@@ -1,4 +1,0 @@
-Input Notebook:  /home/jg2204/workspace/lpp_ecmr/analyses/rendered/fitting_TalmiEEG_eCMR_50_set_likelihood_best_of_3_sub8.ipynb
-Output Notebook: /home/jg2204/workspace/lpp_ecmr/analyses/rendered/fitting_TalmiEEG_eCMR_50_set_likelihood_best_of_3_sub8.ipynb
-Executing:   0%|          | 0/14 [00:00<?, ?cell/s]Executing notebook with kernel: python3
-Executing:   7%|▋         | 1/14 [00:02<00:35,  2.71s/cell]Executing:  14%|█▍        | 2/14 [00:08<00:52,  4.41s/cell]Executing:  43%|████▎     | 6/14 [00:08<00:09,  1.13s/cell]Executing:  57%|█████▋    | 8/14 [16:25<17:24, 174.06s/cell]Executing:  71%|███████▏  | 10/14 [16:25<07:42, 115.57s/cell]Executing:  93%|█████████▎| 13/14 [16:37<01:08, 68.79s/cell] Executing: 100%|██████████| 14/14 [16:38<00:00, 71.31s/cell]

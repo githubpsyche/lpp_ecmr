@@ -1,20 +1,0 @@
-Input Notebook:  /home/jg2204/workspace/lpp_ecmr/analyses/rendered/fitting_TalmiEEG_LPP_eCMR_50_set_likelihood_best_of_3_sub2.ipynb
-Output Notebook: /home/jg2204/workspace/lpp_ecmr/analyses/rendered/fitting_TalmiEEG_LPP_eCMR_50_set_likelihood_best_of_3_sub2.ipynb
-Executing:   0%|          | 0/14 [00:00<?, ?cell/s]Exception in thread Heartbeat:
-Traceback (most recent call last):
-  File "/usr/lib64/python3.12/threading.py", line 1075, in _bootstrap_inner
-    self.run()
-  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/heartbeat.py", line 98, in run
-    self._bind_socket()
-  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/heartbeat.py", line 77, in _bind_socket
-    self._try_bind_socket()
-  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/ipykernel/heartbeat.py", line 64, in _try_bind_socket
-    return self.socket.bind(f"{self.transport}://{self.ip}" + c + str(self.port))
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/jg2204/workspace/.venv/lib64/python3.12/site-packages/zmq/sugar/socket.py", line 320, in bind
-    super().bind(addr)
-  File "zmq/backend/cython/_zmq.py", line 1009, in zmq.backend.cython._zmq.Socket.bind
-  File "zmq/backend/cython/_zmq.py", line 190, in zmq.backend.cython._zmq._check_rc
-zmq.error.ZMQError: Address already in use (addr='tcp://127.0.0.1:47721')
-Executing notebook with kernel: python3
-Executing:   7%|▋         | 1/14 [00:26<05:39, 26.13s/cell]Executing:  14%|█▍        | 2/14 [01:13<07:46, 38.85s/cell]Executing:  21%|██▏       | 3/14 [01:14<03:52, 21.17s/cell]Executing:  29%|██▊       | 4/14 [01:14<02:08, 12.85s/cell]Executing:  43%|████▎     | 6/14 [01:18<00:58,  7.26s/cell]Executing:  57%|█████▋    | 8/14 [11:52<14:04, 140.71s/cell]Executing:  71%|███████▏  | 10/14 [11:53<05:49, 87.33s/cell]Executing:  86%|████████▌ | 12/14 [11:53<01:53, 56.57s/cell]Executing:  93%|█████████▎| 13/14 [12:17<00:49, 49.84s/cell]Executing: 100%|██████████| 14/14 [12:18<00:00, 52.77s/cell]
