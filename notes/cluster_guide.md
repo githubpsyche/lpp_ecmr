@@ -195,6 +195,21 @@ To check a specific run:
 ~/workspace/sbatch/check_run.sh ~/workspace/lpp_ecmr/runs/<run_id>
 ```
 
+Check which runs have failed:
+
+```bash
+cd ~/workspace/lpp_ecmr
+~/workspace/sbatch/check_run.sh -v | grep FAILED
+```
+
+The verbose failure rows include the task index, state, notebook path, and stderr path.
+Inspect one failing stderr log before deciding whether the failures are transient:
+
+```bash
+~/workspace/sbatch/check_run.sh -v | grep FAILED | awk '{print $4}' | head -1
+sed -n '1,200p' <stderr_path>
+```
+
 Check if the post-fit sentinel is queued:
 
 ```bash

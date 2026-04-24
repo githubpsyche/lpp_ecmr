@@ -17,7 +17,7 @@ _POSITIONAL_STOP_FIELDS = {
         "termination_policy_create_fn": "jaxcmr.components.termination.PositionalTermination",
     },
     "sim_alg_path": "jaxcmr.simulation.simulate_study_and_free_recall",
-    "loss_fn_path": "jaxcmr.loss.set_permutation_likelihood.IncludeTerminationLikelihoodFnGenerator",
+    "loss_fn_path": "jaxcmr.loss.set_permutation_likelihood.IncludeTerminationLikelihoodLoss",
     "comparison_analysis_configs": STOP_COMPARISON_ANALYSIS_CONFIGS,
 }
 

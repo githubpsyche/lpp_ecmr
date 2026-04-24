@@ -70,7 +70,7 @@ BASE_PARAMS = {
         "termination_policy_create_fn": "jaxcmr.components.termination.NoStopTermination",
     },
     "sim_alg_path": "jaxcmr.simulation.simulate_study_free_recall_and_forced_stop",
-    "loss_fn_path": "jaxcmr.loss.set_permutation_likelihood.ExcludeTerminationLikelihoodFnGenerator",
+    "loss_fn_path": "jaxcmr.loss.set_permutation_likelihood.ExcludeTerminationLikelihoodLoss",
     "fit_alg_path": "jaxcmr.fitting.ScipyDE",
     "seed": 0,
     "relative_tolerance": 0.001,
