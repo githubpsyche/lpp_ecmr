@@ -13,6 +13,22 @@ __pycache__/
 **/*.quarto_ipynb
 _freeze/
 
+# LaTeX auxiliary files
+*.aux
+*.bcf
+*.blg
+*.fff
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.ttt
+*.xdv
+
 # Editor
 .vscode/
 .luarc.json
