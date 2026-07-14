@@ -1,0 +1,218 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1130 730" width="1130" height="730" font-family="Helvetica, Arial, sans-serif" role="img" aria-labelledby="title desc">
+  <title id="title">Conceptual comparison of four retrieved-context models</title>
+  <desc id="desc">Four matched panels compare CMR, CMR plus LPP, eCMR, and LPP-eCMR. Context and feature boxes show whether emotional representations are included. MFC and MCF use collapsed memory-channel labels. Early LPP occupies the same position and connects to the same encoding-strength location in every panel.</desc>
+
+  <defs>
+    <marker id="v002-arrow-gray" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <path d="M0,0 L9,3.5 L0,7 Z" fill="#525A62"/>
+    </marker>
+    <marker id="v002-arrow-orange" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <path d="M0,0 L9,3.5 L0,7 Z" fill="#D97706"/>
+    </marker>
+
+    <linearGradient id="v002-dual-memory" x1="0" x2="1">
+      <stop offset="0%" stop-color="#EAF3FB"/>
+      <stop offset="49%" stop-color="#EAF3FB"/>
+      <stop offset="51%" stop-color="#F9EAF2"/>
+      <stop offset="100%" stop-color="#F9EAF2"/>
+    </linearGradient>
+    <linearGradient id="v002-category-lpp" x1="0" x2="1">
+      <stop offset="0%" stop-color="#F9EAF2"/>
+      <stop offset="49%" stop-color="#F9EAF2"/>
+      <stop offset="51%" stop-color="#FFF4DF"/>
+      <stop offset="100%" stop-color="#FFF4DF"/>
+    </linearGradient>
+
+    <style>
+      .panel-letter { fill: #202428; font-size: 24px; font-weight: 700; }
+      .model-name { fill: #202428; font-size: 23px; font-weight: 700; }
+      .level-title { fill: #202428; font-size: 17px; font-weight: 700; }
+      .outer-box { fill: #DCE1E6; stroke: #687079; stroke-width: 1.7; }
+      .memory-box { fill: #EEF1F3; stroke: #687079; stroke-width: 1.7; }
+      .memory-title { fill: #30363B; font-size: 14px; font-weight: 700; }
+      .temporal-cell { fill: #EAF3FB; stroke: #2E78B0; stroke-width: 1.7; }
+      .emotional-cell { fill: #F9EAF2; stroke: #A74C78; stroke-width: 1.7; }
+      .ghost-cell { fill: #F8F8F8; stroke: #A7ABB0; stroke-width: 1.4; stroke-dasharray: 5 4; }
+      .cell-text { fill: #263B4C; font-size: 15px; font-weight: 700; }
+      .emotion-text { fill: #6F324F; font-size: 14px; font-weight: 700; }
+      .ghost-text { fill: #858A90; font-size: 13.5px; font-weight: 700; }
+      .memory-pill-temporal { fill: #EAF3FB; stroke: #2E78B0; stroke-width: 1.5; }
+      .memory-pill-dual { fill: url(#v002-dual-memory); stroke: #7C6470; stroke-width: 1.5; }
+      .memory-pill-text { fill: #303A42; font-size: 14px; font-weight: 700; }
+      .memory-pill-text-small { fill: #303A42; font-size: 12.5px; font-weight: 700; }
+      .encoding-base { fill: #FFFFFF; stroke: #A7ABB0; stroke-width: 1.3; }
+      .encoding-lpp { fill: #FFF4DF; stroke: #D97706; stroke-width: 1.6; }
+      .encoding-category { fill: #F9EAF2; stroke: #A74C78; stroke-width: 1.6; }
+      .encoding-both { fill: url(#v002-category-lpp); stroke: #9B6555; stroke-width: 1.6; }
+      .encoding-text { fill: #4C5359; font-size: 13.5px; font-weight: 700; }
+      .encoding-text-lpp { fill: #75400A; font-size: 13.5px; font-weight: 700; }
+      .encoding-text-category { fill: #6F324F; font-size: 12.5px; font-weight: 700; }
+      .structure-arrow { fill: none; stroke: #525A62; stroke-width: 2.3; stroke-linejoin: round; marker-end: url(#v002-arrow-gray); }
+      .arrow-label { fill: #525A62; font-size: 13.5px; font-weight: 700; }
+      .lpp-active { fill: #FFF4DF; stroke: #D97706; stroke-width: 1.9; }
+      .lpp-ghost { fill: #F8F8F8; stroke: #A7ABB0; stroke-width: 1.4; stroke-dasharray: 5 4; }
+      .lpp-title { fill: #75400A; font-size: 15.5px; font-weight: 700; }
+      .lpp-scope { fill: #75400A; font-size: 12.5px; }
+      .lpp-title-ghost { fill: #858A90; font-size: 15px; font-weight: 700; }
+      .lpp-line { fill: none; stroke: #D97706; stroke-width: 2.6; marker-end: url(#v002-arrow-orange); }
+      .lpp-line-ghost { fill: none; stroke: #A7ABB0; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    </style>
+
+    <g id="v002-panel-base">
+      <!-- Context and feature levels -->
+      <text x="280" y="38" text-anchor="middle" class="level-title">Context (C)</text>
+      <rect x="120" y="47" width="320" height="84" rx="18" class="outer-box"/>
+
+      <text x="280" y="262" text-anchor="middle" class="level-title">Features (F)</text>
+      <rect x="120" y="271" width="320" height="84" rx="18" class="outer-box"/>
+
+      <!-- Memory blocks -->
+      <rect x="10" y="142" width="130" height="112" rx="15" class="memory-box"/>
+      <text x="75" y="165" text-anchor="middle" class="memory-title">Feature-to-context</text>
+      <text x="75" y="182" text-anchor="middle" class="memory-title">memory (MFC)</text>
+
+      <rect x="420" y="142" width="130" height="112" rx="15" class="memory-box"/>
+      <text x="485" y="165" text-anchor="middle" class="memory-title">Context-to-feature</text>
+      <text x="485" y="182" text-anchor="middle" class="memory-title">memory (MCF)</text>
+
+      <!-- Retrieved-context cycle -->
+      <polyline points="75,142 75,89 120,89" class="structure-arrow"/>
+      <polyline points="440,89 485,89 485,142" class="structure-arrow"/>
+      <polyline points="120,313 75,313 75,254" class="structure-arrow"/>
+      <polyline points="485,254 485,313 440,313" class="structure-arrow"/>
+
+      <text x="88" y="62" text-anchor="middle" class="arrow-label">updates</text>
+      <text x="88" y="78" text-anchor="middle" class="arrow-label">context</text>
+      <text x="478" y="334" text-anchor="middle" class="arrow-label">cues</text>
+      <text x="478" y="350" text-anchor="middle" class="arrow-label">features</text>
+    </g>
+  </defs>
+
+  <rect width="1130" height="730" fill="#FFFFFF"/>
+
+  <!-- A. CMR -->
+  <g transform="translate(0,0)">
+    <use href="#v002-panel-base"/>
+    <text x="12" y="26" class="panel-letter">A</text>
+    <text x="42" y="26" class="model-name">CMR</text>
+
+    <rect x="132" y="65" width="137" height="48" rx="12" class="temporal-cell"/>
+    <text x="200.5" y="94" text-anchor="middle" class="cell-text">Temporal context</text>
+    <rect x="291" y="65" width="137" height="48" rx="12" class="ghost-cell"/>
+    <text x="359.5" y="86" text-anchor="middle" class="ghost-text">Emotional</text>
+    <text x="359.5" y="103" text-anchor="middle" class="ghost-text">context</text>
+
+    <rect x="132" y="289" width="137" height="48" rx="12" class="temporal-cell"/>
+    <text x="200.5" y="318" text-anchor="middle" class="cell-text">Item features</text>
+    <rect x="291" y="289" width="137" height="48" rx="12" class="ghost-cell"/>
+    <text x="359.5" y="310" text-anchor="middle" class="ghost-text">Emotion</text>
+    <text x="359.5" y="327" text-anchor="middle" class="ghost-text">features</text>
+
+    <rect x="22" y="197" width="106" height="36" rx="9" class="memory-pill-temporal"/>
+    <text x="75" y="220" text-anchor="middle" class="memory-pill-text">Temporal</text>
+    <rect x="432" y="193" width="106" height="31" rx="8" class="memory-pill-temporal"/>
+    <text x="485" y="213" text-anchor="middle" class="memory-pill-text">Temporal</text>
+    <rect x="432" y="229" width="106" height="19" rx="6" class="encoding-base"/>
+    <text x="485" y="243" text-anchor="middle" class="encoding-text">baseline</text>
+
+    <rect x="306" y="171" width="100" height="52" rx="12" class="lpp-ghost"/>
+    <text x="356" y="202" text-anchor="middle" class="lpp-title-ghost">Early LPP</text>
+    <path d="M406,197 C417,197 414,238 428,238" class="lpp-line-ghost"/>
+  </g>
+
+  <!-- B. CMR + LPP -->
+  <g transform="translate(570,0)">
+    <use href="#v002-panel-base"/>
+    <text x="12" y="26" class="panel-letter">B</text>
+    <text x="42" y="26" class="model-name">CMR + LPP</text>
+
+    <rect x="132" y="65" width="137" height="48" rx="12" class="temporal-cell"/>
+    <text x="200.5" y="94" text-anchor="middle" class="cell-text">Temporal context</text>
+    <rect x="291" y="65" width="137" height="48" rx="12" class="ghost-cell"/>
+    <text x="359.5" y="86" text-anchor="middle" class="ghost-text">Emotional</text>
+    <text x="359.5" y="103" text-anchor="middle" class="ghost-text">context</text>
+
+    <rect x="132" y="289" width="137" height="48" rx="12" class="temporal-cell"/>
+    <text x="200.5" y="318" text-anchor="middle" class="cell-text">Item features</text>
+    <rect x="291" y="289" width="137" height="48" rx="12" class="ghost-cell"/>
+    <text x="359.5" y="310" text-anchor="middle" class="ghost-text">Emotion</text>
+    <text x="359.5" y="327" text-anchor="middle" class="ghost-text">features</text>
+
+    <rect x="22" y="197" width="106" height="36" rx="9" class="memory-pill-temporal"/>
+    <text x="75" y="220" text-anchor="middle" class="memory-pill-text">Temporal</text>
+    <rect x="432" y="193" width="106" height="31" rx="8" class="memory-pill-temporal"/>
+    <text x="485" y="213" text-anchor="middle" class="memory-pill-text">Temporal</text>
+    <rect x="432" y="229" width="106" height="19" rx="6" class="encoding-lpp"/>
+    <text x="485" y="243" text-anchor="middle" class="encoding-text-lpp">LPP</text>
+
+    <rect x="306" y="171" width="100" height="52" rx="12" class="lpp-active"/>
+    <text x="356" y="194" text-anchor="middle" class="lpp-title">Early LPP</text>
+    <text x="356" y="213" text-anchor="middle" class="lpp-scope">all items</text>
+    <path d="M406,197 C417,197 414,238 428,238" class="lpp-line"/>
+  </g>
+
+  <!-- C. eCMR -->
+  <g transform="translate(0,365)">
+    <use href="#v002-panel-base"/>
+    <text x="12" y="26" class="panel-letter">C</text>
+    <text x="42" y="26" class="model-name">eCMR</text>
+
+    <rect x="132" y="65" width="137" height="48" rx="12" class="temporal-cell"/>
+    <text x="200.5" y="94" text-anchor="middle" class="cell-text">Temporal context</text>
+    <rect x="291" y="65" width="137" height="48" rx="12" class="emotional-cell"/>
+    <text x="359.5" y="86" text-anchor="middle" class="emotion-text">Emotional</text>
+    <text x="359.5" y="103" text-anchor="middle" class="emotion-text">context</text>
+
+    <rect x="132" y="289" width="137" height="48" rx="12" class="temporal-cell"/>
+    <text x="200.5" y="318" text-anchor="middle" class="cell-text">Item features</text>
+    <rect x="291" y="289" width="137" height="48" rx="12" class="emotional-cell"/>
+    <text x="359.5" y="310" text-anchor="middle" class="emotion-text">Emotion</text>
+    <text x="359.5" y="327" text-anchor="middle" class="emotion-text">features</text>
+
+    <rect x="22" y="194" width="106" height="42" rx="9" class="memory-pill-dual"/>
+    <text x="75" y="211" text-anchor="middle" class="memory-pill-text-small">Temporal +</text>
+    <text x="75" y="226" text-anchor="middle" class="memory-pill-text-small">emotional</text>
+    <rect x="432" y="190" width="106" height="34" rx="8" class="memory-pill-dual"/>
+    <text x="485" y="205" text-anchor="middle" class="memory-pill-text-small">Temporal +</text>
+    <text x="485" y="219" text-anchor="middle" class="memory-pill-text-small">emotional</text>
+    <rect x="432" y="229" width="106" height="19" rx="6" class="encoding-category"/>
+    <text x="485" y="243" text-anchor="middle" class="encoding-text-category">category</text>
+
+    <rect x="306" y="171" width="100" height="52" rx="12" class="lpp-ghost"/>
+    <text x="356" y="202" text-anchor="middle" class="lpp-title-ghost">Early LPP</text>
+    <path d="M406,197 C417,197 414,238 428,238" class="lpp-line-ghost"/>
+  </g>
+
+  <!-- D. LPP-eCMR -->
+  <g transform="translate(570,365)">
+    <use href="#v002-panel-base"/>
+    <text x="12" y="26" class="panel-letter">D</text>
+    <text x="42" y="26" class="model-name">LPP-eCMR</text>
+
+    <rect x="132" y="65" width="137" height="48" rx="12" class="temporal-cell"/>
+    <text x="200.5" y="94" text-anchor="middle" class="cell-text">Temporal context</text>
+    <rect x="291" y="65" width="137" height="48" rx="12" class="emotional-cell"/>
+    <text x="359.5" y="86" text-anchor="middle" class="emotion-text">Emotional</text>
+    <text x="359.5" y="103" text-anchor="middle" class="emotion-text">context</text>
+
+    <rect x="132" y="289" width="137" height="48" rx="12" class="temporal-cell"/>
+    <text x="200.5" y="318" text-anchor="middle" class="cell-text">Item features</text>
+    <rect x="291" y="289" width="137" height="48" rx="12" class="emotional-cell"/>
+    <text x="359.5" y="310" text-anchor="middle" class="emotion-text">Emotion</text>
+    <text x="359.5" y="327" text-anchor="middle" class="emotion-text">features</text>
+
+    <rect x="22" y="194" width="106" height="42" rx="9" class="memory-pill-dual"/>
+    <text x="75" y="211" text-anchor="middle" class="memory-pill-text-small">Temporal +</text>
+    <text x="75" y="226" text-anchor="middle" class="memory-pill-text-small">emotional</text>
+    <rect x="432" y="190" width="106" height="34" rx="8" class="memory-pill-dual"/>
+    <text x="485" y="205" text-anchor="middle" class="memory-pill-text-small">Temporal +</text>
+    <text x="485" y="219" text-anchor="middle" class="memory-pill-text-small">emotional</text>
+    <rect x="432" y="229" width="106" height="19" rx="6" class="encoding-both"/>
+    <text x="485" y="243" text-anchor="middle" class="encoding-text-category">category + LPP</text>
+
+    <rect x="306" y="171" width="100" height="52" rx="12" class="lpp-active"/>
+    <text x="356" y="194" text-anchor="middle" class="lpp-title">Early LPP</text>
+    <text x="356" y="213" text-anchor="middle" class="lpp-scope">emotional items</text>
+    <path d="M406,197 C417,197 414,238 428,238" class="lpp-line"/>
+  </g>
+</svg>

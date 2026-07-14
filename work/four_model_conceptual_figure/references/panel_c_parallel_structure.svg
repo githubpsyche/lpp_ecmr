@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="760" height="440" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#4B5158"/>
+    </marker>
+  </defs>
+
+  <rect width="760" height="440" fill="#FFFFFF"/>
+
+  <text x="18" y="30" fill="#222" font-size="28" font-weight="700">C</text>
+
+  <!-- Context level -->
+  <text x="380" y="28" text-anchor="middle" fill="#222" font-size="20" font-weight="700">Context (C)</text>
+  <rect x="164" y="40" width="432" height="104" rx="24" fill="#DCE1E6" stroke="#6B6F76" stroke-width="2"/>
+  <line x1="380" y1="64" x2="380" y2="132" stroke="#6B6F76" stroke-width="2"/>
+
+  <rect x="186" y="72" width="178" height="50" rx="14" fill="#FFFFFF" stroke="#6B6F76" stroke-width="2"/>
+  <text x="275" y="104" text-anchor="middle" fill="#2C3238" font-size="18" font-weight="700">Object Context</text>
+
+  <rect x="396" y="72" width="178" height="50" rx="14" fill="#FFFFFF" stroke="#6B6F76" stroke-width="2"/>
+  <text x="485" y="104" text-anchor="middle" fill="#2C3238" font-size="18" font-weight="700">Event Context</text>
+
+  <!-- Features level -->
+  <text x="380" y="274" text-anchor="middle" fill="#222" font-size="20" font-weight="700">Features (F)</text>
+  <rect x="164" y="286" width="432" height="104" rx="24" fill="#DCE1E6" stroke="#6B6F76" stroke-width="2"/>
+  <line x1="380" y1="302" x2="380" y2="370" stroke="#6B6F76" stroke-width="2"/>
+
+  <rect x="186" y="318" width="178" height="50" rx="14" fill="#FFFFFF" stroke="#6B6F76" stroke-width="2"/>
+  <text x="275" y="350" text-anchor="middle" fill="#2C3238" font-size="18" font-weight="700">Object Features</text>
+
+  <rect x="396" y="318" width="178" height="50" rx="14" fill="#FFFFFF" stroke="#6B6F76" stroke-width="2"/>
+  <text x="485" y="350" text-anchor="middle" fill="#2C3238" font-size="18" font-weight="700">Event Features</text>
+
+  <!-- MFC block -->
+  <rect x="18" y="148" width="164" height="132" rx="18" fill="#DCE1E6" stroke="#6B6F76" stroke-width="2"/>
+  <text x="100" y="171" text-anchor="middle" fill="#333" font-size="16" font-weight="700">Feature-to-Context</text>
+  <text x="100" y="190" text-anchor="middle" fill="#333" font-size="16" font-weight="700">Memory (MFC)</text>
+  <line x1="100" y1="200" x2="100" y2="266" stroke="#6B6F76" stroke-width="1.4"/>
+  <rect x="32" y="210" width="60" height="48" rx="10" fill="#FFFFFF" stroke="#6B6F76" stroke-width="1.4"/>
+  <rect x="108" y="210" width="60" height="48" rx="10" fill="#FFFFFF" stroke="#6B6F76" stroke-width="1.4"/>
+  <text x="62" y="231" text-anchor="middle" fill="#3E444B" font-size="15" font-weight="700">Object</text>
+  <text x="62" y="248" text-anchor="middle" fill="#3E444B" font-size="15" font-weight="700">scale</text>
+  <text x="138" y="231" text-anchor="middle" fill="#3E444B" font-size="15" font-weight="700">Event</text>
+  <text x="138" y="248" text-anchor="middle" fill="#3E444B" font-size="15" font-weight="700">scale</text>
+
+  <!-- MCF block -->
+  <rect x="578" y="148" width="164" height="132" rx="18" fill="#DCE1E6" stroke="#6B6F76" stroke-width="2"/>
+  <text x="660" y="171" text-anchor="middle" fill="#333" font-size="16" font-weight="700">Context-to-Feature</text>
+  <text x="660" y="190" text-anchor="middle" fill="#333" font-size="16" font-weight="700">Memory (MCF)</text>
+  <line x1="660" y1="200" x2="660" y2="266" stroke="#6B6F76" stroke-width="1.4"/>
+  <rect x="592" y="210" width="60" height="48" rx="10" fill="#FFFFFF" stroke="#6B6F76" stroke-width="1.4"/>
+  <rect x="668" y="210" width="60" height="48" rx="10" fill="#FFFFFF" stroke="#6B6F76" stroke-width="1.4"/>
+  <text x="622" y="231" text-anchor="middle" fill="#3E444B" font-size="15" font-weight="700">Object</text>
+  <text x="622" y="248" text-anchor="middle" fill="#3E444B" font-size="15" font-weight="700">scale</text>
+  <text x="698" y="231" text-anchor="middle" fill="#3E444B" font-size="15" font-weight="700">Event</text>
+  <text x="698" y="248" text-anchor="middle" fill="#3E444B" font-size="15" font-weight="700">scale</text>
+
+  <!-- Cycle arrows -->
+  <polyline points="100,148 100,92 164,92" fill="none" stroke="#4B5158" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+  <polyline points="596,92 660,92 660,148" fill="none" stroke="#4B5158" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+
+  <polyline points="164,338 100,338 100,280" fill="none" stroke="#4B5158" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+  <polyline points="660,280 660,338 596,338" fill="none" stroke="#4B5158" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+
+  <text x="118" y="56" text-anchor="middle" fill="#4B5158" font-size="16" font-weight="700">Updates</text>
+  <text x="118" y="75" text-anchor="middle" fill="#4B5158" font-size="16" font-weight="700">Context</text>
+
+  <text x="646" y="366" text-anchor="middle" fill="#4B5158" font-size="16" font-weight="700">Cues</text>
+  <text x="646" y="385" text-anchor="middle" fill="#4B5158" font-size="16" font-weight="700">Features</text>
+</svg>

@@ -1,0 +1,24 @@
+---
+format:
+  docx:
+    reference-doc: reference_landscape.docx
+tbl-colwidths: [10, 16, 19, 18, 9, 28]
+---
+
+| Model | Context architecture | Encoding-strength modulation | Information available | Free parameters | Key prediction |
+|---|---|---|---|---:|---|
+| **CMR** | Temporal context only | No emotion or LPP term | Item identity | 9 | Neither category-level emotional advantage nor LPP-recall relationship |
+| **CMR+LPP** | Temporal context only | $\kappa_L L_i$ for **all items** | Item identity + trial-level LPP | 10 | LPP-recall relationship; only weak indirect category separation |
+| **eCMR** | Temporal + emotional context | $\phi_{emot}e_i$ | Item identity + emotional/neutral category | 10 | Emotional recall advantage, but no item-level LPP-recall relationship |
+| **LPP-eCMR** | Temporal + emotional context | $\phi_{emot}e_i+\kappa_{EL}L_i e_i$ | Category + trial-level LPP | 11 | Both emotional recall advantage and LPP-recall relationship |
+
+```{=openxml}
+<w:p><w:r><w:br w:type="page"/></w:r></w:p>
+```
+
+::: {#fig-model-comparison}
+
+![](../four_model_conceptual_figure/versions/v009_four_model_emotional_palette.png){width=95% fig-alt="Four matched retrieved-context diagrams comparing temporal and emotional representations and Early LPP modulation across CMR, CMR plus LPP, eCMR, and LPP-eCMR."}
+
+Conceptual comparison of the four models. Blue components denote temporal context, item features, and temporal memory pathways; pink components denote emotional context, emotional features, and emotional memory pathways. Early LPP modulates temporal context-to-feature learning for all items in CMR+LPP and emotional context-to-feature learning for emotional items in LPP-eCMR.
+:::

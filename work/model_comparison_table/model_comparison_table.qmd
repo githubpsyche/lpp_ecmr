@@ -1,0 +1,13 @@
+---
+format:
+  docx:
+    reference-doc: reference_landscape.docx
+tbl-colwidths: [10, 16, 19, 18, 9, 28]
+---
+
+| Model | Context architecture | Encoding-strength modulation | Information available | Free parameters | Key prediction |
+|---|---|---|---|---:|---|
+| **CMR** | Temporal context only | No emotion or LPP term | Item identity | 9 | Neither category-level emotional advantage nor LPP-recall relationship |
+| **CMR+LPP** | Temporal context only | $\kappa_L L_i$ for **all items** | Item identity + trial-level LPP | 10 | LPP-recall relationship; only weak indirect category separation |
+| **eCMR** | Temporal + emotional context | $\phi_{emot}e_i$ | Item identity + emotional/neutral category | 10 | Emotional recall advantage, but no item-level LPP-recall relationship |
+| **LPP-eCMR** | Temporal + emotional context | $\phi_{emot}e_i+\kappa_{EL}L_i e_i$ | Category + trial-level LPP | 11 | Both emotional recall advantage and LPP-recall relationship |

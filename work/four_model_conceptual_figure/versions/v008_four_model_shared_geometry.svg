@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1130 730" width="1130" height="730" font-family="Helvetica, Arial, sans-serif" role="img" aria-labelledby="title desc">
+  <title id="title">Comparison of CMR, CMR plus LPP, eCMR, and LPP-eCMR</title>
+  <desc id="desc">Four model diagrams share an identical retrieved-context architecture. CMR contains temporal components only. CMR plus LPP adds Early LPP modulation of temporal context-to-feature learning for all items. eCMR adds emotional features, emotional context, and emotional components to both memory matrices. LPP-eCMR adds Early LPP modulation of emotional context-to-feature learning for emotional items.</desc>
+
+  <defs>
+    <marker id="v008-arrow-gray" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <path d="M0,0 L9,3.5 L0,7 Z" fill="#525A62"/>
+    </marker>
+    <marker id="v008-arrow-lpp" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <path d="M0,0 L9,3.5 L0,7 Z" fill="#D97706"/>
+    </marker>
+
+    <style>
+      .panel-letter { fill: #202428; font-size: 24px; font-weight: 700; }
+      .model-name { fill: #202428; font-size: 23px; font-weight: 700; }
+      .section-label { fill: #202428; font-size: 17px; font-weight: 700; text-anchor: middle; }
+      .outer-box { fill: #DCE1E6; stroke: #687079; stroke-width: 1.7; }
+      .memory-box { fill: #EEF1F3; stroke: #687079; stroke-width: 1.7; }
+      .memory-title { fill: #30363B; font-size: 14px; font-weight: 700; text-anchor: middle; }
+      .component { fill: #EAF3FB; stroke: #2E78B0; stroke-width: 1.7; }
+      .component-text { fill: #263B4C; font-size: 14.5px; font-weight: 700; text-anchor: middle; }
+      .memory-component { fill: #EAF3FB; stroke: #2E78B0; stroke-width: 1.6; }
+      .memory-component-text { fill: #303A42; font-size: 13.5px; font-weight: 700; text-anchor: middle; }
+      .structure-arrow { fill: none; stroke: #525A62; stroke-width: 2.3; stroke-linejoin: round; marker-end: url(#v008-arrow-gray); }
+      .cycle-label { fill: #525A62; font-size: 13.5px; font-weight: 700; text-anchor: middle; }
+      .lpp-box { fill: #FFF4DF; stroke: #D97706; stroke-width: 1.9; }
+      .lpp-title { fill: #75400A; font-size: 15.5px; font-weight: 700; text-anchor: middle; }
+      .lpp-scope { fill: #75400A; font-size: 11.5px; text-anchor: middle; }
+      .lpp-arrow { fill: none; stroke: #D97706; stroke-width: 2.5; stroke-linejoin: round; marker-end: url(#v008-arrow-lpp); }
+    </style>
+
+    <g id="v008-shared-architecture">
+      <!-- Context -->
+      <text x="280" y="38" class="section-label">Context (C)</text>
+      <rect x="120" y="47" width="320" height="84" rx="18" class="outer-box"/>
+
+      <!-- Features -->
+      <text x="280" y="262" class="section-label">Features (F)</text>
+      <rect x="120" y="271" width="320" height="84" rx="18" class="outer-box"/>
+
+      <!-- Parallel memory systems -->
+      <rect x="10" y="142" width="130" height="112" rx="15" class="memory-box"/>
+      <text x="75" y="165" class="memory-title">Feature-to-context</text>
+      <text x="75" y="182" class="memory-title">memory (MFC)</text>
+
+      <rect x="420" y="142" width="130" height="112" rx="15" class="memory-box"/>
+      <text x="485" y="165" class="memory-title">Context-to-feature</text>
+      <text x="485" y="182" class="memory-title">memory (MCF)</text>
+
+      <!-- Retrieved-context cycle -->
+      <polyline points="75,142 75,89 120,89" class="structure-arrow"/>
+      <polyline points="440,89 485,89 485,142" class="structure-arrow"/>
+      <polyline points="120,313 75,313 75,254" class="structure-arrow"/>
+      <polyline points="485,254 485,313 440,313" class="structure-arrow"/>
+      <text x="88" y="62" class="cycle-label">updates</text>
+      <text x="88" y="78" class="cycle-label">context</text>
+      <text x="478" y="334" class="cycle-label">cues</text>
+      <text x="478" y="350" class="cycle-label">features</text>
+    </g>
+  </defs>
+
+  <rect width="1130" height="730" fill="#FFFFFF"/>
+
+  <!-- A. CMR -->
+  <g transform="translate(0 0)">
+    <use href="#v008-shared-architecture"/>
+    <text x="12" y="26" class="panel-letter">A</text>
+    <text x="42" y="26" class="model-name">CMR</text>
+
+    <rect x="211.5" y="65" width="137" height="48" rx="12" class="component"/>
+    <text x="280" y="94" class="component-text">Temporal context</text>
+    <rect x="211.5" y="289" width="137" height="48" rx="12" class="component"/>
+    <text x="280" y="318" class="component-text">Item features</text>
+
+    <rect x="22" y="209" width="106" height="24" rx="7" class="memory-component"/>
+    <text x="75" y="226" class="memory-component-text">Temporal</text>
+    <rect x="432" y="209" width="106" height="24" rx="7" class="memory-component"/>
+    <text x="485" y="226" class="memory-component-text">Temporal</text>
+  </g>
+
+  <!-- B. CMR + LPP -->
+  <g transform="translate(570 0)">
+    <use href="#v008-shared-architecture"/>
+    <text x="12" y="26" class="panel-letter">B</text>
+    <text x="42" y="26" class="model-name">CMR + LPP</text>
+
+    <rect x="211.5" y="65" width="137" height="48" rx="12" class="component"/>
+    <text x="280" y="94" class="component-text">Temporal context</text>
+    <rect x="211.5" y="289" width="137" height="48" rx="12" class="component"/>
+    <text x="280" y="318" class="component-text">Item features</text>
+
+    <rect x="22" y="209" width="106" height="24" rx="7" class="memory-component"/>
+    <text x="75" y="226" class="memory-component-text">Temporal</text>
+    <rect x="432" y="209" width="106" height="24" rx="7" class="memory-component"/>
+    <text x="485" y="226" class="memory-component-text">Temporal</text>
+
+    <rect x="306" y="142" width="100" height="52" rx="12" class="lpp-box"/>
+    <text x="356" y="165" class="lpp-title">Early LPP</text>
+    <text x="356" y="184" class="lpp-scope">all items</text>
+    <path d="M356,194 V221 H429" class="lpp-arrow"/>
+  </g>
+
+  <!-- C. eCMR -->
+  <g transform="translate(0 370)">
+    <use href="#v008-shared-architecture"/>
+    <text x="12" y="26" class="panel-letter">C</text>
+    <text x="42" y="26" class="model-name">eCMR</text>
+
+    <rect x="132" y="65" width="137" height="48" rx="12" class="component"/>
+    <text x="200.5" y="94" class="component-text">Temporal context</text>
+    <rect x="291" y="65" width="137" height="48" rx="12" class="component"/>
+    <text x="359.5" y="94" class="component-text">Emotional context</text>
+
+    <rect x="132" y="289" width="137" height="48" rx="12" class="component"/>
+    <text x="200.5" y="318" class="component-text">Item features</text>
+    <rect x="291" y="289" width="137" height="48" rx="12" class="component"/>
+    <text x="359.5" y="318" class="component-text">Emotional features</text>
+
+    <rect x="22" y="194" width="106" height="24" rx="7" class="memory-component"/>
+    <text x="75" y="211" class="memory-component-text">Temporal</text>
+    <rect x="22" y="224" width="106" height="24" rx="7" class="memory-component"/>
+    <text x="75" y="241" class="memory-component-text">Emotional</text>
+
+    <rect x="432" y="194" width="106" height="24" rx="7" class="memory-component"/>
+    <text x="485" y="211" class="memory-component-text">Temporal</text>
+    <rect x="432" y="224" width="106" height="24" rx="7" class="memory-component"/>
+    <text x="485" y="241" class="memory-component-text">Emotional</text>
+  </g>
+
+  <!-- D. LPP-eCMR -->
+  <g transform="translate(570 370)">
+    <use href="#v008-shared-architecture"/>
+    <text x="12" y="26" class="panel-letter">D</text>
+    <text x="42" y="26" class="model-name">LPP-eCMR</text>
+
+    <rect x="132" y="65" width="137" height="48" rx="12" class="component"/>
+    <text x="200.5" y="94" class="component-text">Temporal context</text>
+    <rect x="291" y="65" width="137" height="48" rx="12" class="component"/>
+    <text x="359.5" y="94" class="component-text">Emotional context</text>
+
+    <rect x="132" y="289" width="137" height="48" rx="12" class="component"/>
+    <text x="200.5" y="318" class="component-text">Item features</text>
+    <rect x="291" y="289" width="137" height="48" rx="12" class="component"/>
+    <text x="359.5" y="318" class="component-text">Emotional features</text>
+
+    <rect x="22" y="194" width="106" height="24" rx="7" class="memory-component"/>
+    <text x="75" y="211" class="memory-component-text">Temporal</text>
+    <rect x="22" y="224" width="106" height="24" rx="7" class="memory-component"/>
+    <text x="75" y="241" class="memory-component-text">Emotional</text>
+
+    <rect x="432" y="194" width="106" height="24" rx="7" class="memory-component"/>
+    <text x="485" y="211" class="memory-component-text">Temporal</text>
+    <rect x="432" y="224" width="106" height="24" rx="7" class="memory-component"/>
+    <text x="485" y="241" class="memory-component-text">Emotional</text>
+
+    <rect x="306" y="142" width="100" height="52" rx="12" class="lpp-box"/>
+    <text x="356" y="165" class="lpp-title">Early LPP</text>
+    <text x="356" y="184" class="lpp-scope">emotional items</text>
+    <path d="M356,194 V236 H429" class="lpp-arrow"/>
+  </g>
+</svg>
