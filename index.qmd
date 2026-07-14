@@ -533,9 +533,9 @@ A weaker relationship for neutral items could still exist, but under the present
 
 ::: {#fig-empirical layout-ncol=2}
 
-![](figures/analyses/reference_catspc.png)
+![](work/reference_analyses/reference_catspc.png)
 
-![](figures/analyses/cat_lpp_by_recall_EarlyLPP_Negative.png)
+![](work/reference_analyses/cat_lpp_by_recall_EarlyLPP_Negative.png)
 
 Empirical benchmark diagnostics. Left: category-specific serial position curves showing the negative-above-neutral recall advantage. Right: Early LPP amplitude by recall status for negative items showing the recalled/unrecalled separation.
 :::
