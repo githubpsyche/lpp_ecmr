@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["papermill", "ipykernel", "ruff"]
+dev = ["papermill", "ipykernel", "pytest", "ruff"]
 
 [tool.uv.sources]
 jaxcmr = { path = "../jaxcmr", editable = true }

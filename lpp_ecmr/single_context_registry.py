@@ -1,6 +1,12 @@
 """Single-context model registry for lpp_ecmr render notebooks."""
 
-from .fitting_config import BASE_FREE, ECMR_FREE, EPS, STOP_COMPARISON_ANALYSIS_CONFIGS, STOP_FREE, _NO_LPP_FIXED, _NO_STOP_FIXED
+from .fitting_config import (
+    BASE_FREE,
+    EPS,
+    STOP_COMPARISON_ANALYSIS_CONFIGS,
+    STOP_FREE,
+    _NO_STOP_FIXED,
+)
 
 __all__ = ["SINGLE_CONTEXT_MODELS"]
 
@@ -66,7 +72,7 @@ SINGLE_CONTEXT_MODELS = [
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
-                "learn_after_context_update": False,
+                "learn_after_context_update": True,
             },
             "free": {**BASE_FREE, **STOP_FREE},
         },
@@ -80,7 +86,7 @@ SINGLE_CONTEXT_MODELS = [
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
-                "learn_after_context_update": False,
+                "learn_after_context_update": True,
                 "modulate_emotion_by_primacy": False,
                 "emotion_scale": 0.0,
                 "lpp_main_threshold": 0.0,
@@ -104,7 +110,7 @@ SINGLE_CONTEXT_MODELS = [
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
-                "learn_after_context_update": False,
+                "learn_after_context_update": True,
             },
             "free": {**BASE_FREE, **STOP_FREE},
         },
@@ -118,7 +124,7 @@ SINGLE_CONTEXT_MODELS = [
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
-                "learn_after_context_update": False,
+                "learn_after_context_update": True,
                 "modulate_emotion_by_primacy": False,
                 "emotion_scale": 0.0,
                 "lpp_main_threshold": 0.0,

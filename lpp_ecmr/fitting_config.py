@@ -38,7 +38,7 @@ STOP_FREE = {
 # Shared fixed parameters for models that disable stopping/context-update
 _NO_STOP_FIXED = {
     "allow_repeated_recalls": False,
-    "learn_after_context_update": False,
+    "learn_after_context_update": True,
 }
 
 _NO_LPP_FIXED = {

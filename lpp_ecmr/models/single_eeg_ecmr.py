@@ -1,9 +1,9 @@
-"""Single-context eCMR with EEG-modulated encoding strength.
+"""Single-context CMR with EEG-modulated encoding strength.
 
 Single-context counterpart of full_eeg_ecmr. Emotion and EEG (LPP) signals
-modulate the context-to-item association (MCF) learning rate via phi_emot,
-using the same encoding formula as full eCMR but without the dual
-temporal/emotional context architecture.
+modulate the context-to-item association (MCF) learning rate through a
+categorical multiplier and exponential LPP multiplier, using the same
+encoding formula as full eCMR but without the dual-context architecture.
 
 """
 
@@ -37,11 +37,14 @@ from jaxcmr.typing import (
     TerminationPolicyCreateFn,
 )
 
+from .learning_strength import compose_learning_strength
+
 
 __all__ = [
     "CMR",
     "make_factory",
 ]
+
 
 class CMR(Pytree):
     """CMR model where emotion and EEG modulate core encoding strength.
@@ -72,8 +75,9 @@ class CMR(Pytree):
         self.primacy_decay = parameters["primacy_decay"]
         self.mfc_learning_rate = parameters["learning_rate"]
         self.mcf_sensitivity = parameters["choice_sensitivity"]
-        self.emotion_scale = parameters["emotion_scale"]
-        self.modulate_emotion_by_primacy = parameters["modulate_emotion_by_primacy"]
+        self.emotion_scale = parameters.get("emotion_scale", 1.0)
+        self.lpp_main_scale = parameters.get("lpp_main_scale", 0.0)
+        self.lpp_inter_scale = parameters.get("lpp_inter_scale", 0.0)
         self.learn_after_context_update = parameters["learn_after_context_update"]
         self.allow_repeated_recalls = parameters["allow_repeated_recalls"]
 
@@ -88,22 +92,7 @@ class CMR(Pytree):
         self.mcf = mcf_create_fn(list_length, parameters, self.context)
         self.is_emotional = jnp.array(is_emotional, dtype=jnp.float32)
 
-        # LPP transforms supporting both main effects and interaction terms.
-        lpp_main_scale = parameters["lpp_main_scale"]
-        lpp_main_threshold = parameters["lpp_main_threshold"]
-        lpp_main_raw = lpp_main_scale * (lpp_centered - lpp_main_threshold)
-        self.lpp_main = lpp_main_raw
-
-        lpp_inter_scale = parameters["lpp_inter_scale"]
-        lpp_inter_threshold = parameters["lpp_inter_threshold"]
-        lpp_inter_raw = lpp_inter_scale * (lpp_centered - lpp_inter_threshold) * is_emotional
-        self.lpp_interaction = lpp_inter_raw
-
-        self.phi_emot = (
-            self.emotion_scale * self.is_emotional
-            + self.lpp_main
-            + self.lpp_interaction
-        )
+        self.lpp_centered = jnp.asarray(lpp_centered, dtype=jnp.float32)
 
         self.termination_policy = termination_policy_create_fn(list_length, parameters)
         self.recalls = jnp.zeros(self.item_count, dtype=int)
@@ -112,6 +101,19 @@ class CMR(Pytree):
         self.is_active = jnp.array(True)
         self.recall_total = jnp.array(0, dtype=int)
         self.study_index = jnp.array(0, dtype=int)
+
+    def _mcf_learning_rate(self) -> Float_:
+        """Return temporal learning with categorical and log-LPP multipliers."""
+
+        index = self.study_index
+        return compose_learning_strength(
+            self.primacy[index],
+            self.is_emotional[index],
+            self.lpp_centered[index],
+            self.emotion_scale,
+            self.lpp_main_scale,
+            self.lpp_inter_scale,
+        )
 
     def experience_item(self, item_index: Int_) -> "CMR":
         """Return the model after experiencing item with the specified index.
@@ -128,14 +130,7 @@ class CMR(Pytree):
             lambda: self.context.state,
         )
 
-        p = self.primacy[self.study_index]
-        phi_emot_i = jnp.maximum(0.0, self.phi_emot[self.study_index])
-
-        mcf_lr = lax.cond(
-            self.modulate_emotion_by_primacy,
-            lambda: p * phi_emot_i,
-            lambda: p + jnp.maximum(-p, phi_emot_i),
-        )
+        mcf_lr = self._mcf_learning_rate()
 
         return self.replace(
             context=new_context,

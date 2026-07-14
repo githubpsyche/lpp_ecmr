@@ -1,6 +1,13 @@
 """Full eCMR model registry for lpp_ecmr render notebooks."""
 
-from .fitting_config import ECMR_FREE, EPS, STOP_COMPARISON_ANALYSIS_CONFIGS, STOP_FREE, _NO_LPP_FIXED, _NO_STOP_FIXED
+from .fitting_config import (
+    ECMR_FREE,
+    EPS,
+    STOP_COMPARISON_ANALYSIS_CONFIGS,
+    STOP_FREE,
+    _NO_LPP_FIXED,
+    _NO_STOP_FIXED,
+)
 
 __all__ = ["ECMR_MODELS"]
 
@@ -73,7 +80,7 @@ ECMR_MODELS = [
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
-                "learn_after_context_update": False,
+                "learn_after_context_update": True,
                 "modulate_emotion_by_primacy": False,
                 "emotion_drift_rate": 1.0,
                 **_NO_LPP_FIXED,
@@ -90,7 +97,7 @@ ECMR_MODELS = [
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
-                "learn_after_context_update": False,
+                "learn_after_context_update": True,
                 "modulate_emotion_by_primacy": False,
                 "emotion_drift_rate": 1.0,
                 "lpp_main_scale": 0.0,
@@ -114,7 +121,7 @@ ECMR_MODELS = [
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
-                "learn_after_context_update": False,
+                "learn_after_context_update": True,
                 "modulate_emotion_by_primacy": False,
                 "emotion_drift_rate": 1.0,
                 **_NO_LPP_FIXED,
@@ -131,7 +138,7 @@ ECMR_MODELS = [
         "parameters": {
             "fixed": {
                 "allow_repeated_recalls": False,
-                "learn_after_context_update": False,
+                "learn_after_context_update": True,
                 "modulate_emotion_by_primacy": False,
                 "emotion_drift_rate": 1.0,
                 "lpp_main_scale": 0.0,
@@ -236,7 +243,7 @@ ECMR_MODELS = [
     #     "parameters": {
     #         "fixed": {
     #             "allow_repeated_recalls": False,
-    #             "learn_after_context_update": False,
+    #             "learn_after_context_update": True,
     #             "modulate_emotion_by_primacy": False,
     #             "emotion_drift_rate": 1.0,
     #             **_NO_LPP_FIXED,
@@ -254,7 +261,7 @@ ECMR_MODELS = [
     #     "parameters": {
     #         "fixed": {
     #             "allow_repeated_recalls": False,
-    #             "learn_after_context_update": False,
+    #             "learn_after_context_update": True,
     #             "modulate_emotion_by_primacy": False,
     #             "emotion_drift_rate": 1.0,
     #             "lpp_main_scale": 0.0,

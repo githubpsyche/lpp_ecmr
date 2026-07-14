@@ -1,22 +1,22 @@
-"""eCMR with EEG-modulated emotional encoding strength.
+"""eCMR with EEG-modulated source-context encoding strength.
 
-Implements the full emotional context maintenance and retrieval
+Implements the full source-context maintenance and retrieval
 model (eCMR; Talmi, Lohnas, & Daw, 2019) with dual context layers
-(temporal and emotional), 2-unit localist source features, and
+(temporal and source), 2-unit localist source features, and
 per-item encoding-strength modulation via LPP amplitude.
 
 Notes
 -----
 The temporal pathway uses standard CMR encoding and retrieval.
-The emotional pathway maintains a separate 3-D emotional context
+The source pathway maintains a separate 3-D source context
 (start-of-list + emotional pole + neutral pole) and separate
 emotion_mfc / emotion_mcf association matrices.  During encoding,
-the emotional context-to-item learning rate is scaled by phi_emot
-(which incorporates emotion category and LPP), while the temporal
+the source context-to-item learning rate combines a relative source scale,
+categorical multiplier, and exponential LPP multiplier, while the temporal
 pathway learning rate depends only on primacy (TLD19 Eq. 11).
 
 Both emotional and neutral items have source features and update
-emotional context.  Emotional items push emotional context toward
+source context.  Emotional items push source context toward
 the emotional pole; neutral items push it toward the neutral pole.
 This 2-unit localist representation is critical for the
 list-composition effect.
@@ -53,6 +53,8 @@ from jaxcmr.typing import (
     TerminationPolicyCreateFn,
 )
 
+from .learning_strength import compose_learning_strength
+
 __all__ = [
     "eCMR",
     "make_factory",
@@ -60,7 +62,7 @@ __all__ = [
 
 
 class eCMR(Pytree):
-    """Full eCMR with dual context and LPP-modulated emotional encoding."""
+    """Full eCMR with dual context and LPP-modulated source encoding."""
 
     def __init__(
         self,
@@ -84,7 +86,7 @@ class eCMR(Pytree):
         is_emotional : Bool[Array, " study_events"]
             Per-item emotional flag (1 = emotional, 0 = neutral).
         lpp_centered : Float[Array, " study_events"]
-            Per-item trial-mean-centered LPP amplitude.
+            Per-item within-list mean-centered LPP amplitude.
         mfc_create_fn : MemoryCreateFn, optional
             Factory for item-to-context memory.
         mcf_create_fn : MemoryCreateFn, optional
@@ -99,10 +101,22 @@ class eCMR(Pytree):
         self.encoding_drift_rate = parameters["encoding_drift_rate"]
         self.start_drift_rate = parameters["start_drift_rate"]
         self.recall_drift_rate = parameters["recall_drift_rate"]
-        self.emotion_drift_rate = parameters.get("emotion_drift_rate", 1.0)
+        self.source_encoding_drift_rate = parameters.get(
+            "source_encoding_drift_rate",
+            parameters.get("emotion_drift_rate", 1.0),
+        )
+        self.source_recall_drift_rate = parameters.get(
+            "source_recall_drift_rate", self.recall_drift_rate
+        )
+        # Backward-compatible attribute for legacy workflows. The canonical
+        # comparison registry uses source_encoding_drift_rate.
+        self.emotion_drift_rate = self.source_encoding_drift_rate
         self.mfc_learning_rate = parameters["learning_rate"]
         self.mcf_sensitivity = parameters["choice_sensitivity"]
-        self.modulate_emotion_by_primacy = parameters["modulate_emotion_by_primacy"]
+        self.emotion_scale = parameters.get("emotion_scale", 1.0)
+        self.lpp_main_scale = parameters.get("lpp_main_scale", 0.0)
+        self.lpp_inter_scale = parameters.get("lpp_inter_scale", 0.0)
+        self.source_learning_rate = parameters.get("source_learning_rate", 1.0)
         self.phi_emot_modulates_temporal = parameters.get(
             "phi_emot_modulates_temporal", False
         )
@@ -121,35 +135,17 @@ class eCMR(Pytree):
             jnp.arange(list_length), self.primacy_scale, self.primacy_decay
         )
 
-        # --- Phi_emot (TLD19 Eq. 11) ---
-        # Scales L^CF_sw (emotional pathway); also temporal when
-        # phi_emot_modulates_temporal is True.
-        emotion_scale = parameters["emotion_scale"]
-        lpp_main_scale = parameters["lpp_main_scale"]
-        lpp_main_threshold = parameters["lpp_main_threshold"]
-        lpp_inter_scale = parameters["lpp_inter_scale"]
-        lpp_inter_threshold = parameters["lpp_inter_threshold"]
-        lpp_main = lpp_main_scale * (lpp_centered - lpp_main_threshold)
-        lpp_interaction = (
-            lpp_inter_scale
-            * (lpp_centered - lpp_inter_threshold)
-            * self.is_emotional
-        )
-        self.phi_emot = (
-            emotion_scale * self.is_emotional + lpp_main + lpp_interaction
-        )
+        self.lpp_centered = jnp.asarray(lpp_centered, dtype=jnp.float32)
 
         # --- Temporal pathway ---
         self.context = context_create_fn(list_length)
         self.mfc = mfc_create_fn(list_length, parameters, self.context)
         self.mcf = mcf_create_fn(list_length, parameters, self.context)
 
-        # --- Emotional pathway ---
+        # --- Source pathway ---
         #! Hardcoded inits — not using create_fn factories yet
         # 3-D emotional context: [start-of-list, emotional_pole, neutral_pole]
-        self.emotion_context = TemporalContext.TemporalContext(
-            item_count=2, size=3
-        )
+        self.emotion_context = TemporalContext.TemporalContext(item_count=2, size=3)
         # emotion_mfc: item -> emotional context (list_length x 3)
         is_neutral = 1.0 - self.is_emotional
         emot_mfc_state = jnp.zeros((list_length, 3))
@@ -161,20 +157,43 @@ class eCMR(Pytree):
         )
         self.emotion_mfc = LinearMemory.LinearMemory(emot_mfc_state)
         # emotion_mcf: emotional context -> item (3 x list_length, all zeros)
-        self.emotion_mcf = LinearMemory.LinearMemory(
-            jnp.zeros((3, list_length))
-        )
+        self.emotion_mcf = LinearMemory.LinearMemory(jnp.zeros((3, list_length)))
 
         # --- Recall state ---
-        self.termination_policy = termination_policy_create_fn(
-            list_length, parameters
-        )
+        self.termination_policy = termination_policy_create_fn(list_length, parameters)
         self.recalls = jnp.zeros(self.item_count, dtype=int)
         self.studied = jnp.zeros(self.item_count, dtype=bool)
         self.recallable = jnp.zeros(self.item_count, dtype=bool)
         self.is_active = jnp.array(True)
         self.recall_total = jnp.array(0, dtype=int)
         self.study_index = jnp.array(0, dtype=int)
+
+    def _optional_learning_terms(self, baseline: Float_) -> Float_:
+        index = self.study_index
+        return compose_learning_strength(
+            baseline,
+            self.is_emotional[index],
+            self.lpp_centered[index],
+            self.emotion_scale,
+            self.lpp_main_scale,
+            self.lpp_inter_scale,
+        )
+
+    def _temporal_mcf_learning_rate(self) -> Float_:
+        """Return temporal learning, optionally including broad terms."""
+
+        baseline = self.primacy[self.study_index]
+        return lax.cond(
+            self.phi_emot_modulates_temporal,
+            lambda: self._optional_learning_terms(baseline),
+            lambda: baseline,
+        )
+
+    def _source_mcf_learning_rate(self) -> Float_:
+        """Return source learning with categorical and log-LPP multipliers."""
+
+        baseline = self.source_learning_rate * self.primacy[self.study_index]
+        return self._optional_learning_terms(baseline)
 
     def experience_item(self, item_index: Int_) -> "eCMR":
         """Encode a single item, updating both context pathways.
@@ -193,20 +212,18 @@ class eCMR(Pytree):
 
         # --- Temporal pathway ---
         context_input = self.mfc.probe(item)
-        new_context = self.context.integrate(
-            context_input, self.encoding_drift_rate
-        )
+        new_context = self.context.integrate(context_input, self.encoding_drift_rate)
         learning_state = lax.cond(
             self.learn_after_context_update,
             lambda: new_context.state,
             lambda: self.context.state,
         )
 
-        # --- Emotional pathway ---
+        # --- Source pathway ---
         # Both emotional and neutral items update emotional context
         emot_context_input = self.emotion_mfc.probe(item)
         new_emotion_context = self.emotion_context.integrate(
-            emot_context_input, self.emotion_drift_rate
+            emot_context_input, self.source_encoding_drift_rate
         )
         emot_learning_state = lax.cond(
             self.learn_after_context_update,
@@ -214,32 +231,14 @@ class eCMR(Pytree):
             lambda: self.emotion_context.state,
         )
 
-        phi_emot_i = jnp.maximum(0.0, self.phi_emot[self.study_index])
-        p = self.primacy[self.study_index]
-
-        # Temporal MCF: primacy only, or primacy + phi_emot when broad
-        temporal_mcf_lr = lax.cond(
-            self.phi_emot_modulates_temporal,
-            lambda: p + jnp.maximum(-p, phi_emot_i),
-            lambda: p,
-        )
-
-        # Emotional MCF: primacy x phi_emot or primacy + phi_emot
-        emotional_mcf_lr = lax.cond(
-            self.modulate_emotion_by_primacy,
-            lambda: p * phi_emot_i,
-            lambda: p + jnp.maximum(-p, phi_emot_i),
-        )
+        temporal_mcf_lr = self._temporal_mcf_learning_rate()
+        emotional_mcf_lr = self._source_mcf_learning_rate()
 
         return self.replace(
             # Temporal pathway updates
             context=new_context,
-            mfc=self.mfc.associate(
-                item, learning_state, self.mfc_learning_rate
-            ),
-            mcf=self.mcf.associate(
-                learning_state, item, temporal_mcf_lr
-            ),
+            mfc=self.mfc.associate(item, learning_state, self.mfc_learning_rate),
+            mcf=self.mcf.associate(learning_state, item, temporal_mcf_lr),
             # Emotional pathway updates
             emotion_context=new_emotion_context,
             emotion_mfc=self.emotion_mfc.associate(
@@ -297,17 +296,15 @@ class eCMR(Pytree):
         new_context = self.context.integrate(
             self.mfc.probe(item), self.recall_drift_rate
         )
-        # Emotional context reinstatement
+        # Source context reinstatement
         new_emotion_context = self.emotion_context.integrate(
-            self.emotion_mfc.probe(item), self.recall_drift_rate
+            self.emotion_mfc.probe(item), self.source_recall_drift_rate
         )
         return self.replace(
             context=new_context,
             emotion_context=new_emotion_context,
             recalls=self.recalls.at[self.recall_total].set(item_index + 1),
-            recallable=self.recallable.at[item_index].set(
-                self.allow_repeated_recalls
-            ),
+            recallable=self.recallable.at[item_index].set(self.allow_repeated_recalls),
             recall_total=self.recall_total + 1,
         )
 
@@ -343,9 +340,7 @@ class eCMR(Pytree):
             self.emotion_mcf.probe(self.emotion_context.state) * self.recallable
         )
         combined = temporal_act + emotional_act
-        return (
-            power_scale(combined, self.mcf_sensitivity) + lb
-        ) * self.recallable
+        return (power_scale(combined, self.mcf_sensitivity) + lb) * self.recallable
 
     def stop_probability(self) -> Float[Array, ""]:
         """Compute probability of terminating recall.
@@ -402,9 +397,7 @@ class eCMR(Pytree):
                 (
                     (1 - p_stop)
                     * item_activation
-                    / lax.select(
-                        item_activation_sum == 0, 1.0, item_activation_sum
-                    )
+                    / lax.select(item_activation_sum == 0, 1.0, item_activation_sum)
                 ),
             )
         )
@@ -471,9 +464,7 @@ def make_factory(
 
             self.model_create_fn = model_create_fn
 
-        def create_model(
-            self, parameters: Mapping[str, Float_]
-        ) -> MemorySearch:
+        def create_model(self, parameters: Mapping[str, Float_]) -> MemorySearch:
             """Create model from first trial (for shape inference).
 
             Parameters
