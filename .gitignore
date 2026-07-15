@@ -41,4 +41,7 @@ _freeze/
 # Project
 simulations/
 
+# Generated work-unit simulation products
+work/**/*_best_of_*.h5
+
 /.quarto/
