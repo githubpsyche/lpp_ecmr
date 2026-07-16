@@ -1,0 +1,61 @@
+{
+  "status": "simulation-tuned mechanism-capability configuration; not a likelihood fit",
+  "selection_rule": "From 20-repetition boundary-refine results: mixed negative delta > mixed neutral delta; mixed neutral delta in [0, .05]; both pure deltas positive; pure neutral delta >= pure negative delta; pure neutral delta >= .08. Select largest mixed negative delta.",
+  "selected_refine_metrics": {
+    "mixed_negative_delta": 0.12347543425858021,
+    "mixed_neutral_delta": 0.03497566365465321,
+    "pure_negative_delta": 0.051670977404635166,
+    "pure_neutral_delta": 0.10257139708846807
+  },
+  "parameters": {
+    "encoding_drift_rate": 0.9460629354314493,
+    "start_drift_rate": 0.6362076095387273,
+    "recall_drift_rate": 0.6148312179139462,
+    "shared_support": 27.52012932669144,
+    "item_support": 0.17597599585577275,
+    "learning_rate": 0.11217566231084548,
+    "primacy_scale": 14.816132906703174,
+    "primacy_decay": 0.3064613983948485,
+    "choice_sensitivity": 18.114160719899015,
+    "emotion_scale": 1.6411582832144558,
+    "lpp_main_scale": 0.07668452851490401,
+    "lpp_inter_scale": 0.0,
+    "source_encoding_drift_rate": 0.20203359974471102,
+    "source_learning_rate": 0.37545206719205293
+  },
+  "validation_experiment_count": 200,
+  "validation_seed": 9450,
+  "validation_metrics": {
+    "mixed_negative_delta": 0.11065942539196261,
+    "mixed_neutral_delta": 0.036500579732666294,
+    "pure_negative_delta": 0.08318249219538348,
+    "pure_neutral_delta": 0.07365930454168274,
+    "mixed_cross_category_margin": 0.33059017570983423,
+    "pure_cross_category_margin": -0.06472801240651233,
+    "mixed_negative_recall_rate": 0.4822348737529241,
+    "mixed_negative_recalled": 0.8364532348748884,
+    "mixed_negative_forgotten": 0.7257938094829258,
+    "mixed_neutral_recall_rate": 0.433137948581654,
+    "mixed_neutral_recalled": 0.3952036337730916,
+    "mixed_neutral_forgotten": 0.3587030540404253,
+    "pure_negative_recall_rate": 0.4465131578947368,
+    "pure_negative_recalled": 0.5617463739196721,
+    "pure_negative_forgotten": 0.4785638817242886,
+    "pure_neutral_recall_rate": 0.4630921052631579,
+    "pure_neutral_recalled": 0.5432918941308009,
+    "pure_neutral_forgotten": 0.4696325895891182,
+    "score": 1.6258473067856414
+  },
+  "pure_input_constraint": {
+    "fixed_lpp_means": {
+      "1": 0.5140236616134644,
+      "2": 0.5029792785644531
+    },
+    "negative_minus_neutral_lpp_mean": 0.01104438304901123,
+    "fixed_recall_rates": {
+      "1": 0.44941520467836255,
+      "2": 0.44941520467836255
+    },
+    "ordering_bound": "Because both pure-list categories have the same fixed recall rate, strict separation of both negative bins above both neutral bins implies r*negative_delta + (1-r)*neutral_delta cannot exceed the fixed category-mean difference."
+  }
+}

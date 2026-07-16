@@ -1,0 +1,84 @@
+{
+  "status": "simulation-tuned mechanism-capability configuration; not a likelihood fit",
+  "model": "EEM_eCMR_LPP_Full",
+  "source_fit": "work/lpp_model_comparison/EEM_eCMR_LPP_Full_best_of_3.json",
+  "search_scope": [
+    "encoding_drift_rate",
+    "start_drift_rate",
+    "recall_drift_rate",
+    "shared_support",
+    "item_support",
+    "learning_rate",
+    "primacy_scale",
+    "primacy_decay",
+    "choice_sensitivity",
+    "emotion_scale",
+    "lpp_main_scale",
+    "lpp_inter_scale",
+    "source_encoding_drift_rate",
+    "source_learning_rate"
+  ],
+  "fixed_parameters": {
+    "allow_repeated_recalls": 0.0,
+    "learn_after_context_update": 1.0,
+    "source_recall_drift_rate": 1.0,
+    "phi_emot_modulates_temporal": 0.0
+  },
+  "search_design": {
+    "broad_candidates": 144,
+    "search_experiments": 3,
+    "refine_count": 12,
+    "refine_experiments": 20,
+    "finalist_count": 4,
+    "finalist_experiments": 80,
+    "validation_experiments": 200
+  },
+  "pure_input_constraint": {
+    "fixed_lpp_means": {
+      "1": 0.5140236616134644,
+      "2": 0.5029792785644531
+    },
+    "negative_minus_neutral_lpp_mean": 0.01104438304901123,
+    "fixed_recall_rates": {
+      "1": 0.44941520467836255,
+      "2": 0.44941520467836255
+    },
+    "ordering_bound": "Because both pure-list categories have the same fixed recall rate, strict separation of both negative bins above both neutral bins implies r*negative_delta + (1-r)*neutral_delta cannot exceed the fixed category-mean difference."
+  },
+  "best_parameters": {
+    "encoding_drift_rate": 0.8512066104344134,
+    "start_drift_rate": 0.9995153161888604,
+    "recall_drift_rate": 0.07421060671164378,
+    "shared_support": 1.2409355513595837,
+    "item_support": 19.71516970475342,
+    "learning_rate": 0.20310314998853313,
+    "primacy_scale": 1.0674921247429827,
+    "primacy_decay": 0.5057177805426619,
+    "choice_sensitivity": 0.48933489529105645,
+    "emotion_scale": 1.1190193056251443,
+    "lpp_main_scale": 0.09386657790573848,
+    "lpp_inter_scale": 0.01623894576938947,
+    "source_encoding_drift_rate": 0.0447723751985378,
+    "source_learning_rate": 2.6700288048720227
+  },
+  "validation_metrics": {
+    "stage": "validation",
+    "candidate": 0,
+    "experiment_count": 200,
+    "mixed_negative_delta": 0.15043520084337192,
+    "mixed_neutral_delta": 0.11883199234542091,
+    "pure_negative_delta": 0.1609234381467104,
+    "pure_neutral_delta": 0.13232172033014267,
+    "mixed_cross_category_margin": 0.26888556170620415,
+    "pure_cross_category_margin": -0.12769879582092947,
+    "mixed_negative_recalled": 0.8582514869539362,
+    "mixed_negative_forgotten": 0.7078162861105642,
+    "mixed_neutral_recalled": 0.4389307244043601,
+    "mixed_neutral_forgotten": 0.3200987320589392,
+    "pure_negative_recalled": 0.6035455833434274,
+    "pure_negative_forgotten": 0.44262214519671705,
+    "pure_neutral_recalled": 0.5703209410176465,
+    "pure_neutral_forgotten": 0.43799922068750385,
+    "score": 1.6951083500359951
+  }
+}

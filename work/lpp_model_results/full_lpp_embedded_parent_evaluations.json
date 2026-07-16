@@ -1,0 +1,166 @@
+{
+  "analysis": "Exploratory source-context Full-LPP nesting audit",
+  "scope": "Two source-context Full variants; temporal-only Full variants excluded",
+  "evaluation_check": "Each reported kappa=0 parent was explicitly evaluated through the corresponding Full-model likelihood",
+  "likelihood": "jaxcmr.loss.set_permutation_likelihood.ExcludeTerminationLikelihoodLoss",
+  "model_factory": "lpp_ecmr.models.full_eeg_ecmr.make_factory",
+  "components": {
+    "mfc_create_fn": "jaxcmr.components.linear_memory.init_mfc",
+    "mcf_create_fn": "jaxcmr.components.linear_memory.init_mcf",
+    "context_create_fn": "jaxcmr.components.context.init",
+    "termination_policy_create_fn": "jaxcmr.components.termination.NoStopTermination"
+  },
+  "trial_query": "data['subject'] > -1",
+  "list_count": 342,
+  "nll_tolerance": 0.0001,
+  "data": {
+    "path": "data/TalmiEEG.h5",
+    "sha256": "adea78c12ef9ce73de6e8bba95ce37d524aaeea3706780f39e4e0c95cc5981e3"
+  },
+  "models": [
+    {
+      "emotion_based_learning_boost": "No",
+      "full_model": "CategoryOnly_eCMR_LPP_Full",
+      "nested_parent_model": "CategoryOnly_eCMR_LPP_EmotionalOnly",
+      "source_files": {
+        "full": {
+          "path": "work/lpp_model_comparison/CategoryOnly_eCMR_LPP_Full_best_of_3.json",
+          "sha256": "cef46eef1d4a98c956c732a432051a5345a0e037a13922d5fe412a1dab23865c"
+        },
+        "parent": {
+          "path": "work/lpp_model_comparison/CategoryOnly_eCMR_LPP_EmotionalOnly_best_of_3.json",
+          "sha256": "e20aa3d1966bf12c5a6db9e40bb5e9bc6341d785d2719237555db1fc8167afdd"
+        }
+      },
+      "raw_full": {
+        "stored_nll": 8283.9580078125,
+        "reevaluated_nll": 8283.9580078125,
+        "aic": 16593.916015625,
+        "free_parameter_count": 13,
+        "parameters": {
+          "allow_repeated_recalls": 0.0,
+          "learn_after_context_update": 1.0,
+          "emotion_scale": 1.0,
+          "source_recall_drift_rate": 1.0,
+          "phi_emot_modulates_temporal": 0.0,
+          "encoding_drift_rate": 0.6391890645027161,
+          "start_drift_rate": 0.9992769956588745,
+          "recall_drift_rate": 0.1968233734369278,
+          "shared_support": 6.421429634094238,
+          "item_support": 29.36248207092285,
+          "learning_rate": 0.4833521246910095,
+          "primacy_scale": 0.2966429591178894,
+          "primacy_decay": 1.0566660165786743,
+          "choice_sensitivity": 3.139051914215088,
+          "lpp_main_scale": 0.001683658454567194,
+          "lpp_inter_scale": 0.1056194081902504,
+          "source_encoding_drift_rate": 0.0480734258890152,
+          "source_learning_rate": 6.949695587158203
+        }
+      },
+      "nested_parent": {
+        "stored_nll": 8280.693359375,
+        "free_parameter_count": 12
+      },
+      "embedded_parent_candidate": {
+        "evaluated_full_model_nll": 8280.693359375,
+        "difference_from_parent_nll": 0.0,
+        "aic_counting_full_parameters": 16587.38671875,
+        "parameters": {
+          "allow_repeated_recalls": 0.0,
+          "learn_after_context_update": 1.0,
+          "emotion_scale": 1.0,
+          "source_recall_drift_rate": 1.0,
+          "phi_emot_modulates_temporal": 0.0,
+          "encoding_drift_rate": 0.759604811668396,
+          "start_drift_rate": 0.9999911785125732,
+          "recall_drift_rate": 0.14344137907028198,
+          "shared_support": 1.6940016746520996,
+          "item_support": 39.12565994262695,
+          "learning_rate": 0.13427338004112244,
+          "primacy_scale": 0.19390307366847992,
+          "primacy_decay": 4.431426525115967,
+          "choice_sensitivity": 1.753919243812561,
+          "lpp_main_scale": 0.0,
+          "lpp_inter_scale": 0.18409980833530426,
+          "source_encoding_drift_rate": 0.11015655845403671,
+          "source_learning_rate": 1.3851264715194702
+        },
+        "general_lpp_slope_status": "free in Full model; evaluated at boundary zero"
+      },
+      "nesting_result": "Embedded parent has lower NLL than raw Full optimizer output"
+    },
+    {
+      "emotion_based_learning_boost": "Yes",
+      "full_model": "EEM_eCMR_LPP_Full",
+      "nested_parent_model": "EEM_eCMR_LPP_EmotionalOnly",
+      "source_files": {
+        "full": {
+          "path": "work/lpp_model_comparison/EEM_eCMR_LPP_Full_best_of_3.json",
+          "sha256": "2ca041b36f79adb1d9c14d435923c09bdb01604c1c357d039c4c565faaeef1b3"
+        },
+        "parent": {
+          "path": "work/lpp_model_comparison/EEM_eCMR_LPP_EmotionalOnly_best_of_3.json",
+          "sha256": "a2ec93b2a5e3ab615e7e00954c3ea58a624eacb063612ac90b5c654a94d38e2c"
+        }
+      },
+      "raw_full": {
+        "stored_nll": 8241.603515625,
+        "reevaluated_nll": 8241.603515625,
+        "aic": 16511.20703125,
+        "free_parameter_count": 14,
+        "parameters": {
+          "allow_repeated_recalls": 0.0,
+          "learn_after_context_update": 1.0,
+          "source_recall_drift_rate": 1.0,
+          "phi_emot_modulates_temporal": 0.0,
+          "encoding_drift_rate": 0.7526938319206238,
+          "start_drift_rate": 0.9999171495437622,
+          "recall_drift_rate": 0.14938905835151672,
+          "shared_support": 7.5664544105529785,
+          "item_support": 61.35744857788086,
+          "learning_rate": 0.26261141896247864,
+          "primacy_scale": 0.7354971766471863,
+          "primacy_decay": 0.8523863554000854,
+          "choice_sensitivity": 1.7813348770141602,
+          "emotion_scale": 1.7822833061218262,
+          "lpp_main_scale": 0.006866815034300089,
+          "lpp_inter_scale": 0.1155889481306076,
+          "source_encoding_drift_rate": 0.09063605219125748,
+          "source_learning_rate": 3.5453085899353027
+        }
+      },
+      "nested_parent": {
+        "stored_nll": 8240.3095703125,
+        "free_parameter_count": 13
+      },
+      "embedded_parent_candidate": {
+        "evaluated_full_model_nll": 8240.3095703125,
+        "difference_from_parent_nll": 0.0,
+        "aic_counting_full_parameters": 16508.619140625,
+        "parameters": {
+          "allow_repeated_recalls": 0.0,
+          "learn_after_context_update": 1.0,
+          "source_recall_drift_rate": 1.0,
+          "phi_emot_modulates_temporal": 0.0,
+          "encoding_drift_rate": 0.8090680241584778,
+          "start_drift_rate": 0.9999943971633911,
+          "recall_drift_rate": 0.15336653590202332,
+          "shared_support": 1.8590167760849,
+          "item_support": 27.33430290222168,
+          "learning_rate": 0.21390840411186218,
+          "primacy_scale": 0.22805720567703247,
+          "primacy_decay": 57.41071701049805,
+          "choice_sensitivity": 1.577230453491211,
+          "emotion_scale": 1.9459059238433838,
+          "lpp_main_scale": 0.0,
+          "lpp_inter_scale": 0.12805306911468506,
+          "source_encoding_drift_rate": 0.08675140887498856,
+          "source_learning_rate": 0.9299607276916504
+        },
+        "general_lpp_slope_status": "free in Full model; evaluated at boundary zero"
+      },
+      "nesting_result": "Embedded parent has lower NLL than raw Full optimizer output"
+    }
+  ]
+}

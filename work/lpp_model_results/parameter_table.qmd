@@ -1,0 +1,26 @@
+**Model-column key**
+
+| Emotion-based learning boost | LPP-based boost: None | LPP-based boost: All items | LPP-based boost: Negative items only |
+|:--|:--:|:--:|:--:|
+| No | A | B | C |
+| Yes | D | E | F |
+
+| Parameter | Role | Range / fixed value | A | B | C | D | E | F |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| $\beta_{\mathrm{enc}}^{T}$ | Temporal-context drift at study | $(0,1)$ | 0.86396 | 0.73472 | 0.7596 | 0.83243 | 0.0008416 | 0.80907 |
+| $\beta_{\mathrm{enc}}^{S}$ | Source-context drift at study | $(0,1)$ | 0.18153 | 0.028485 | 0.11016 | 0.040122 | 0.72584 | 0.086751 |
+| $\beta_{\mathrm{start}}$ | Pre-recall drift toward start-of-list context | $(0,1)$ | 0.97321 | 0.98771 | 0.99999 | 0.99999 | 0.031218 | 0.99999 |
+| $\beta_{\mathrm{rec}}^{T}$ | Temporal-context reinstatement after recall | $(0,1)$ | 0.70721 | 0.67079 | 0.14344 | 0.18358 | 0.051413 | 0.15337 |
+| $\beta_{\mathrm{rec}}^{S}$ | Source-context reinstatement after recall | $1$ (fixed) | [1] | [1] | [1] | [1] | [1] | [1] |
+| $\alpha$ | Shared pre-experimental context-to-item support | $(0,100]$ | 0.2413 | 3.5373 | 1.694 | 3.8183 | 74.645 | 1.859 |
+| $\delta$ | Item-specific pre-experimental context-to-item support | $(0,100]$ | 68.959 | 28.732 | 39.126 | 18.541 | 48.979 | 27.334 |
+| $\gamma$ | Feature-to-context learning rate | $(0,1)$ | 0.79003 | 0.46162 | 0.13427 | 0.25922 | 0.28439 | 0.21391 |
+| $\phi_s$ | Primacy scale | $(0,100]$ | 28.721 | 0.48668 | 0.1939 | 0.028965 | 2.3558 | 0.22806 |
+| $\phi_d$ | Primacy decay | $(0,100]$ | 2.2062 | 1.3806 | 4.4314 | 1.4066 | 2.1189 | 57.411 |
+| $\tau_c$ | Recall-choice sensitivity | $(0,100]$ | 0.19046 | 2.1708 | 1.7539 | 3.3224 | 1.1908 | 1.5772 |
+| $\omega$ | Source learning relative to temporal learning | $(0,10]$ | 0.22586 | 9.0469 | 1.3851 | 1.4516 | 1.0372 | 0.92996 |
+| $\phi_{\mathrm{emot}}$ | Categorical multiplier for negative items | $1$ (fixed) or $(0,10]$ | [1] | [1] | [1] | 1.5044 | 7.525 | 1.9459 |
+| $\kappa$ | General Early-LPP slope on log learning strength | $0$ (fixed) or $[0,0.2145]$ | [0] | 0.059731 | [0] | [0] | 0.20799 | [0] |
+| $\kappa_{\mathrm{emot}}$ | Emotion-dependent Early-LPP slope increment | $0$ (fixed) or $[0,0.2145]$ | [0] | [0] | 0.1841 | [0] | [0] | 0.12805 |
+
+Pooled best-found parameter estimates for the six primary source-context models, rounded to five significant digits. Values in square brackets were fixed rather than estimated. Bounds shown as open at zero were implemented with machine epsilon as the positive lower bound. The complete-precision estimates and implementation parameter names are provided in `parameter_estimates.csv`. {#tbl-model-parameters}

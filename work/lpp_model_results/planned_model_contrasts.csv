@@ -1,0 +1,10 @@
+contrast,stratum,baseline_model,focal_model,NLL_improvement,AIC_improvement,interpretation
+Categorical enhancement,No,No categorical enhancement + No LPP,Categorical enhancement + No LPP,57.8193359375,113.638671875,Positive values favor the focal model
+Categorical enhancement,General,No categorical enhancement + General LPP,Categorical enhancement + General LPP,49.619140625,97.23828125,Positive values favor the focal model
+Categorical enhancement,Emotion-dependent,No categorical enhancement + Emotion-dependent LPP,Categorical enhancement + Emotion-dependent LPP,40.3837890625,78.767578125,Positive values favor the focal model
+General LPP versus no LPP,Absent,No categorical enhancement + No LPP,No categorical enhancement + General LPP,12.791015625,23.58203125,Positive values favor the focal model
+Emotion-dependent LPP versus no LPP,Absent,No categorical enhancement + No LPP,No categorical enhancement + Emotion-dependent LPP,32.837890625,63.67578125,Positive values favor the focal model
+Emotion-dependent versus General LPP,Absent,No categorical enhancement + General LPP,No categorical enhancement + Emotion-dependent LPP,20.046875,40.09375,Positive values favor the focal model
+General LPP versus no LPP,Present,Categorical enhancement + No LPP,Categorical enhancement + General LPP,4.5908203125,7.181640625,Positive values favor the focal model
+Emotion-dependent LPP versus no LPP,Present,Categorical enhancement + No LPP,Categorical enhancement + Emotion-dependent LPP,15.40234375,28.8046875,Positive values favor the focal model
+Emotion-dependent versus General LPP,Present,Categorical enhancement + General LPP,Categorical enhancement + Emotion-dependent LPP,10.8115234375,21.623046875,Positive values favor the focal model

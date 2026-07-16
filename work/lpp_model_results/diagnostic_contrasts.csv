@@ -1,0 +1,22 @@
+source_type,source_id,source_label,contrast,estimate
+observed,Observed,Observed data,Negative minus Neutral recall rate,0.12382007980175758
+observed,Observed,Observed data,Remembered minus Forgotten centered Early LPP: Negative,0.4032692482310485
+observed,Observed,Observed data,Remembered minus Forgotten centered Early LPP: Neutral,0.02107232366332086
+predicted,CategoryOnly_eCMR,No categorical enhancement + No LPP,Negative minus Neutral recall rate,0.0007128244334316802
+predicted,CategoryOnly_eCMR,No categorical enhancement + No LPP,Remembered minus Forgotten centered Early LPP: Negative,0.003243940263779721
+predicted,CategoryOnly_eCMR,No categorical enhancement + No LPP,Remembered minus Forgotten centered Early LPP: Neutral,0.003629020960743662
+predicted,CategoryOnly_eCMR_LPP_General,No categorical enhancement + General LPP,Negative minus Neutral recall rate,0.006576331704854499
+predicted,CategoryOnly_eCMR_LPP_General,No categorical enhancement + General LPP,Remembered minus Forgotten centered Early LPP: Negative,0.21147198233062148
+predicted,CategoryOnly_eCMR_LPP_General,No categorical enhancement + General LPP,Remembered minus Forgotten centered Early LPP: Neutral,0.1841288149070042
+predicted,CategoryOnly_eCMR_LPP_EmotionalOnly,No categorical enhancement + Emotion-dependent LPP,Negative minus Neutral recall rate,0.018847791211001108
+predicted,CategoryOnly_eCMR_LPP_EmotionalOnly,No categorical enhancement + Emotion-dependent LPP,Remembered minus Forgotten centered Early LPP: Negative,0.44676004135072706
+predicted,CategoryOnly_eCMR_LPP_EmotionalOnly,No categorical enhancement + Emotion-dependent LPP,Remembered minus Forgotten centered Early LPP: Neutral,0.01274674953904932
+predicted,EEM_eCMR,Categorical enhancement + No LPP,Negative minus Neutral recall rate,0.11774209421145859
+predicted,EEM_eCMR,Categorical enhancement + No LPP,Remembered minus Forgotten centered Early LPP: Negative,0.006394929791373016
+predicted,EEM_eCMR,Categorical enhancement + No LPP,Remembered minus Forgotten centered Early LPP: Neutral,-0.0007899343223927435
+predicted,EEM_eCMR_LPP_General,Categorical enhancement + General LPP,Negative minus Neutral recall rate,0.1338972611224814
+predicted,EEM_eCMR_LPP_General,Categorical enhancement + General LPP,Remembered minus Forgotten centered Early LPP: Negative,0.3169124781264086
+predicted,EEM_eCMR_LPP_General,Categorical enhancement + General LPP,Remembered minus Forgotten centered Early LPP: Neutral,0.058933285590757625
+predicted,EEM_eCMR_LPP_EmotionalOnly,Categorical enhancement + Emotion-dependent LPP,Negative minus Neutral recall rate,0.12993106205649863
+predicted,EEM_eCMR_LPP_EmotionalOnly,Categorical enhancement + Emotion-dependent LPP,Remembered minus Forgotten centered Early LPP: Negative,0.33570645171349256
+predicted,EEM_eCMR_LPP_EmotionalOnly,Categorical enhancement + Emotion-dependent LPP,Remembered minus Forgotten centered Early LPP: Neutral,0.0068651777015609206

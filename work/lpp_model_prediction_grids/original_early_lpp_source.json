@@ -1,0 +1,21 @@
+{
+  "archive": "/Users/jordangunn/workspace/downloads/LPP_Zarubin_PureLists_for_Deborah.zip",
+  "archive_sha256": "dbd8968155ac6767290c9d4a66f2b37889c3f841fb2afccd1de83be3bb7fe800",
+  "data_member": "Data/Extracted_Behavioural_and_LPP_Data/Single_Trial_Behavioural_and_EEG_Data_Z.csv",
+  "data_member_sha256": "4a4691f3145fda9cb2f1154c40ddf92394acefe53daf18b1b3bcf4899df80aae",
+  "analysis_member": "R_Script/Behaviour_and_Relationship_to_LPP.Rmd",
+  "analysis_member_sha256": "a4321a40d185bc9cb204d0824d967b408d8138c3978ddb64ecfe16df5da05d4f",
+  "empirical_rows": 6508,
+  "participants": 38,
+  "participant_cell_means": 152,
+  "rows_with_presentation_order_outside_1_to_20": 39,
+  "observed_summary": "Mean EarlyLPP within Participant \u00d7 Condition \u00d7 Memory, then mean across participants, matching the source R figure",
+  "observed_interval": "95% percentile interval from 10,000 participant bootstrap samples",
+  "bootstrap_seed": 20260715,
+  "prediction_summary": "Within each complete simulated dataset: mean original-z EarlyLPP within Participant \u00d7 Condition \u00d7 simulated recall status, then mean across participants",
+  "prediction_interval": "Central 95% interval across 200 complete simulated datasets",
+  "contrast_interval": "Remembered-minus-Forgotten differences are calculated within each participant-bootstrap sample or complete simulated dataset before percentile limits are taken",
+  "model_prediction_positions": 6469,
+  "model_prediction_exclusion": "lpp_imputed == 1 positions are excluded because the empirical figure summarizes observed EEG values, not imputed fitting inputs",
+  "comparison_note": "The source empirical figure includes 39 EEG rows whose PresentationOrder is 99. Those rows contribute to the observed panel, as in the source R code, but cannot be assigned simulated recall status and therefore are absent from prediction summaries."
+}

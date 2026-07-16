@@ -1,0 +1,8 @@
+| Preferential emotional learning | No Early-LPP modulation | General Early-LPP modulation | Emotion-dependent Early-LPP modulation |
+|---|---|---|---|
+| **Absent** | Source-context baseline (11) | General-LPP model (12) | Emotion-dependent-LPP model (12) |
+| **Present** | Preferential-learning model (12) | Preferential learning + General-LPP model (13) | Preferential learning + Emotion-dependent-LPP model (13) |
+
+: Primary pooled comparison of Early-LPP modulation across eCMR model variants. {#tbl-primary-ecmr-comparison prefix="" tblnum="1"}
+
+*Note.* All models contained temporal and negative/neutral source-context components. Preferential emotional learning was either absent, with the category-wide emotional-learning multiplier fixed at 1, or tested by estimating that multiplier. General-LPP models estimated one slope shared by negative and neutral items. Emotion-dependent-LPP models instead estimated one slope applied only to negative items. Models without Early-LPP modulation estimated neither slope. Parenthetical values are numbers of free parameters.

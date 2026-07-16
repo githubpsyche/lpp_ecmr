@@ -2,6 +2,8 @@
 local figureword = "Figure"
 local tableword = "Table"
 local labelnum = ""
+local tbl_fallback = 0
+local fig_fallback = 0
 
 local function gettablefig(m)
  -- Get names for Figure and Table specified in language field
@@ -62,15 +64,17 @@ end
 
 local divcaption = function(div)
   if div.identifier:find("^tbl%-") or div.identifier:find("^fig%-") then
-    
-    -- Get figure/table prefix and number
-    if div.attributes.prefix then
-      if div.attributes.fignum then
-        labelnum = div.attributes.prefix .. div.attributes.fignum
-      end
-      if div.attributes.tblnum then
-        labelnum = div.attributes.prefix .. div.attributes.tblnum
-      end
+
+    -- Get figure/table prefix and number. Quarto's DOCX table floats do not
+    -- always retain tblnum, so fall back to document order when it is absent.
+    local prefix = div.attributes.prefix or ""
+    if div.identifier:find("^tbl%-") then
+      tbl_fallback = tbl_fallback + 1
+      labelnum = prefix .. tostring(div.attributes.tblnum or tbl_fallback)
+    end
+    if div.identifier:find("^fig%-") then
+      fig_fallback = fig_fallback + 1
+      labelnum = prefix .. tostring(div.attributes.fignum or fig_fallback)
     end
     
     if FORMAT == "html" then
@@ -90,4 +94,3 @@ return {
   {Meta = gettablefig},
   {Div = divcaption}
 }
-

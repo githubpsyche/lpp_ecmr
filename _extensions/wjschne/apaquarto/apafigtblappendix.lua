@@ -5,6 +5,8 @@ end
 local i = 1
 local tbl = {}
 local fig = {}
+local tbl_fallback = 0
+local fig_fallback = 0
 local kAriaExpanded = "aria-expanded"
 -- Get names for Figure and Table in language specified in lang field
 local figureword = "Figure"
@@ -43,7 +45,9 @@ local function figtblconvert(ct)
           -- Table is already in the array. Do not add.
         else
            --Add table to array
-           tbl[float.identifier] = float.attributes.prefix .. float.attributes.tblnum
+           tbl_fallback = tbl_fallback + 1
+           local tblnum = float.attributes.tblnum or (float.order and float.order.number) or tbl_fallback
+           tbl[float.identifier] = (float.attributes.prefix or "") .. tostring(tblnum)
         end
       end
       --Is the float a figure?
@@ -53,7 +57,9 @@ local function figtblconvert(ct)
           -- Figure is already in the array. Do not add.
         else
           --Add figure to array
-           fig[float.identifier] = float.attributes.prefix .. float.attributes.fignum
+           fig_fallback = fig_fallback + 1
+           local fignum = float.attributes.fignum or (float.order and float.order.number) or fig_fallback
+           fig[float.identifier] = (float.attributes.prefix or "") .. tostring(fignum)
         end
       end
 

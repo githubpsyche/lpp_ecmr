@@ -1,0 +1,3 @@
+emotion_based_learning_boost,full_registry_id,nested_parent_registry_id,raw_full_nll,raw_full_aic,nested_parent_nll,raw_nll_minus_parent,embedded_parent_nll,embedded_minus_parent,full_parameter_count,optimization_status
+No,CategoryOnly_eCMR_LPP_Full,CategoryOnly_eCMR_LPP_EmotionalOnly,8283.9580078125,16593.916015625,8280.693359375,3.2646484375,8280.693359375,0.0,13,Raw optimizer output violates nesting; embedded parent verified
+Yes,EEM_eCMR_LPP_Full,EEM_eCMR_LPP_EmotionalOnly,8241.603515625,16511.20703125,8240.3095703125,1.2939453125,8240.3095703125,0.0,14,Raw optimizer output violates nesting; embedded parent verified
