@@ -132,17 +132,8 @@ def validate_legacy_mixed_semantics(
     return actual
 
 
-def mixed_trial_mask(
-    dataset: Mapping[str, Any],
-    *,
-    allow_legacy_missing_field: bool = False,
-) -> np.ndarray:
-    """Return a one-dimensional mask selecting mixed trials.
-
-    New data and regenerated simulations must carry ``list_type`` explicitly.
-    The opt-in legacy mode exists only for migration tooling that compares an
-    old artifact before replacing it.
-    """
+def mixed_trial_mask(dataset: Mapping[str, Any]) -> np.ndarray:
+    """Return a one-dimensional mask selecting mixed trials."""
 
     if "subject" not in dataset:
         raise DataContractError("Cannot infer trial count without subject")
@@ -152,9 +143,7 @@ def mixed_trial_mask(
     trial_count = subject.shape[0]
 
     if "list_type" not in dataset:
-        if not allow_legacy_missing_field:
-            raise DataContractError("Dataset does not contain list_type")
-        return np.ones(trial_count, dtype=bool)
+        raise DataContractError("Dataset does not contain list_type")
 
     list_type = np.asarray(dataset["list_type"])
     if list_type.shape not in {(trial_count,), (trial_count, 1)}:

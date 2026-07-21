@@ -286,7 +286,7 @@ def _validate_data(project_root: Path) -> dict[str, Any]:
     data = load_data(data_path)
     mixed_data = slice_trials(
         data,
-        mixed_trial_mask(data, allow_legacy_missing_field=False),
+        mixed_trial_mask(data),
     )
     list_count = int(np.asarray(mixed_data["subject"]).shape[0])
     expected = FIT_SETTINGS["expected_list_count"]
@@ -313,7 +313,7 @@ def _validate_model_factories(project_root: Path) -> int:
     data = load_data(project_root / FIT_SETTINGS["data_path"])
     data = slice_trials(
         data,
-        mixed_trial_mask(data, allow_legacy_missing_field=False),
+        mixed_trial_mask(data),
     )
     components = {
         key: import_from_string(path)
@@ -758,7 +758,7 @@ def review_results() -> pd.DataFrame:
     data = load_data(project_root / FIT_SETTINGS["data_path"])
     data = slice_trials(
         data,
-        mixed_trial_mask(data, allow_legacy_missing_field=False),
+        mixed_trial_mask(data),
     )
 
     for model in MODEL_COMPARISON_REGISTRY:

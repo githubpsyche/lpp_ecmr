@@ -144,12 +144,11 @@ def test_combined_contract_rejects_wrong_mixed_subject_count():
         validate_combined_dataset(dataset, enforce_source_counts=False)
 
 
-def test_mixed_trial_mask_rejects_legacy_artifacts_unless_explicitly_allowed():
+def test_mixed_trial_mask_requires_list_type():
     dataset = _structural_combined_dataset()
     legacy = {key: value[:342] for key, value in dataset.items() if key != "list_type"}
     with pytest.raises(DataContractError, match="does not contain list_type"):
         mixed_trial_mask(legacy)
-    assert np.all(mixed_trial_mask(legacy, allow_legacy_missing_field=True))
     legacy["bad"] = np.zeros((341, 1))
     with pytest.raises(DataContractError, match="not aligned"):
         slice_trials(legacy, np.ones(342, dtype=bool))
