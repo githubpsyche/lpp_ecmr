@@ -1,1 +1,0 @@
-Five model rows compare Negative and Neutral recall rates. Observed data show higher recall for Negative items. The model without categorical enhancement shows little difference, while all three categorical-enhancement models reproduce the observed Negative advantage.

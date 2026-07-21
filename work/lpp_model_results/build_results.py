@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the six-model result tables and grouped-bar diagnostics for Issue #10.
+"""Build the six-model result tables and diagnostic summaries.
 
 The script reads the returned pooled fit JSON and simulation HDF5 artifacts from
 ``work/lpp_model_comparison``.  It does not copy or modify those source files.
@@ -9,11 +9,10 @@ flat, bounded, and reproducible.
 
 from __future__ import annotations
 
+import argparse
 import csv
-import hashlib
 import json
 import math
-import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
@@ -21,23 +20,25 @@ from typing import Any, Iterable
 import h5py
 import numpy as np
 
+from lpp_ecmr.data_contract import (
+    MIXED_EXPECTED_LISTS,
+    MIXED_EXPECTED_SUBJECTS,
+    MIXED_TRIAL_QUERY,
+    mixed_trial_mask,
+    slice_trials,
+)
+from lpp_ecmr.model_comparison_registry import FIT_SETTINGS
+
 
 PACKAGE_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = PACKAGE_DIR.parents[1]
 FIT_DIR = PROJECT_ROOT / "work" / "lpp_model_comparison"
 DATA_PATH = PROJECT_ROOT / "data" / "TalmiEEG.h5"
-RUN_MANIFEST_PATH = FIT_DIR / "run_manifest.json"
-FIGURE_SCRIPT_PATH = PACKAGE_DIR / "build_diagnostic_figure.R"
-ORIGINAL_LPP_CONTRAST_PATH = (
-    PROJECT_ROOT
-    / "work"
-    / "lpp_model_prediction_grids"
-    / "original_early_lpp_contrasts.csv"
-)
 
 BOOTSTRAP_SEED = 20260715
 BOOTSTRAP_SAMPLES = 10_000
 CONFIDENCE_LEVEL = 0.95
+EXPECTED_SIMULATIONS = int(FIT_SETTINGS["experiment_count"])
 
 NEGATIVE = 1
 NEUTRAL = 2
@@ -113,27 +114,6 @@ LPP_BOOST_LABELS = {
     "General": "All items",
     "Emotion-dependent": "Negative items only",
 }
-MODEL_SPECIFICATION_LABELS = {
-    "CategoryOnly_eCMR": "Baseline",
-    "CategoryOnly_eCMR_LPP_General": "LPP-based boost for all items",
-    "CategoryOnly_eCMR_LPP_EmotionalOnly": (
-        "LPP-based boost for negative items only"
-    ),
-    "EEM_eCMR": "Emotion-based boost",
-    "EEM_eCMR_LPP_General": (
-        "Emotion-based boost + LPP-based boost for all items"
-    ),
-    "EEM_eCMR_LPP_EmotionalOnly": (
-        "Emotion-based boost + LPP-based boost for negative items only"
-    ),
-}
-FIGURE_MODEL_IDS = (
-    "CategoryOnly_eCMR_LPP_EmotionalOnly",
-    "EEM_eCMR",
-    "EEM_eCMR_LPP_General",
-    "EEM_eCMR_LPP_EmotionalOnly",
-)
-
 PARAMETERS = (
     (
         "encoding_drift_rate",
@@ -231,14 +211,6 @@ def _scalar(value: Any) -> float:
     return result
 
 
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
 def _write_csv(path: Path, rows: list[dict[str, Any]], fields: Iterable[str]) -> None:
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(fields))
@@ -262,6 +234,17 @@ def load_fit_results() -> tuple[list[dict[str, Any]], dict[str, dict[str, Any]]]
                 f"{fit_path.name} or {simulation_path.name}"
             )
         result = _load_json(fit_path)
+        if result.get("model") != model.registry_id:
+            raise ValueError(
+                f"Expected {model.registry_id}, found {result.get('model')!r}"
+            )
+        if result.get("trial_query") != MIXED_TRIAL_QUERY:
+            raise ValueError(
+                f"{model.registry_id} was not fitted with {MIXED_TRIAL_QUERY!r}"
+            )
+        fit_subjects = np.asarray(result.get("fits", {}).get("subject", []))
+        if fit_subjects.size != 1 or int(fit_subjects.reshape(-1)[0]) != -1:
+            raise ValueError(f"Selected fit is not pooled: {model.registry_id}")
         nll = _scalar(result["fitness"])
         free_parameters = result["free"]
         parameter_count = len(free_parameters)
@@ -347,21 +330,30 @@ def _recall_hits(recalls: np.ndarray, presentations: np.ndarray) -> np.ndarray:
     return hits
 
 
-def _load_recall_data(path: Path) -> dict[str, np.ndarray]:
+def _load_recall_data(path: Path, *, mixed_only: bool = False) -> dict[str, np.ndarray]:
+    keys = (
+        "subject",
+        "list",
+        "listLength",
+        "condition",
+        "pres_itemnos",
+        "recalls",
+        "EarlyLPP",
+    )
+    if mixed_only:
+        keys += ("list_type",)
     with h5py.File(path, "r") as handle:
         group = handle["data"]
-        data = {
-            key: np.asarray(group[key][:])
-            for key in (
-                "subject",
-                "list",
-                "listLength",
-                "condition",
-                "pres_itemnos",
-                "recalls",
-                "EarlyLPP",
-            )
-        }
+        data = {key: np.asarray(group[key][:]) for key in keys}
+
+    if mixed_only:
+        trial_major = {key: value.T for key, value in data.items()}
+        trial_major = slice_trials(
+            trial_major,
+            mixed_trial_mask(trial_major),
+        )
+        data = {key: np.asarray(value).T for key, value in trial_major.items()}
+
     columns = data["condition"].shape[1]
     if data["condition"].shape[0] != 20:
         raise ValueError(f"Expected 20 study positions in {path}")
@@ -549,16 +541,14 @@ def _simulation_intervals(
     )
 
 
-def diagnostic_rows(
-    run_manifest: dict[str, Any],
-) -> tuple[
+def diagnostic_rows() -> tuple[
     list[dict[str, Any]],
     list[dict[str, Any]],
     dict[str, dict[str, np.ndarray]],
 ]:
-    expected_lists = int(run_manifest["fit_settings"]["expected_list_count"])
-    expected_simulations = int(run_manifest["fit_settings"]["experiment_count"])
-    observed = _load_recall_data(DATA_PATH)
+    expected_lists = MIXED_EXPECTED_LISTS
+    expected_simulations = EXPECTED_SIMULATIONS
+    observed = _load_recall_data(DATA_PATH, mixed_only=True)
     (
         subject_ids,
         observed_recall_numerators,
@@ -566,10 +556,8 @@ def diagnostic_rows(
         observed_lpp_sums,
         observed_lpp_counts,
     ) = summarize_observed(observed)
-    if len(subject_ids) != int(run_manifest["data"]["subject_count"]):
-        raise ValueError("Observed subject count does not match run manifest")
-    if observed_recall_numerators.shape[0] != 38:
-        raise ValueError("Expected 38 participant summaries")
+    if observed_recall_numerators.shape[0] != MIXED_EXPECTED_SUBJECTS:
+        raise ValueError(f"Expected {MIXED_EXPECTED_SUBJECTS} participant summaries")
 
     summaries: dict[str, dict[str, np.ndarray]] = {}
     obs_recall_mean, obs_recall_bounds, obs_lpp_mean, obs_lpp_bounds = (
@@ -748,32 +736,22 @@ def model_contrast_rows(comparison: list[dict[str, Any]]) -> list[dict[str, Any]
     return rows
 
 
-def render_diagnostic_figure() -> None:
-    subprocess.run(
-        ["Rscript", str(FIGURE_SCRIPT_PATH)],
-        cwd=PROJECT_ROOT,
-        check=True,
-    )
-
-
-def _command_version(command: list[str]) -> str:
-    completed = subprocess.run(
-        command,
-        cwd=PROJECT_ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    return (completed.stdout or completed.stderr).strip()
-
-
 def _format_number(value: float) -> str:
     if value == 0:
         return "0"
     return f"{value:.5g}"
 
 
-def write_model_comparison_qmd(rows: list[dict[str, Any]]) -> None:
+def write_model_comparison_qmd(
+    rows: list[dict[str, Any]],
+    parameter_data: list[dict[str, Any]],
+) -> None:
+    general_lpp = next(
+        float(row["estimate"])
+        for row in parameter_data
+        if row["registry_id"] == "EEM_eCMR_LPP_General"
+        and row["implementation_parameter"] == "lpp_main_scale"
+    )
     lines = [
         "::: {#tbl-pooled-model-fit}",
         "| Emotion-based learning boost | LPP-based learning boost | $k$ | NLL | AIC | $\\Delta$AIC |",
@@ -801,117 +779,12 @@ def write_model_comparison_qmd(rows: list[dict[str, Any]]) -> None:
     lines.extend(
         [
             "",
-            "Pooled comparison of six models that share the same eCMR architecture. An emotion-based learning boost is one multiplier shared by all negative items; an LPP-based learning boost varies with each item's Early LPP and is fitted either for all items or for negative items only. The table indicates which boosts were available for estimation, not whether they improved fit or reproduced a particular empirical pattern. $k$ is the number of free parameters; NLL is the negative log-likelihood for one parameter vector fitted to all 342 lists from 38 participants; $\\Delta$AIC is relative to the best model. Bold values identify the best-fitting model. Every fitted Early-LPP coefficient was constrained to $[0, 0.2145443]$. The comparison between the all-item and negative-item-only LPP-based boosts in models with an emotion-based boost is conditional on this range because the fitted all-item coefficient ($\\hat{\\kappa}=0.20799$) approached its upper bound and no wider-bound sensitivity analysis was performed.",
+            f"Pooled comparison of six models that share the same eCMR architecture. An emotion-based learning boost is one multiplier shared by all negative items; an LPP-based learning boost varies with each item's Early LPP and is fitted either for all items or for negative items only. The table indicates which boosts were available for estimation, not whether they improved fit or reproduced a particular empirical pattern. $k$ is the number of free parameters; NLL is the negative log-likelihood for one parameter vector fitted to all {MIXED_EXPECTED_LISTS} mixed lists from {MIXED_EXPECTED_SUBJECTS} participants; $\\Delta$AIC is relative to the best model. Bold values identify the best-fitting model. Every fitted Early-LPP coefficient was constrained to $[0, 0.2145443]$; the fitted all-item coefficient in the model with an emotion-based learning boost was $\\hat{{\\kappa}}={general_lpp:.5f}$.",
             ":::" ,
             "",
         ]
     )
     (PACKAGE_DIR / "model_comparison_table.qmd").write_text(
-        "\n".join(lines), encoding="utf-8"
-    )
-
-
-def load_original_lpp_contrasts() -> list[dict[str, Any]]:
-    if not ORIGINAL_LPP_CONTRAST_PATH.exists():
-        raise FileNotFoundError(
-            f"Missing {ORIGINAL_LPP_CONTRAST_PATH}. Run "
-            "work/lpp_model_prediction_grids/"
-            "build_selected_early_lpp_figure.py first."
-        )
-    with ORIGINAL_LPP_CONTRAST_PATH.open(newline="", encoding="utf-8") as handle:
-        rows = list(csv.DictReader(handle))
-    if len(rows) != 14:
-        raise ValueError(
-            f"Expected 14 original-scale Early-LPP contrasts, found {len(rows)}"
-        )
-    return rows
-
-
-def write_diagnostic_effects_qmd(
-    recall_rows: list[dict[str, Any]],
-    lpp_rows: list[dict[str, Any]],
-) -> None:
-    contrast_names = (
-        "Negative minus Neutral recall rate",
-        "Remembered minus Forgotten Early LPP: Negative",
-        "Remembered minus Forgotten Early LPP: Neutral",
-    )
-    expected_sources = {"Observed"} | set(MODEL_BY_ID)
-    lookup: dict[tuple[str, str], float] = {}
-    rows = [
-        row
-        for row in recall_rows
-        if row["contrast"] == "Negative minus Neutral recall rate"
-    ] + lpp_rows
-    for row in rows:
-        source_id = str(row["source_id"])
-        contrast = str(row["contrast"])
-        key = (source_id, contrast)
-        if source_id not in expected_sources:
-            raise ValueError(f"Unexpected diagnostic source: {source_id}")
-        if contrast not in contrast_names:
-            raise ValueError(f"Unexpected diagnostic contrast: {contrast}")
-        if key in lookup:
-            raise ValueError(f"Duplicate diagnostic contrast: {key}")
-        lookup[key] = float(row["estimate"])
-
-    expected_keys = {
-        (source_id, contrast)
-        for source_id in expected_sources
-        for contrast in contrast_names
-    }
-    if set(lookup) != expected_keys:
-        missing = sorted(expected_keys - set(lookup))
-        extra = sorted(set(lookup) - expected_keys)
-        raise ValueError(
-            f"Diagnostic contrast table mismatch; missing={missing}, extra={extra}"
-        )
-
-    def values(source_id: str) -> tuple[float, float, float]:
-        return tuple(lookup[(source_id, contrast)] for contrast in contrast_names)
-
-    def format_discrepancy(estimate: float, target: float) -> str:
-        discrepancy = estimate - target
-        return f"{discrepancy:+.3f}".replace("-", "−")
-
-    observed = values("Observed")
-    lines = [
-        "::: {#tbl-pooled-model-diagnostic-effects}",
-        "| eCMR specification | Recall rate: Negative − Neutral | Early LPP: Remembered − Forgotten, Negative items | Early LPP: Remembered − Forgotten, Neutral items |",
-        "|:--|--:|--:|--:|",
-        (
-            "| **Observed data** | "
-            f"{observed[0]:.3f} | {observed[1]:.3f} | {observed[2]:.3f} |"
-        ),
-    ]
-    for model in MODELS:
-        estimates = values(model.registry_id)
-        lines.append(
-            "| {model} | {recall:.3f} *({recall_error})* | "
-            "{negative_lpp:.3f} *({negative_lpp_error})* | "
-            "{neutral_lpp:.3f} *({neutral_lpp_error})* |".format(
-                model=MODEL_SPECIFICATION_LABELS[model.registry_id],
-                recall=estimates[0],
-                recall_error=format_discrepancy(estimates[0], observed[0]),
-                negative_lpp=estimates[1],
-                negative_lpp_error=format_discrepancy(
-                    estimates[1], observed[1]
-                ),
-                neutral_lpp=estimates[2],
-                neutral_lpp_error=format_discrepancy(
-                    estimates[2], observed[2]
-                ),
-            )
-        )
-    lines.extend(
-        [
-            "",
-            "Observed and model-predicted contrasts in recall rate and Early LPP. All model rows share the same eCMR architecture. An emotion-based learning boost is one multiplier shared by all negative items; an LPP-based learning boost varies with each item's Early LPP. The model names indicate which boosts were available for estimation, not whether they reproduced a particular empirical pattern. Each main numerical entry is the first-named condition minus the second, so positive values indicate greater recall for negative than neutral items or greater Early LPP for remembered than forgotten items. For every prediction, the italicized value in parentheses is prediction minus observed; values nearer zero indicate closer reproduction of the observed contrast. Predictions are means across 200 complete simulated datasets. The Early-LPP columns use the original z-transformed values reported in the empirical analysis: values are averaged within participant and cell, then across participants. The fitted models used within-list-centered Early LPP as a predictor, but the displayed diagnostic is the original-scale EEG outcome. The models were fitted to recalled-item identities rather than to these contrast summaries, so the Early-LPP contrasts are derived diagnostics rather than separately fitted outcomes.",
-            ":::" ,
-            "",
-        ]
-    )
-    (PACKAGE_DIR / "diagnostic_effects_table.qmd").write_text(
         "\n".join(lines), encoding="utf-8"
     )
 
@@ -971,240 +844,11 @@ def write_parameter_qmd(
     )
 
 
-def write_figure_qmd() -> None:
-    alt = (
-        "Five rows of paired horizontal grouped-bar charts show observed data followed by "
-        "four selected model predictions. The left column compares Negative and "
-        "Neutral recall rates. Emotion-dependent LPP without categorical "
-        "enhancement does not reproduce the observed Negative advantage, whereas "
-        "the three categorical-enhancement models do. The right column compares "
-        "Remembered and Forgotten items' mean within-list-centered Early LPP in "
-        "each category. Categorical enhancement without LPP shows little "
-        "separation; General LPP separates both categories to differing degrees; "
-        "and Emotion-dependent LPP concentrates the separation in Negative items."
-    )
-    caption = (
-        "Observed benchmarks and four predictions selected from the six pooled "
-        "source-context models to illustrate the planned mechanistic contrasts. "
-        "Bars in the left column are overall recall rates for Negative and Neutral "
-        "items. Bars in the right column are mean within-list-centered Early LPP "
-        "values for Remembered and Forgotten items in each category. Comparing "
-        "the first and fourth prediction rows isolates categorical enhancement; "
-        "comparing the second and fourth isolates Emotion-dependent LPP; and "
-        "comparing the third and fourth contrasts equal-complexity General and "
-        "Emotion-dependent LPP mappings. All six fits are reported in the model-"
-        "comparison and parameter tables. "
-        "Observed error bars are percentile 95% confidence intervals from 10,000 "
-        "participant-cluster bootstrap samples ($N=38$). Predicted error bars are "
-        "central 95% intervals across 200 complete simulated datasets and therefore "
-        "represent simulation variability, not parameter-estimation uncertainty. "
-        "Simulations condition on each list's observed recall count. The LPP-by-"
-        "subsequent-memory contrast is a derived diagnostic from the fitted "
-        "recalled-set model, not an independently optimized target or an out-of-"
-        "sample validation."
-    )
-    fragment = (
-        f'![{caption}](diagnostic_figure.svg){{#fig-model-diagnostics '
-        f'width="100%" fig-alt="{alt}"}}\n'
-    )
-    (PACKAGE_DIR / "diagnostic_figure_caption.qmd").write_text(
-        fragment, encoding="utf-8"
-    )
-    (PACKAGE_DIR / "diagnostic_figure_alt.txt").write_text(
-        alt + "\n", encoding="utf-8"
-    )
-
-
-def write_results_readout(
-    comparison: list[dict[str, Any]],
-    model_contrasts: list[dict[str, Any]],
-    diagnostic_contrasts: list[dict[str, Any]],
-    original_lpp_contrasts: list[dict[str, Any]],
-) -> None:
-    by_id = {row["registry_id"]: row for row in comparison}
-    model_contrast = {
-        (row["contrast"], row["stratum"]): row for row in model_contrasts
-    }
-    diagnostic = {
-        (row["source_id"], row["contrast"]): row
-        for row in diagnostic_contrasts
-        if row["contrast"] == "Negative minus Neutral recall rate"
-    }
-    diagnostic.update(
-        {
-            (row["source_id"], row["contrast"]): row
-            for row in original_lpp_contrasts
-        }
-    )
-    winner = min(comparison, key=lambda row: float(row["AIC"]))
-    lines = [
-        "## Six-model results readout",
-        "",
-        f"The best of the selected fits was **{winner['model']}** "
-        f"(NLL = {winner['NLL']:.3f}, AIC = {winner['AIC']:.3f}).",
-        "",
-        "Across all three LPP specifications, categorical enhancement improved AIC:",
-        "",
-    ]
-    for stratum in ("No", "General", "Emotion-dependent"):
-        gain = model_contrast[("Categorical enhancement", stratum)]["AIC_improvement"]
-        lines.append(f"- {stratum} LPP: $\\Delta$AIC improvement = {gain:.3f}.")
-    lines.extend(
-        [
-            "",
-            "At equal complexity, Emotion-dependent LPP was preferred to General LPP in both categorical-enhancement strata:",
-            "",
-        ]
-    )
-    for stratum in ("Absent", "Present"):
-        gain = model_contrast[("Emotion-dependent versus General LPP", stratum)][
-            "AIC_improvement"
-        ]
-        lines.append(
-            f"- Categorical enhancement {stratum.lower()}: $\\Delta$AIC improvement = {gain:.3f}."
-        )
-    observed_recall_gap = diagnostic[("Observed", "Negative minus Neutral recall rate")][
-        "estimate"
-    ]
-    combined_id = "EEM_eCMR_LPP_EmotionalOnly"
-    combined_recall_gap = diagnostic[
-        (combined_id, "Negative minus Neutral recall rate")
-    ]["estimate"]
-    observed_negative_lpp = diagnostic[
-        ("Observed", "Remembered minus Forgotten Early LPP: Negative")
-    ]["estimate"]
-    observed_neutral_lpp = diagnostic[
-        ("Observed", "Remembered minus Forgotten Early LPP: Neutral")
-    ]["estimate"]
-    combined_negative_lpp = diagnostic[
-        (combined_id, "Remembered minus Forgotten Early LPP: Negative")
-    ]["estimate"]
-    combined_neutral_lpp = diagnostic[
-        (combined_id, "Remembered minus Forgotten Early LPP: Neutral")
-    ]["estimate"]
-    (
-        observed_recall_gap,
-        combined_recall_gap,
-        observed_negative_lpp,
-        observed_neutral_lpp,
-        combined_negative_lpp,
-        combined_neutral_lpp,
-    ) = map(
-        float,
-        (
-            observed_recall_gap,
-            combined_recall_gap,
-            observed_negative_lpp,
-            observed_neutral_lpp,
-            combined_negative_lpp,
-            combined_neutral_lpp,
-        ),
-    )
-    lines.extend(
-        [
-            "",
-            "The grouped-bar diagnostics make the proposed division of explanatory work visible. The observed Negative-minus-Neutral recall-rate difference was "
-            f"{observed_recall_gap:.3f}; the categorical-enhancement plus Emotion-dependent LPP model predicted {combined_recall_gap:.3f}. "
-            "The observed Remembered-minus-Forgotten original-z Early-LPP differences were "
-            f"{observed_negative_lpp:.3f} for Negative items and {observed_neutral_lpp:.3f} for Neutral items; the combined model predicted "
-            f"{combined_negative_lpp:.3f} and {combined_neutral_lpp:.3f}, respectively.",
-            "",
-            "The General-versus-Emotion-dependent conclusion with categorical enhancement is conditional on the declared nonnegative LPP-coefficient range $[0, 0.2145443]$: `EEM_eCMR_LPP_General` fitted $\\hat{\\kappa}=0.20799$, near the upper bound, and no wider-bound sensitivity analysis was performed. These results do not establish that a residual General component is zero because Full-LPP models are outside this manuscript comparison.",
-            "",
-            "The LPP-by-memory-status bars are derived diagnostics. The models were fitted to recalled sets and the simulations condition on observed list recall counts; the bars are not independent validation and do not test recall termination or total recall.",
-            "",
-        ]
-    )
-    (PACKAGE_DIR / "results_readout.qmd").write_text(
-        "\n".join(lines), encoding="utf-8"
-    )
-
-
-def write_manifest(source_paths: list[Path], generated_paths: list[Path]) -> None:
-    manifest = {
-        "package": "work/lpp_model_results",
-        "purpose": "Issue #10 six-model pooled tables and grouped-bar diagnostics",
-        "model_ids": [model.registry_id for model in MODELS],
-        "figure_model_ids": list(FIGURE_MODEL_IDS),
-        "figure_selection_rationale": (
-            "Four predictions isolate categorical enhancement, the addition of "
-            "LPP, and General versus Emotion-dependent LPP while all six fitted "
-            "models remain in the numerical tables"
-        ),
-        "source_artifacts": {
-            path.relative_to(PROJECT_ROOT).as_posix(): _sha256(path)
-            for path in source_paths
-        },
-        "generated_artifacts": {
-            path.name: _sha256(path) for path in generated_paths
-        },
-        "summary_settings": {
-            "observed_point_estimate": "item-pooled within each displayed cell",
-            "observed_resampling_unit": "participant",
-            "observed_units": 38,
-            "observed_interval": "percentile participant-cluster bootstrap",
-            "bootstrap_samples": BOOTSTRAP_SAMPLES,
-            "bootstrap_seed": BOOTSTRAP_SEED,
-            "simulation_unit": "complete simulated dataset across all 342 lists",
-            "simulation_units_per_model": 200,
-            "simulation_interval": "central interval across simulated datasets",
-            "confidence_level": CONFIDENCE_LEVEL,
-            "lpp_preprocessing": "within-list mean centering of EarlyLPP",
-            "manuscript_lpp_contrast_source": (
-                "original-z participant-mean contrasts from "
-                "work/lpp_model_prediction_grids/original_early_lpp_contrasts.csv"
-            ),
-            "recall_status": "presentation position appears at least once in recalls",
-        },
-        "declared_lpp_bounds": [0.0, 0.21454430108484696],
-        "scope_exclusions": [
-            "temporal-only models",
-            "Full-LPP models",
-            "subject-wise process-model fits",
-            "wider-bound sensitivity analysis",
-        ],
-        "software": {
-            "python": __import__("sys").version.split()[0],
-            "numpy": np.__version__,
-            "h5py": h5py.__version__,
-            "R": _command_version(["Rscript", "--version"]),
-            "ggplot2": _command_version(
-                [
-                    "Rscript",
-                    "-e",
-                    'cat(as.character(packageVersion("ggplot2")))',
-                ]
-            ),
-            "pdftocairo": _command_version(["pdftocairo", "-v"]),
-        },
-    }
-    path = PACKAGE_DIR / "build_manifest.json"
-    path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-
-
-def main() -> None:
-    if len(FIGURE_MODEL_IDS) != 4 or len(set(FIGURE_MODEL_IDS)) != 4:
-        raise ValueError("Diagnostic figure requires four unique model IDs")
-    unknown_figure_models = set(FIGURE_MODEL_IDS) - set(MODEL_BY_ID)
-    if unknown_figure_models:
-        raise ValueError(
-            "Unknown diagnostic-figure model IDs: "
-            + ", ".join(sorted(unknown_figure_models))
-        )
-
-    run_manifest = _load_json(RUN_MANIFEST_PATH)
-    if run_manifest["fit_settings"]["pooled"] is not True:
-        raise ValueError("Issue #10 package requires pooled fits")
-    if run_manifest["fit_settings"]["lpp_preprocessing"] != (
-        "within-list mean centering of EarlyLPP"
-    ):
-        raise ValueError("Unexpected LPP preprocessing in fit manifest")
-
+def main(*, write_prose: bool = True) -> None:
     comparison, fit_results = load_fit_results()
     parameters = parameter_rows(fit_results)
-    diagnostics, diagnostic_contrasts, _summaries = diagnostic_rows(run_manifest)
+    diagnostics, diagnostic_contrasts, _summaries = diagnostic_rows()
     planned_contrasts = model_contrast_rows(comparison)
-    original_lpp_contrasts = load_original_lpp_contrasts()
 
     _write_csv(
         PACKAGE_DIR / "model_comparison.csv",
@@ -1275,55 +919,17 @@ def main() -> None:
         ),
     )
 
-    write_model_comparison_qmd(comparison)
-    write_diagnostic_effects_qmd(diagnostic_contrasts, original_lpp_contrasts)
-    write_parameter_qmd(parameters)
-    write_figure_qmd()
-    write_results_readout(
-        comparison,
-        planned_contrasts,
-        diagnostic_contrasts,
-        original_lpp_contrasts,
-    )
-    render_diagnostic_figure()
-
-    generated = [
-        PACKAGE_DIR / name
-        for name in (
-            "model_comparison.csv",
-            "model_comparison_table.qmd",
-            "diagnostic_effects_table.qmd",
-            "parameter_estimates.csv",
-            "parameter_table.qmd",
-            "diagnostic_summary.csv",
-            "diagnostic_contrasts.csv",
-            "planned_model_contrasts.csv",
-            "diagnostic_figure.svg",
-            "diagnostic_figure.pdf",
-            "diagnostic_figure.png",
-            "diagnostic_figure_caption.qmd",
-            "diagnostic_figure_alt.txt",
-            "results_readout.qmd",
-        )
-    ]
-    source_paths = [
-        DATA_PATH,
-        RUN_MANIFEST_PATH,
-        Path(__file__),
-        FIGURE_SCRIPT_PATH,
-        ORIGINAL_LPP_CONTRAST_PATH,
-    ]
-    for model in MODELS:
-        source_paths.extend(_fit_paths(model))
-    write_manifest(source_paths, generated)
+    if write_prose:
+        write_model_comparison_qmd(comparison, parameters)
+        write_parameter_qmd(parameters)
 
     print(
         json.dumps(
             {
                 "package": PACKAGE_DIR.relative_to(PROJECT_ROOT).as_posix(),
                 "models": len(MODELS),
-                "generated": len(generated) + 1,
                 "best_model": min(comparison, key=lambda row: row["AIC"])["model"],
+                "write_prose": write_prose,
             },
             indent=2,
         )
@@ -1331,4 +937,11 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--no-prose",
+        action="store_true",
+        help="Refresh numerical and figure artifacts without rewriting QMD/TXT prose.",
+    )
+    args = parser.parse_args()
+    main(write_prose=not args.no_prose)
