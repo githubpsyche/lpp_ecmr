@@ -1,10 +1,16 @@
 from copy import deepcopy
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
 from jax import numpy as jnp
 from jaxcmr.components.termination import NoStopTermination
 
+from lpp_ecmr.data_contract import (
+    MIXED_EXPECTED_LISTS,
+    MIXED_EXPECTED_SUBJECTS,
+    MIXED_TRIAL_QUERY,
+)
 from lpp_ecmr.model_comparison_registry import (
     EXPECTED_MODEL_NAMES,
     FIT_SETTINGS,
@@ -16,6 +22,9 @@ from lpp_ecmr.model_comparison_registry import (
     PARAMETER_NEUTRAL_VALUES,
     SOURCE_ENCODING_DRIFT_BOUNDS,
     SOURCE_LEARNING_BOUNDS,
+)
+from lpp_ecmr.model_comparison_workflow import (
+    _make_notebook_query_cohort_aware,
 )
 from lpp_ecmr.models.full_eeg_ecmr import eCMR
 from lpp_ecmr.models.learning_strength import compose_learning_strength
@@ -60,7 +69,9 @@ def test_registry_free_parameter_counts():
 
 def test_all_models_share_frozen_fitting_policy():
     assert FIT_SETTINGS["pooled"] is True
-    assert FIT_SETTINGS["expected_list_count"] == 342
+    assert FIT_SETTINGS["trial_query"] == MIXED_TRIAL_QUERY
+    assert FIT_SETTINGS["expected_list_count"] == MIXED_EXPECTED_LISTS == 342
+    assert MIXED_EXPECTED_SUBJECTS == 38
     assert FIT_SETTINGS["best_of"] == 3
     assert FIT_SETTINGS["num_steps"] == 1000
     assert FIT_SETTINGS["learning_strength_link"] == "log"
@@ -71,6 +82,34 @@ def test_all_models_share_frozen_fitting_policy():
         fixed = model["parameters"]["fixed"]
         assert fixed["learn_after_context_update"] is True
         assert fixed["allow_repeated_recalls"] is False
+
+
+def test_generated_fit_notebook_applies_subject_limit_within_trial_query():
+    notebook = SimpleNamespace(
+        cells=[
+            {
+                "cell_type": "code",
+                "metadata": {"tags": ["parameters"]},
+                "source": (
+                    "trial_query = \"data['listtype'] == -1\"\n"
+                    "data = load_data(os.path.join(project_root, data_path), "
+                    "max_subjects)\n"
+                    "trial_mask = generate_trial_mask(data, trial_query)\n"
+                    'unique_subjects = jnp.unique(jnp.array(data["subject"]))\n'
+                ),
+            }
+        ]
+    )
+
+    _make_notebook_query_cohort_aware(notebook)
+
+    source = notebook.cells[0]["source"]
+    assert "load_data(os.path.join(project_root, data_path), 0)" in source
+    assert 'reshape(-1)[trial_mask]' in source
+    assert "cohort_subjects" in source
+    assert "max_subjects)" not in source
+    assert f"trial_query = {MIXED_TRIAL_QUERY!r}" in source
+    assert "listtype" not in source
 
 
 def test_source_models_share_architectural_parameters_and_drift_policy():

@@ -6,6 +6,7 @@ from copy import deepcopy
 from math import log
 from typing import Any
 
+from .data_contract import MIXED_EXPECTED_LISTS, MIXED_TRIAL_QUERY
 from .fitting_config import BASE_FREE, EPS
 
 __all__ = [
@@ -63,8 +64,8 @@ EXPECTED_MODEL_NAMES = (
 FIT_SETTINGS: dict[str, Any] = {
     "data_tag": "TalmiEEG",
     "data_path": "data/TalmiEEG.h5",
-    "trial_query": "data['subject'] > -1",
-    "expected_list_count": 342,
+    "trial_query": MIXED_TRIAL_QUERY,
+    "expected_list_count": MIXED_EXPECTED_LISTS,
     "pooled": True,
     "base_run_tag": "pooled_evosax_set_likelihood",
     "fit_alg_path": "jaxcmr.fitting.EvosaxDE",

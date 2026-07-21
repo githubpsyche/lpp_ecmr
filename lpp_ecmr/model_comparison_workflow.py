@@ -16,8 +16,9 @@ from typing import Any, Iterable
 import numpy as np
 import pandas as pd
 
-from jaxcmr.helpers import generate_trial_mask, import_from_string, load_data
+from jaxcmr.helpers import import_from_string, load_data
 
+from .data_contract import mixed_trial_mask, slice_trials
 from .model_comparison_registry import (
     EXPECTED_MODEL_NAMES,
     FIT_SETTINGS,
@@ -283,17 +284,22 @@ def _validate_registry() -> list[dict[str, Any]]:
 def _validate_data(project_root: Path) -> dict[str, Any]:
     data_path = project_root / FIT_SETTINGS["data_path"]
     data = load_data(data_path)
-    trial_mask = generate_trial_mask(data, FIT_SETTINGS["trial_query"])
-    list_count = int(np.asarray(trial_mask).sum())
+    mixed_data = slice_trials(
+        data,
+        mixed_trial_mask(data, allow_legacy_missing_field=False),
+    )
+    list_count = int(np.asarray(mixed_data["subject"]).shape[0])
     expected = FIT_SETTINGS["expected_list_count"]
     if list_count != expected:
         raise AssertionError(f"Expected {expected} lists, found {list_count}")
-    early_lpp = np.asarray(data["EarlyLPP"], dtype=float)
+    early_lpp = np.asarray(mixed_data["EarlyLPP"], dtype=float)
     centered_lpp = early_lpp - early_lpp.mean(axis=1, keepdims=True)
     return {
         "list_count": list_count,
-        "subject_count": int(np.unique(data["subject"]).size),
-        "list_lengths": sorted(int(value) for value in np.unique(data["listLength"])),
+        "subject_count": int(np.unique(mixed_data["subject"]).size),
+        "list_lengths": sorted(
+            int(value) for value in np.unique(mixed_data["listLength"])
+        ),
         "within_list_centered_early_lpp": {
             "minimum": float(centered_lpp.min()),
             "maximum": float(centered_lpp.max()),
@@ -305,6 +311,10 @@ def _validate_data(project_root: Path) -> dict[str, Any]:
 
 def _validate_model_factories(project_root: Path) -> int:
     data = load_data(project_root / FIT_SETTINGS["data_path"])
+    data = slice_trials(
+        data,
+        mixed_trial_mask(data, allow_legacy_missing_field=False),
+    )
     components = {
         key: import_from_string(path)
         for key, path in FIT_SETTINGS["component_paths"].items()
@@ -372,6 +382,81 @@ def _template_parameters(model: dict[str, Any], unit_rel: str) -> dict[str, Any]
         "comparison_analysis_configs": DIAGNOSTICS,
         "single_analysis_configs": [],
     }
+
+
+def _make_notebook_query_cohort_aware(notebook: Any) -> None:
+    """Freeze the query in the notebook and apply ``max_subjects`` after it.
+
+    The shared jaxcmr template limits the loaded H5 before it evaluates
+    ``trial_query``. In a combined pure/mixed file, that would select the
+    lower-numbered pure-list participants first. Keep the full dataset loaded
+    and restrict the already-selected cohort instead. Also replace the
+    template's stale default query so the notebook has one visible cohort
+    contract even when it is opened outside papermill.
+    """
+
+    setup_old = (
+        "data = load_data(os.path.join(project_root, data_path), max_subjects)\n"
+        "trial_mask = generate_trial_mask(data, trial_query)\n"
+    )
+    setup_new = (
+        "data = load_data(os.path.join(project_root, data_path), 0)\n"
+        "trial_mask = generate_trial_mask(data, trial_query)\n"
+        "if max_subjects:\n"
+        "    cohort_subjects = jnp.unique(\n"
+        '        jnp.asarray(data["subject"]).reshape(-1)[trial_mask]\n'
+        "    )[:max_subjects]\n"
+        "    trial_mask = trial_mask & jnp.isin(\n"
+        '        jnp.asarray(data["subject"]).reshape(-1), cohort_subjects\n'
+        "    )\n"
+    )
+    simulation_old = 'unique_subjects = jnp.unique(jnp.array(data["subject"]))'
+    simulation_new = (
+        'unique_subjects = jnp.unique(jnp.asarray(data["subject"])'
+        ".reshape(-1)[trial_mask])"
+    )
+    parameter_query_replacements = 0
+    setup_replacements = 0
+    simulation_replacements = 0
+    for cell in notebook.cells:
+        if cell.get("cell_type") != "code":
+            continue
+        source = str(cell.get("source", ""))
+        if "parameters" in cell.get("metadata", {}).get("tags", []):
+            lines = source.splitlines(keepends=True)
+            query_lines = [
+                index
+                for index, line in enumerate(lines)
+                if line.lstrip().startswith("trial_query = ")
+            ]
+            if len(query_lines) != 1:
+                raise AssertionError(
+                    "Expected one trial_query assignment in the parameters cell; "
+                    f"found {len(query_lines)}"
+                )
+            index = query_lines[0]
+            newline = "\n" if lines[index].endswith("\n") else ""
+            lines[index] = f"trial_query = {FIT_SETTINGS['trial_query']!r}{newline}"
+            source = "".join(lines)
+            parameter_query_replacements += 1
+        if setup_old in source:
+            source = source.replace(setup_old, setup_new, 1)
+            setup_replacements += 1
+        if simulation_old in source:
+            source = source.replace(simulation_old, simulation_new, 1)
+            simulation_replacements += 1
+        cell["source"] = source
+
+    if (
+        parameter_query_replacements != 1
+        or setup_replacements != 1
+        or simulation_replacements != 1
+    ):
+        raise AssertionError(
+            "Could not make generated notebook cohort-aware: "
+            f"query={parameter_query_replacements}, setup={setup_replacements}, "
+            f"simulation={simulation_replacements}"
+        )
 
 
 def _expected_products(model_name: str) -> dict[str, str]:
@@ -482,6 +567,7 @@ def prepare_work_unit(jaxcmr_root: str | Path | None = None) -> dict[str, Any]:
             prepare_only=True,
         )
         notebook = nbformat.read(output_path, as_version=4)
+        _make_notebook_query_cohort_aware(notebook)
         papermill_metadata = notebook.metadata.get("papermill", {})
         papermill_metadata["input_path"] = TEMPLATE.as_posix()
         papermill_metadata["output_path"] = products["notebook"]
@@ -670,6 +756,10 @@ def review_results() -> pd.DataFrame:
     parameter_rows = []
     results_by_model = {}
     data = load_data(project_root / FIT_SETTINGS["data_path"])
+    data = slice_trials(
+        data,
+        mixed_trial_mask(data, allow_legacy_missing_field=False),
+    )
 
     for model in MODEL_COMPARISON_REGISTRY:
         name = model["model_name"]

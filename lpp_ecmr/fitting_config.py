@@ -1,5 +1,7 @@
 """Shared fitting configuration for lpp_ecmr render notebooks."""
 
+from .data_contract import MIXED_TRIAL_QUERY
+
 __all__ = [
     "EPS",
     "BASE_FREE",
@@ -61,7 +63,7 @@ BASE_PARAMS = {
     "base_data_tag": "TalmiEEG",
     "data_tag": "TalmiEEG",
     "data_path": "data/TalmiEEG.h5",
-    "trial_query": "data['subject'] > -1",
+    "trial_query": MIXED_TRIAL_QUERY,
     "target_directory": "",
     "component_paths": {
         "mfc_create_fn": "jaxcmr.components.linear_memory.init_mfc",
