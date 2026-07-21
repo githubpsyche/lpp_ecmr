@@ -1,11 +1,10 @@
-"""Build authenticated empirical and simulated original-z Early-LPP summaries.
+"""Build empirical and simulated original-z Early-LPP summaries.
 
 The observed summaries follow the participant-level summarization in Robin
-Hellerstedt's mixed-list R analysis and reads its original z-transformed
-single-trial Early-LPP data from either the downloaded archive or its retained
-extracted directory. Predicted summaries use the returned simulations but
-summarize the uncentered ``EarlyLPP`` input rather than the within-list-centered
-predictor used during fitting.
+Hellerstedt's mixed-list R analysis and read its original z-transformed
+single-trial Early-LPP data from the retained extracted delivery. Predicted
+summaries use the returned simulations but summarize the uncentered ``EarlyLPP``
+input rather than the within-list-centered predictor used during fitting.
 """
 
 from __future__ import annotations
@@ -13,9 +12,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import io
-import json
 import os
-import zipfile
 from collections import defaultdict
 from pathlib import Path
 from typing import Iterable
@@ -32,13 +29,10 @@ from lpp_ecmr.data_contract import (
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 WORK_DIR = Path(__file__).resolve().parent
 FIT_DIR = PROJECT_ROOT / "work" / "pooled_model_runs"
-DOWNLOAD_ARCHIVE = (
+EXTRACTED_DELIVERY = (
     PROJECT_ROOT.parent
     / "downloads"
-    / "LPP_Zarubin_PureLists_for_Deborah.zip"
-)
-EXTRACTED_DELIVERY = DOWNLOAD_ARCHIVE.with_name(
-    "LPP_Zarubin_PureLists_for_Deborah_extracted_2026-07-17"
+    / "LPP_Zarubin_PureLists_for_Deborah_extracted_2026-07-17"
 )
 EXTRACTED_DELIVERY = Path(
     os.environ.get("LPP_ECMR_EMPIRICAL_SOURCE_ROOT", EXTRACTED_DELIVERY)
@@ -47,12 +41,13 @@ EMPIRICAL_DATA_MEMBER = (
     "Data/Extracted_Behavioural_and_LPP_Data/"
     "Single_Trial_Behavioural_and_EEG_Data_Z.csv"
 )
-EMPIRICAL_CODE_MEMBER = "R_Script/Behaviour_and_Relationship_to_LPP.Rmd"
+EMPIRICAL_DATA_SHA256 = (
+    "4a4691f3145fda9cb2f1154c40ddf92394acefe53daf18b1b3bcf4899df80aae"
+)
 
 PARTICIPANT_MEANS_PATH = WORK_DIR / "empirical_early_lpp_participant_means.csv"
 SUMMARY_PATH = WORK_DIR / "original_early_lpp_summary.csv"
 CONTRAST_PATH = WORK_DIR / "original_early_lpp_contrasts.csv"
-SOURCE_PATH = WORK_DIR / "original_early_lpp_source.json"
 
 BOOTSTRAP_SEED = 20260715
 BOOTSTRAP_SAMPLES = 10_000
@@ -93,115 +88,30 @@ SOURCE_LABELS = {
     ),
 }
 
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
 def _bytes_sha256(contents: bytes) -> str:
     return hashlib.sha256(contents).hexdigest()
 
 
-def _load_recorded_source(path: Path) -> dict[str, object]:
-    if not path.exists():
-        raise FileNotFoundError(
-            f"Missing empirical-source provenance: {path}. The recorded member "
-            "hashes are required before the source data can be used."
-        )
-    recorded = json.loads(path.read_text(encoding="utf-8"))
-    expected_members = {
-        "data_member": EMPIRICAL_DATA_MEMBER,
-        "analysis_member": EMPIRICAL_CODE_MEMBER,
-    }
-    for key, expected in expected_members.items():
-        if recorded.get(key) != expected:
-            raise ValueError(
-                f"{path} records an unexpected {key}: {recorded.get(key)!r}"
-            )
-        hash_key = f"{key}_sha256"
-        digest = recorded.get(hash_key)
-        if not isinstance(digest, str) or len(digest) != 64:
-            raise ValueError(f"{path} has no valid {hash_key}")
-    return recorded
-
-
 def _load_empirical_source_bytes(
     *,
-    archive_path: Path = DOWNLOAD_ARCHIVE,
     extracted_root: Path = EXTRACTED_DELIVERY,
-    provenance_path: Path = SOURCE_PATH,
-) -> tuple[bytes, bytes, dict[str, object]]:
-    """Load and authenticate the two retained empirical source members."""
+    expected_sha256: str = EMPIRICAL_DATA_SHA256,
+) -> bytes:
+    """Load the retained empirical CSV after checking its pinned checksum."""
 
-    recorded = _load_recorded_source(provenance_path)
-    archive_path = Path(archive_path)
     extracted_root = Path(extracted_root)
+    empirical_path = extracted_root / EMPIRICAL_DATA_MEMBER
+    if not empirical_path.is_file():
+        raise FileNotFoundError(f"Missing empirical source CSV: {empirical_path}")
 
-    if archive_path.exists():
-        with zipfile.ZipFile(archive_path) as archive:
-            names = set(archive.namelist())
-            required = {EMPIRICAL_DATA_MEMBER, EMPIRICAL_CODE_MEMBER}
-            if not required.issubset(names):
-                raise FileNotFoundError(
-                    "Empirical archive is missing members: "
-                    f"{sorted(required - names)}"
-                )
-            empirical_bytes = archive.read(EMPIRICAL_DATA_MEMBER)
-            analysis_bytes = archive.read(EMPIRICAL_CODE_MEMBER)
-        source_metadata: dict[str, object] = {
-            "source_type": "zip_archive",
-            "source_path": str(archive_path),
-            "archive": str(archive_path),
-            "archive_sha256": _sha256(archive_path),
-        }
-    else:
-        empirical_path = extracted_root / EMPIRICAL_DATA_MEMBER
-        analysis_path = extracted_root / EMPIRICAL_CODE_MEMBER
-        missing = [
-            str(path)
-            for path in (empirical_path, analysis_path)
-            if not path.is_file()
-        ]
-        if missing:
-            raise FileNotFoundError(
-                "Neither the empirical archive nor a complete extracted delivery "
-                f"is available. Missing extracted members: {missing}"
-            )
-        empirical_bytes = empirical_path.read_bytes()
-        analysis_bytes = analysis_path.read_bytes()
-        source_metadata = {
-            "source_type": "extracted_directory",
-            "source_path": str(extracted_root),
-            # Retain the original delivery identity even though the redundant ZIP
-            # no longer needs to remain on disk.
-            "archive": recorded.get("archive"),
-            "archive_sha256": recorded.get("archive_sha256"),
-        }
-
-    member_hashes = {
-        "data_member_sha256": _bytes_sha256(empirical_bytes),
-        "analysis_member_sha256": _bytes_sha256(analysis_bytes),
-    }
-    for key, actual in member_hashes.items():
-        expected = recorded[key]
-        if actual != expected:
-            raise ValueError(
-                f"Empirical source {key} mismatch: expected {expected}, found {actual}"
-            )
-
-    source_metadata.update(
-        {
-            "source_provenance": str(provenance_path),
-            "data_member": EMPIRICAL_DATA_MEMBER,
-            "data_member_sha256": member_hashes["data_member_sha256"],
-            "analysis_member": EMPIRICAL_CODE_MEMBER,
-            "analysis_member_sha256": member_hashes["analysis_member_sha256"],
-        }
-    )
-    return empirical_bytes, analysis_bytes, source_metadata
+    empirical_bytes = empirical_path.read_bytes()
+    actual = _bytes_sha256(empirical_bytes)
+    if actual != expected_sha256:
+        raise ValueError(
+            "Empirical source checksum mismatch: "
+            f"expected {expected_sha256}, found {actual}"
+        )
+    return empirical_bytes
 
 
 def _write_csv(path: Path, rows: list[dict[str, object]], fields: Iterable[str]) -> None:
@@ -211,11 +121,9 @@ def _write_csv(path: Path, rows: list[dict[str, object]], fields: Iterable[str])
         writer.writerows(rows)
 
 
-def load_empirical_participant_means() -> tuple[np.ndarray, list[dict[str, object]], dict[str, object]]:
+def load_empirical_participant_means() -> tuple[np.ndarray, list[dict[str, object]]]:
     """Reproduce the R analysis's participant-by-cell Early-LPP means."""
-    empirical_bytes, analysis_bytes, source_metadata = (
-        _load_empirical_source_bytes()
-    )
+    empirical_bytes = _load_empirical_source_bytes()
 
     header = (
         "Participant",
@@ -293,13 +201,7 @@ def load_empirical_participant_means() -> tuple[np.ndarray, list[dict[str, objec
     if not np.isfinite(means).all() or len(output_rows) != 152:
         raise ValueError("Empirical participant summaries are incomplete")
 
-    metadata = source_metadata | {
-        "empirical_rows": len(rows),
-        "participants": len(participants),
-        "participant_cell_means": len(output_rows),
-        "rows_with_presentation_order_outside_1_to_20": out_of_range,
-    }
-    return means, output_rows, metadata
+    return means, output_rows
 
 
 def _recall_hits(recalls: np.ndarray, presentations: np.ndarray) -> np.ndarray:
@@ -499,9 +401,7 @@ def summarize(
 
 
 def main() -> None:
-    empirical_means, participant_rows, source_metadata = (
-        load_empirical_participant_means()
-    )
+    empirical_means, participant_rows = load_empirical_participant_means()
     summary_rows, contrast_rows, _, nonimputed_positions = summarize(empirical_means)
 
     _write_csv(
@@ -543,49 +443,10 @@ def main() -> None:
             "n_units",
         ),
     )
-    source_metadata.update(
-        {
-            "observed_summary": (
-                "Mean EarlyLPP within Participant × Condition × Memory, then "
-                "mean across participants, matching the source R figure"
-            ),
-            "observed_interval": (
-                f"{CONFIDENCE_LEVEL:.0%} percentile interval from "
-                f"{BOOTSTRAP_SAMPLES:,} participant bootstrap samples"
-            ),
-            "bootstrap_seed": BOOTSTRAP_SEED,
-            "prediction_summary": (
-                "Within each complete simulated dataset: mean original-z EarlyLPP "
-                "within Participant × Condition × simulated recall status, then "
-                "mean across participants"
-            ),
-            "prediction_interval": (
-                f"Central {CONFIDENCE_LEVEL:.0%} interval across "
-                f"{EXPECTED_SIMULATIONS} complete simulated datasets"
-            ),
-            "contrast_interval": (
-                "Remembered-minus-Forgotten differences are calculated within "
-                "each participant-bootstrap sample or complete simulated "
-                "dataset before percentile limits are taken"
-            ),
-            "model_prediction_positions": nonimputed_positions,
-            "model_prediction_exclusion": (
-                "lpp_imputed == 1 positions are excluded because the empirical "
-                "figure summarizes observed EEG values, not imputed fitting inputs"
-            ),
-            "comparison_note": (
-                "The source empirical figure includes 39 EEG rows whose "
-                "PresentationOrder is 99. Those rows contribute to the observed "
-                "panel, as in the source R code, but cannot be assigned simulated "
-                "recall status and therefore are absent from prediction summaries."
-            ),
-        }
-    )
-    SOURCE_PATH.write_text(json.dumps(source_metadata, indent=2) + "\n", encoding="utf-8")
     print(f"Saved {SUMMARY_PATH}")
     print(f"Saved {CONTRAST_PATH}")
     print(f"Saved {PARTICIPANT_MEANS_PATH}")
-    print(f"Saved {SOURCE_PATH}")
+    print(f"Summarized {nonimputed_positions} non-imputed prediction positions")
 
 
 if __name__ == "__main__":

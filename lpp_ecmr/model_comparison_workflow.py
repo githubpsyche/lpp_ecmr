@@ -4,12 +4,8 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import importlib.metadata
 import json
 import os
-import platform
-import subprocess
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -24,7 +20,6 @@ from .model_comparison_registry import (
     FIT_SETTINGS,
     LPP_CENTERED_MAX,
     LPP_CENTERED_MIN,
-    LPP_SINGLE_EFFECT_MULTIPLIER_LIMIT,
     LPP_SLOPE_BOUNDS,
     MODEL_COMPARISON_REGISTRY,
     NESTING_RELATIONSHIPS,
@@ -93,26 +88,6 @@ def _sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
-
-
-def _git_value(repo: Path, *args: str) -> str:
-    return subprocess.run(
-        ["git", "-C", str(repo), *args],
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
-
-
-def _git_provenance(repo: Path, excluded_path: Path | None = None) -> dict[str, Any]:
-    status_args = ["status", "--porcelain", "--untracked-files=all", "--", "."]
-    if excluded_path is not None:
-        status_args.append(f":(exclude){excluded_path.as_posix()}")
-    return {
-        "commit": _git_value(repo, "rev-parse", "HEAD"),
-        "branch": _git_value(repo, "branch", "--show-current"),
-        "source_dirty": bool(_git_value(repo, *status_args)),
-    }
 
 
 def _resolve_jaxcmr_root(explicit: str | Path | None) -> Path:
@@ -613,91 +588,14 @@ def prepare_work_unit(jaxcmr_root: str | Path | None = None) -> dict[str, Any]:
 
     _write_csv(plot_rows, unit_dir / "plot_manifest.csv")
 
-    packages = {}
-    for package in ("jax", "jaxcmr", "numpy", "papermill", "pandas"):
-        try:
-            packages[package] = importlib.metadata.version(package)
-        except importlib.metadata.PackageNotFoundError:
-            packages[package] = None
-
-    manifest = {
-        "analysis": "Pooled 16-model Early LPP hierarchy",
-        "state": "prepared",
-        "prepared_at": datetime.now(timezone.utc).isoformat(),
+    return {
         "work_unit": WORK_UNIT.as_posix(),
         "model_count": len(MODEL_COMPARISON_REGISTRY),
-        "expected_products_per_model": 5,
-        "expected_products": {
-            model["model_name"]: _expected_products(model["model_name"])
-            for model in MODEL_COMPARISON_REGISTRY
-        },
-        "model_specification": {
-            "issues": {
-                "hierarchy": 2,
-                "canonical_manuscript_specification": 8,
-                "learning_strength_composition": 19,
-            },
-            "learning_strength_link": "log",
-            "parameter_manuscript_names": PARAMETER_MANUSCRIPT_NAMES,
-            "lpp_bounds": {
-                "coefficient_bounds": LPP_SLOPE_BOUNDS,
-                "direction": "nonnegative",
-                "observed_centered_range": [LPP_CENTERED_MIN, LPP_CENTERED_MAX],
-                "single_effect_multiplier_at_positive_maximum": (
-                    LPP_SINGLE_EFFECT_MULTIPLIER_LIMIT
-                ),
-                "single_effect_multiplier_at_negative_minimum": float(
-                    np.exp(LPP_SLOPE_BOUNDS[1] * LPP_CENTERED_MIN)
-                ),
-                "full_emotional_multiplier_at_positive_maximum": (
-                    LPP_SINGLE_EFFECT_MULTIPLIER_LIMIT**2
-                ),
-                "full_emotional_multiplier_at_negative_minimum": float(
-                    np.exp(2 * LPP_SLOPE_BOUNDS[1] * LPP_CENTERED_MIN)
-                ),
-            },
-            "source_learning": {
-                "implementation_parameter": "source_learning_rate",
-                "manuscript_parameter": "omega",
-                "bounds": SOURCE_LEARNING_BOUNDS,
-                "reference_value": 1.0,
-                "bounds_rationale": FIT_SETTINGS[
-                    "source_learning_bounds_rationale"
-                ],
-            },
-            "source_drift": {
-                "encoding_parameter": "source_encoding_drift_rate",
-                "encoding_bounds": SOURCE_ENCODING_DRIFT_BOUNDS,
-                "recall_parameter": "source_recall_drift_rate",
-                "recall_fixed_value": 1.0,
-            },
-        },
-        "fit_settings": FIT_SETTINGS,
-        "data": data_summary,
-        "repositories": {
-            "lpp_ecmr": _git_provenance(project_root, WORK_UNIT),
-            "jaxcmr": _git_provenance(resolved_jaxcmr_root),
-        },
-        "template": {
-            "path": TEMPLATE.as_posix(),
-            "sha256": _sha256(template),
-        },
-        "environment": {
-            "python": platform.python_version(),
-            "platform": platform.platform(),
-            "packages": packages,
-        },
-        "manifests": {
-            "fit_grid": "fit_grid.csv",
-            "unit_checks": "unit_checks.csv",
-            "plots": "plot_manifest.csv",
-        },
+        "generated_notebooks": len(MODEL_COMPARISON_REGISTRY),
+        "fit_grid": "fit_grid.csv",
+        "unit_checks": "unit_checks.csv",
+        "plot_inventory": "plot_manifest.csv",
     }
-    with (unit_dir / "run_manifest.json").open("w") as handle:
-        json.dump(manifest, handle, indent=2)
-        handle.write("\n")
-
-    return manifest
 
 
 def _first_scalar(value: Any) -> Any:
@@ -853,21 +751,6 @@ def review_results() -> pd.DataFrame:
         raise AssertionError("At least one expected product is missing")
     product_manifest.to_csv(unit_dir / "plot_manifest.csv", index=False)
 
-    manifest_path = unit_dir / "run_manifest.json"
-    with manifest_path.open() as handle:
-        manifest = json.load(handle)
-    manifest |= {
-        "state": "reviewed",
-        "reviewed_at": datetime.now(timezone.utc).isoformat(),
-        "review_outputs": {
-            "model_comparison": "model_comparison.csv",
-            "parameter_summary": "parameter_summary.csv",
-            "plot_manifest": "plot_manifest.csv",
-        },
-    }
-    with manifest_path.open("w") as handle:
-        json.dump(manifest, handle, indent=2)
-        handle.write("\n")
     return comparison
 
 
@@ -875,8 +758,8 @@ def _main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--jaxcmr-root")
     args = parser.parse_args()
-    manifest = prepare_work_unit(args.jaxcmr_root)
-    print(json.dumps(manifest, indent=2))
+    summary = prepare_work_unit(args.jaxcmr_root)
+    print(json.dumps(summary, indent=2))
 
 
 if __name__ == "__main__":

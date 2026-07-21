@@ -163,8 +163,6 @@ before fitting.
 - `render_fits.ipynb` prepares the model-specific fitting notebooks.
 - `fit_<model>.ipynb` is the cluster-ready notebook for one registry model.
 - `fit_grid.csv` records each model's free and fixed parameters.
-- `run_manifest.json` records the expected outputs and current preparation
-  state.
 - `unit_checks.csv` records the deterministic pre-fit validation results.
 - `review.ipynb` validates and aggregates returned results only after all
   expected products are present.
@@ -172,4 +170,4 @@ before fitting.
 This README summarizes the learning-strength hierarchy and the parameter
 differences needed to interpret its counts. Other shared fitting choices—such
 as pooled fitting, the set-permutation likelihood, forced stopping, and
-optimizer settings—remain defined by the executable registry and run manifest.
+optimizer settings—remain defined by the executable registry.

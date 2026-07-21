@@ -21,25 +21,23 @@ The recall-rate figure reads the verified
 The Early-LPP figure reads:
 
 - `original_early_lpp_summary.csv`;
-- `original_early_lpp_contrasts.csv`; and
-- the source record `original_early_lpp_source.json`.
+- `original_early_lpp_contrasts.csv`.
 
 `build_original_early_lpp_summaries.py` reproduces the original-z empirical
 summaries from Robin Hellerstedt's mixed-list analysis delivery and summarizes
-the six relevant mixed-list simulations. It authenticates the two source
-members against the hashes recorded in `original_early_lpp_source.json`.
+the six relevant mixed-list simulations. The builder pins the expected source
+CSV checksum so a changed external input cannot silently alter the summaries.
 
-The builder first looks for:
-
-`/Users/jordangunn/workspace/downloads/LPP_Zarubin_PureLists_for_Deborah.zip`
-
-If that redundant ZIP is absent, it uses:
-
-`/Users/jordangunn/workspace/downloads/LPP_Zarubin_PureLists_for_Deborah_extracted_2026-07-17`
-
-Set `LPP_ECMR_EMPIRICAL_SOURCE_ROOT` to use a different extracted delivery.
+By default, the builder looks for the retained extracted delivery in a
+`downloads` directory alongside the repository. Set
+`LPP_ECMR_EMPIRICAL_SOURCE_ROOT` to use a different extracted-delivery root.
 The builder writes the participant-level audit table
 `empirical_early_lpp_participant_means.csv` alongside the retained summaries.
+
+The observed summaries retain the 39 rows whose `PresentationOrder` is 99,
+matching the source analysis. Prediction summaries exclude positions marked
+`lpp_imputed == 1`, because those values are fitting inputs rather than observed
+EEG measurements.
 
 ## Outputs
 
