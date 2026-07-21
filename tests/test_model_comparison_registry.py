@@ -4,6 +4,8 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 from jax import numpy as jnp
+import jaxcmr.components.context as TemporalContext
+import jaxcmr.components.linear_memory as LinearMemory
 from jaxcmr.components.termination import NoStopTermination
 
 from lpp_ecmr.data_contract import (
@@ -14,7 +16,7 @@ from lpp_ecmr.data_contract import (
 from lpp_ecmr.model_comparison_registry import (
     EXPECTED_MODEL_NAMES,
     FIT_SETTINGS,
-    LPP_CENTERED_MAX,
+    LPP_OBSERVED_MAX,
     LPP_SINGLE_EFFECT_MULTIPLIER_LIMIT,
     LPP_SLOPE_BOUNDS,
     MODEL_COMPARISON_REGISTRY,
@@ -26,9 +28,9 @@ from lpp_ecmr.model_comparison_registry import (
 from lpp_ecmr.model_comparison_workflow import (
     _make_notebook_query_cohort_aware,
 )
-from lpp_ecmr.models.full_eeg_ecmr import eCMR
+from lpp_ecmr.models.full_eeg_ecmr import eCMR, make_factory as make_ecmr_factory
 from lpp_ecmr.models.learning_strength import compose_learning_strength
-from lpp_ecmr.models.single_eeg_ecmr import CMR
+from lpp_ecmr.models.single_eeg_ecmr import CMR, make_factory as make_cmr_factory
 
 
 def _lookup():
@@ -75,6 +77,9 @@ def test_all_models_share_frozen_fitting_policy():
     assert FIT_SETTINGS["best_of"] == 3
     assert FIT_SETTINGS["num_steps"] == 1000
     assert FIT_SETTINGS["learning_strength_link"] == "log"
+    assert FIT_SETTINGS["lpp_preprocessing"] == (
+        "stored pre-stimulus-standardized EarlyLPP used directly"
+    )
     assert FIT_SETTINGS["lpp_slope_direction"] == "nonnegative"
     assert "ExcludeTermination" in FIT_SETTINGS["loss_fn_path"]
     assert "NoStopTermination" in str(FIT_SETTINGS["component_paths"])
@@ -105,7 +110,7 @@ def test_generated_fit_notebook_applies_subject_limit_within_trial_query():
 
     source = notebook.cells[0]["source"]
     assert "load_data(os.path.join(project_root, data_path), 0)" in source
-    assert 'reshape(-1)[trial_mask]' in source
+    assert "reshape(-1)[trial_mask]" in source
     assert "cohort_subjects" in source
     assert "max_subjects)" not in source
     assert f"trial_query = {MIXED_TRIAL_QUERY!r}" in source
@@ -131,7 +136,7 @@ def test_lpp_slopes_use_approved_log_scale_bounds():
     assert LPP_SLOPE_BOUNDS[0] == 0.0
     assert LPP_SLOPE_BOUNDS[1] < 1.0
     assert np.isclose(
-        np.exp(LPP_SLOPE_BOUNDS[1] * LPP_CENTERED_MAX),
+        np.exp(LPP_SLOPE_BOUNDS[1] * LPP_OBSERVED_MAX),
         LPP_SINGLE_EFFECT_MULTIPLIER_LIMIT,
     )
     for model in MODEL_COMPARISON_REGISTRY:
@@ -172,14 +177,10 @@ def test_log_lpp_terms_have_independent_zero_values_and_expected_slopes():
     main = 0.3
     interaction = 0.2
     full = float(
-        compose_learning_strength(
-            baseline, 1.0, lpp, emotion_scale, main, interaction
-        )
+        compose_learning_strength(baseline, 1.0, lpp, emotion_scale, main, interaction)
     )
     no_main = float(
-        compose_learning_strength(
-            baseline, 1.0, lpp, emotion_scale, 0.0, interaction
-        )
+        compose_learning_strength(baseline, 1.0, lpp, emotion_scale, 0.0, interaction)
     )
     no_interaction = float(
         compose_learning_strength(baseline, 1.0, lpp, emotion_scale, main, 0.0)
@@ -216,6 +217,36 @@ def _source_parameters():
         "learn_after_context_update": True,
         "phi_emot_modulates_temporal": False,
     }
+
+
+@pytest.mark.parametrize(
+    "factory_builder",
+    (
+        lambda: make_cmr_factory(
+            LinearMemory.init_mfc,
+            LinearMemory.init_mcf,
+            TemporalContext.init,
+            NoStopTermination,
+        ),
+        lambda: make_ecmr_factory(termination_policy_create_fn=NoStopTermination),
+    ),
+    ids=("temporal", "source"),
+)
+def test_model_factories_use_stored_early_lpp_without_list_centering(
+    factory_builder,
+):
+    early_lpp = np.asarray([[3.0, 5.0]], dtype=float)
+    data = {
+        "pres_itemids": np.asarray([[1, 2]]),
+        "listLength": np.asarray([[2]]),
+        "condition": np.asarray([[1, 2]]),
+        "EarlyLPP": early_lpp,
+    }
+    factory = factory_builder()(data, None)
+    model = factory.create_trial_model(0, _source_parameters())
+
+    np.testing.assert_allclose(factory.early_lpp, early_lpp)
+    np.testing.assert_allclose(model.early_lpp, early_lpp[0])
 
 
 @pytest.mark.parametrize(

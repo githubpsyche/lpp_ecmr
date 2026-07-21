@@ -168,6 +168,9 @@ def test_fit_task_calls_one_explicit_key_restart_only(
     assert tuple(int(value) for value in calls[0][1]) == task.restart_key
     assert calls[0][2] == -1
     assert payload["name"] == "CMR_restart_0"
+    assert payload["lpp_preprocessing"] == (
+        "stored pre-stimulus-standardized EarlyLPP used directly"
+    )
 
 
 def test_reducer_selects_complete_lowest_restart_without_averaging(

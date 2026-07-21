@@ -69,7 +69,7 @@ class eCMR(Pytree):
         list_length: int,
         parameters: Mapping[str, Float_],
         is_emotional: Bool[Array, " study_events"],
-        lpp_centered: Float[Array, " study_events"],
+        early_lpp: Float[Array, " study_events"],
         mfc_create_fn: MemoryCreateFn = LinearMemory.init_mfc,
         mcf_create_fn: MemoryCreateFn = LinearMemory.init_mcf,
         context_create_fn: ContextCreateFn = TemporalContext.init,
@@ -85,8 +85,8 @@ class eCMR(Pytree):
             Model parameters.
         is_emotional : Bool[Array, " study_events"]
             Per-item emotional flag (1 = emotional, 0 = neutral).
-        lpp_centered : Float[Array, " study_events"]
-            Per-item within-list mean-centered LPP amplitude.
+        early_lpp : Float[Array, " study_events"]
+            Stored per-item pre-stimulus-standardized Early-LPP amplitude.
         mfc_create_fn : MemoryCreateFn, optional
             Factory for item-to-context memory.
         mcf_create_fn : MemoryCreateFn, optional
@@ -135,7 +135,7 @@ class eCMR(Pytree):
             jnp.arange(list_length), self.primacy_scale, self.primacy_decay
         )
 
-        self.lpp_centered = jnp.asarray(lpp_centered, dtype=jnp.float32)
+        self.early_lpp = jnp.asarray(early_lpp, dtype=jnp.float32)
 
         # --- Temporal pathway ---
         self.context = context_create_fn(list_length)
@@ -173,7 +173,7 @@ class eCMR(Pytree):
         return compose_learning_strength(
             baseline,
             self.is_emotional[index],
-            self.lpp_centered[index],
+            self.early_lpp[index],
             self.emotion_scale,
             self.lpp_main_scale,
             self.lpp_inter_scale,
@@ -441,21 +441,19 @@ def make_factory(
 
             # 0 for neutral study events, 1 for emotional study events
             self.trial_emotions = (2 - dataset["condition"]).astype(bool)
-            lpp_raw = jnp.array(dataset["EarlyLPP"], dtype=jnp.float32)
-            trial_mean = jnp.mean(lpp_raw, axis=1, keepdims=True)
-            self.lpp_centered = lpp_raw - trial_mean
+            self.early_lpp = jnp.array(dataset["EarlyLPP"], dtype=jnp.float32)
 
             def model_create_fn(
                 list_length: int,
                 parameters: Mapping[str, Float_],
                 is_emotional: Bool[Array, " study_events"],
-                lpp_centered: Float[Array, " study_events"],
+                early_lpp: Float[Array, " study_events"],
             ) -> MemorySearch:
                 return eCMR(
                     list_length,
                     parameters,
                     is_emotional,
-                    lpp_centered,
+                    early_lpp,
                     mfc_create_fn,
                     mcf_create_fn,
                     context_create_fn,
@@ -480,7 +478,7 @@ def make_factory(
                 self.max_list_length,
                 parameters,
                 self.trial_emotions[0],
-                self.lpp_centered[0],
+                self.early_lpp[0],
             )
 
         def create_trial_model(
@@ -504,7 +502,7 @@ def make_factory(
                 self.max_list_length,
                 parameters,
                 self.trial_emotions[trial_index],
-                self.lpp_centered[trial_index],
+                self.early_lpp[trial_index],
             )
 
     return eCMRModelFactory

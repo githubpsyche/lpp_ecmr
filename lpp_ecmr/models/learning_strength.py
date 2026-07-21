@@ -9,7 +9,7 @@ __all__ = ["compose_learning_strength"]
 def compose_learning_strength(
     baseline: Float_,
     is_emotional: Float_,
-    lpp_centered: Float_,
+    early_lpp: Float_,
     emotion_scale: Float_,
     lpp_main_scale: Float_,
     lpp_inter_scale: Float_,
@@ -27,7 +27,6 @@ def compose_learning_strength(
 
     categorical_multiplier = 1.0 + (emotion_scale - 1.0) * is_emotional
     log_lpp_multiplier = (
-        lpp_main_scale * lpp_centered
-        + lpp_inter_scale * is_emotional * lpp_centered
+        lpp_main_scale * early_lpp + lpp_inter_scale * is_emotional * early_lpp
     )
     return baseline * categorical_multiplier * jnp.exp(log_lpp_multiplier)

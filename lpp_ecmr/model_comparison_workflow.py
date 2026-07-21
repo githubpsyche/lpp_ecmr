@@ -18,8 +18,8 @@ from .data_contract import mixed_trial_mask, slice_trials
 from .model_comparison_registry import (
     EXPECTED_MODEL_NAMES,
     FIT_SETTINGS,
-    LPP_CENTERED_MAX,
-    LPP_CENTERED_MIN,
+    LPP_OBSERVED_MAX,
+    LPP_OBSERVED_MIN,
     LPP_SLOPE_BOUNDS,
     MODEL_COMPARISON_REGISTRY,
     NESTING_RELATIONSHIPS,
@@ -187,7 +187,9 @@ def _validate_registry() -> list[dict[str, Any]]:
     )
 
     source_models = [
-        model for model in MODEL_COMPARISON_REGISTRY if model["architecture"] == "source"
+        model
+        for model in MODEL_COMPARISON_REGISTRY
+        if model["architecture"] == "source"
     ]
     temporal_models = [
         model
@@ -268,17 +270,16 @@ def _validate_data(project_root: Path) -> dict[str, Any]:
     if list_count != expected:
         raise AssertionError(f"Expected {expected} lists, found {list_count}")
     early_lpp = np.asarray(mixed_data["EarlyLPP"], dtype=float)
-    centered_lpp = early_lpp - early_lpp.mean(axis=1, keepdims=True)
     return {
         "list_count": list_count,
         "subject_count": int(np.unique(mixed_data["subject"]).size),
         "list_lengths": sorted(
             int(value) for value in np.unique(mixed_data["listLength"])
         ),
-        "within_list_centered_early_lpp": {
-            "minimum": float(centered_lpp.min()),
-            "maximum": float(centered_lpp.max()),
-            "standard_deviation": float(centered_lpp.std()),
+        "early_lpp": {
+            "minimum": float(early_lpp.min()),
+            "maximum": float(early_lpp.max()),
+            "standard_deviation": float(early_lpp.std()),
         },
         "sha256": _sha256(data_path),
     }
@@ -475,9 +476,13 @@ def prepare_work_unit(jaxcmr_root: str | Path | None = None) -> dict[str, Any]:
     if '"figures": figure_dir' not in template_source:
         raise AssertionError("jaxcmr template does not route figures to figure_dir")
     if "exist_ok=True" not in template_source:
-        raise AssertionError("jaxcmr template directory creation is not concurrency-safe")
+        raise AssertionError(
+            "jaxcmr template directory creation is not concurrency-safe"
+        )
     if "figures/fitting" in template_source:
-        raise AssertionError("jaxcmr template retains the legacy nested figure directory")
+        raise AssertionError(
+            "jaxcmr template retains the legacy nested figure directory"
+        )
 
     checks = _validate_registry()
     data_summary = _validate_data(project_root)
@@ -489,10 +494,10 @@ def prepare_work_unit(jaxcmr_root: str | Path | None = None) -> dict[str, Any]:
             "expected": FIT_SETTINGS["expected_list_count"],
         }
     )
-    lpp_summary = data_summary["within_list_centered_early_lpp"]
+    lpp_summary = data_summary["early_lpp"]
     for name, observed, expected in (
-        ("centered_lpp_minimum", lpp_summary["minimum"], LPP_CENTERED_MIN),
-        ("centered_lpp_maximum", lpp_summary["maximum"], LPP_CENTERED_MAX),
+        ("early_lpp_minimum", lpp_summary["minimum"], LPP_OBSERVED_MIN),
+        ("early_lpp_maximum", lpp_summary["maximum"], LPP_OBSERVED_MAX),
     ):
         checks.append(
             {
@@ -609,25 +614,21 @@ def _learning_strength_diagnostics(
     """Summarize the fitted pathway carrying categorical and LPP modulation."""
 
     early_lpp = np.asarray(data["EarlyLPP"], dtype=float)
-    centered_lpp = early_lpp - early_lpp.mean(axis=1, keepdims=True)
     is_emotional = (2 - np.asarray(data["condition"], dtype=float)).astype(bool)
-    study_index = np.arange(centered_lpp.shape[1], dtype=float)[None, :]
-    primacy = parameters["primacy_scale"] * np.exp(
-        -parameters["primacy_decay"] * study_index
-    ) + 1.0
-    pathway_scale = (
-        parameters["source_learning_rate"]
-        if model["architecture"] == "source"
-        else 1.0
+    study_index = np.arange(early_lpp.shape[1], dtype=float)[None, :]
+    primacy = (
+        parameters["primacy_scale"] * np.exp(-parameters["primacy_decay"] * study_index)
+        + 1.0
     )
-    categorical_multiplier = 1.0 + (
-        parameters.get("emotion_scale", 1.0) - 1.0
-    ) * is_emotional
+    pathway_scale = (
+        parameters["source_learning_rate"] if model["architecture"] == "source" else 1.0
+    )
+    categorical_multiplier = (
+        1.0 + (parameters.get("emotion_scale", 1.0) - 1.0) * is_emotional
+    )
     log_lpp_multiplier = (
-        parameters.get("lpp_main_scale", 0.0) * centered_lpp
-        + parameters.get("lpp_inter_scale", 0.0)
-        * is_emotional
-        * centered_lpp
+        parameters.get("lpp_main_scale", 0.0) * early_lpp
+        + parameters.get("lpp_inter_scale", 0.0) * is_emotional * early_lpp
     )
     lpp_multiplier = np.exp(log_lpp_multiplier)
     learning_strength = (

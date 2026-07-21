@@ -39,6 +39,8 @@ from .data_contract import (
 )
 from .model_comparison_registry import (
     FIT_SETTINGS,
+    LPP_OBSERVED_MAX,
+    LPP_OBSERVED_MIN,
     MODEL_COMPARISON_REGISTRY,
 )
 
@@ -47,7 +49,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "work" / "pooled_model_runs"
 DEFAULT_DATA_PATH = PROJECT_ROOT / FIT_SETTINGS["data_path"]
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 FIT_CALL_INDEX = 0
 RESTART_COUNT = int(FIT_SETTINGS["best_of"])
 TASK_COUNT = len(MODEL_COMPARISON_REGISTRY) * RESTART_COUNT
@@ -215,6 +217,14 @@ def validate_fitting_data(data: Mapping[str, Any]) -> np.ndarray:
         )
     if summary["mixed_subject_count"] != MIXED_EXPECTED_SUBJECTS:
         raise RestartError("Combined-dataset summary disagrees with mixed mask.")
+    early_lpp = np.asarray(data["EarlyLPP"], dtype=float)[mask]
+    observed_range = (float(early_lpp.min()), float(early_lpp.max()))
+    expected_range = (LPP_OBSERVED_MIN, LPP_OBSERVED_MAX)
+    if not np.allclose(observed_range, expected_range):
+        raise RestartError(
+            f"Mixed EarlyLPP range {observed_range} does not match "
+            f"the registered raw range {expected_range}."
+        )
     return mask
 
 
@@ -240,6 +250,7 @@ def _base_metadata(
         "data_path": FIT_SETTINGS["data_path"],
         "data_sha256": data_sha256,
         "trial_query": MIXED_TRIAL_QUERY,
+        "lpp_preprocessing": FIT_SETTINGS["lpp_preprocessing"],
         "model": task.model_name,
         "name": Path(task.filename).stem,
         "components": _json_copy(FIT_SETTINGS["component_paths"]),
@@ -338,6 +349,7 @@ def validate_restart_payload(
         "fit_call_index": FIT_CALL_INDEX,
         "requested_best_of": RESTART_COUNT,
         "trial_query": MIXED_TRIAL_QUERY,
+        "lpp_preprocessing": FIT_SETTINGS["lpp_preprocessing"],
         "model": task.model_name,
         "name": Path(task.filename).stem,
         "components": _json_copy(FIT_SETTINGS["component_paths"]),

@@ -12,8 +12,8 @@ from .fitting_config import BASE_FREE, EPS
 __all__ = [
     "EXPECTED_MODEL_NAMES",
     "FIT_SETTINGS",
-    "LPP_CENTERED_MAX",
-    "LPP_CENTERED_MIN",
+    "LPP_OBSERVED_MAX",
+    "LPP_OBSERVED_MIN",
     "LPP_SINGLE_EFFECT_MULTIPLIER_LIMIT",
     "LPP_SLOPE_BOUNDS",
     "MODEL_COMPARISON_REGISTRY",
@@ -26,18 +26,18 @@ __all__ = [
 ]
 
 
-# Observed range after the EarlyLPP values in TalmiEEG.h5 are centered within
-# each 20-item study list. The log-slope ceiling lets either LPP term contribute
+# Observed range of the stored pre-stimulus-standardized EarlyLPP values in the
+# 342-list mixed cohort. The log-slope ceiling lets either LPP term contribute
 # at most a tenfold multiplier at the largest observed positive value. In the
 # full model, both terms can therefore contribute at most 10 x 10 = 100 for an
 # emotional item. The directional hypothesis is nonnegative (index.qmd reports
 # positive Early-LPP main and emotion x Early-LPP effects).
-LPP_CENTERED_MIN = -8.3405953
-LPP_CENTERED_MAX = 10.732445846153846
+LPP_OBSERVED_MIN = -8.3335
+LPP_OBSERVED_MAX = 11.9711
 LPP_SINGLE_EFFECT_MULTIPLIER_LIMIT = 10.0
 LPP_SLOPE_BOUNDS = [
     0.0,
-    log(LPP_SINGLE_EFFECT_MULTIPLIER_LIMIT) / LPP_CENTERED_MAX,
+    log(LPP_SINGLE_EFFECT_MULTIPLIER_LIMIT) / LPP_OBSERVED_MAX,
 ]
 SOURCE_LEARNING_BOUNDS = [EPS, 10.0]
 SOURCE_ENCODING_DRIFT_BOUNDS = list(BASE_FREE["encoding_drift_rate"])
@@ -91,10 +91,10 @@ FIT_SETTINGS: dict[str, Any] = {
     "init": "latinhypercube",
     "best_of": 3,
     "experiment_count": 200,
-    "lpp_preprocessing": "within-list mean centering of EarlyLPP",
+    "lpp_preprocessing": "stored pre-stimulus-standardized EarlyLPP used directly",
     "learning_strength_link": "log",
     "lpp_slope_direction": "nonnegative",
-    "lpp_observed_centered_range": [LPP_CENTERED_MIN, LPP_CENTERED_MAX],
+    "lpp_observed_range": [LPP_OBSERVED_MIN, LPP_OBSERVED_MAX],
     "lpp_single_effect_multiplier_limit": LPP_SINGLE_EFFECT_MULTIPLIER_LIMIT,
     "source_learning_bounds_rationale": (
         "source_learning_rate is a positive scale relative to temporal "

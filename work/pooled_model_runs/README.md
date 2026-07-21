@@ -53,16 +53,8 @@ Here:
   Thus, $\omega=1$ gives equal ordinary temporal and source learning.
 - $e_i=1$ for a negative (emotionally negative) item and $e_i=0$ for a neutral
   item.
-- $z_i$ is the stored, pre-stimulus-standardized Early LPP amplitude after
-  within-list mean centering:
-
-  $$
-  z_i
-  =
-  \mathrm{EarlyLPP}_i
-  -
-  \overline{\mathrm{EarlyLPP}}_{\operatorname{list}(i)}.
-  $$
+- $z_i$ is the stored, pre-stimulus-standardized Early-LPP amplitude used
+  directly, without subtracting the study list's mean.
 
 - $\phi_{\mathrm{emot}}$ is a categorical multiplier with neutral value 1.
 - $\kappa$ is the neutral-item slope on log learning strength.
@@ -140,10 +132,10 @@ $$
 \in
 \left[
 0,
-\frac{\log 10}{10.732445846153846}
+\frac{\log 10}{11.9711}
 \right]
 \approx
-[0,0.2145443011].
+[0,0.1923453227].
 $$
 
 The nonnegative LPP bounds encode the directional hypothesis reported in the
