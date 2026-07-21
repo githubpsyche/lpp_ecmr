@@ -36,7 +36,7 @@ from .model_comparison_registry import (
 
 __all__ = ["prepare_work_unit", "review_results"]
 
-WORK_UNIT = Path("work/lpp_model_comparison")
+WORK_UNIT = Path("work/pooled_model_runs")
 TEMPLATE = Path("templates/fitting_evosaxde.ipynb")
 
 DIAGNOSTICS = [

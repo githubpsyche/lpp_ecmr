@@ -1,0 +1,9 @@
+source_type,source_id,source_label,metric,category,recall_status,mean,lower,upper,interval,confidence_level,n_units
+observed,Observed,Observed data,recall_rate,Negative,,0.5322153574580759,0.5004432525959708,0.5637508619754789,Participant-cluster percentile bootstrap,0.95,38
+observed,Observed,Observed data,recall_rate,Neutral,,0.40839527765631833,0.366288818553855,0.4509215349615543,Participant-cluster percentile bootstrap,0.95,38
+predicted,CategoryOnly_eCMR_LPP_EmotionalOnly,No categorical enhancement + Emotion-dependent LPP,recall_rate,Negative,,0.4622947925860547,0.44836716681376876,0.47491173874669024,Central interval across complete simulated datasets,0.95,200
+predicted,CategoryOnly_eCMR_LPP_EmotionalOnly,No categorical enhancement + Emotion-dependent LPP,recall_rate,Neutral,,0.4430345430695234,0.43678399650196764,0.44993441189331,Central interval across complete simulated datasets,0.95,200
+predicted,EEM_eCMR,Categorical enhancement + No LPP,recall_rate,Negative,,0.5337025595763459,0.5202890556045896,0.5481575463371581,Central interval across complete simulated datasets,0.95,200
+predicted,EEM_eCMR,Categorical enhancement + No LPP,recall_rate,Neutral,,0.40765850459116765,0.40049737647573236,0.41430367293397463,Central interval across complete simulated datasets,0.95,200
+predicted,EEM_eCMR_LPP_EmotionalOnly,Categorical enhancement + Emotion-dependent LPP,recall_rate,Negative,,0.5292122683142096,0.5127758164165931,0.5450242718446602,Central interval across complete simulated datasets,0.95,200
+predicted,EEM_eCMR_LPP_EmotionalOnly,Categorical enhancement + Emotion-dependent LPP,recall_rate,Neutral,,0.40988303454306957,0.4020496283340621,0.41802579798863143,Central interval across complete simulated datasets,0.95,200

@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from work.lpp_model_prediction_grids import (
+from work.pooled_model_figures import (
     build_original_early_lpp_summaries as build,
 )
 

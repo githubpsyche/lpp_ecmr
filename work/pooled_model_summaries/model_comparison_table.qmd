@@ -1,0 +1,12 @@
+::: {#tbl-pooled-model-fit}
+| Emotion-based learning boost | LPP-based learning boost | $k$ | NLL | AIC | $\Delta$AIC |
+|:--:|:--|--:|--:|--:|--:|
+| No | None | 11 | 8312.401 | 16646.803 | 136.826 |
+| No | All items | 12 | 8300.416 | 16624.832 | 114.855 |
+| No | Negative items only | 12 | 8283.055 | 16590.109 | 80.133 |
+| Yes | None | 12 | 8257.154 | 16538.309 | 28.332 |
+| Yes | All items | 13 | 8251.272 | 16528.545 | 18.568 |
+| Yes | Negative items only | 13 | **8241.988** | **16509.977** | **0.000** |
+
+Pooled comparison of six models that share the same eCMR architecture. An emotion-based learning boost is one multiplier shared by all negative items; an LPP-based learning boost varies with each item's Early LPP and is fitted either for all items or for negative items only. The table indicates which boosts were available for estimation, not whether they improved fit or reproduced a particular empirical pattern. $k$ is the number of free parameters; NLL is the negative log-likelihood for one parameter vector fitted to all 342 mixed lists from 38 participants; $\Delta$AIC is relative to the best model. Bold values identify the best-fitting model. Every fitted Early-LPP coefficient was constrained to $[0, 0.2145443]$; the fitted all-item coefficient in the model with an emotion-based learning boost was $\hat{\kappa}=0.15144$.
+:::

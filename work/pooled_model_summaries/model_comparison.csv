@@ -1,0 +1,7 @@
+model_code,model,registry_id,categorical_enhancement,lpp_modulation,free_parameters,NLL,AIC,delta_AIC,Akaike_weight
+A,No categorical enhancement + No LPP,CategoryOnly_eCMR,Absent,No,11,8312.4013671875,16646.802734375,136.826171875,1.9432722331360055e-30
+B,No categorical enhancement + General LPP,CategoryOnly_eCMR_LPP_General,Absent,General,12,8300.416015625,16624.83203125,114.85546875,1.1465980809518312e-25
+C,No categorical enhancement + Emotion-dependent LPP,CategoryOnly_eCMR_LPP_EmotionalOnly,Absent,Emotion-dependent,12,8283.0546875,16590.109375,80.1328125,3.975028197717718e-18
+D,Categorical enhancement + No LPP,EEM_eCMR,Present,No,12,8257.154296875,16538.30859375,28.33203125,7.042663550888618e-07
+E,Categorical enhancement + General LPP,EEM_eCMR_LPP_General,Present,General,13,8251.2724609375,16528.544921875,18.568359375,9.287340120594064e-05
+F,Categorical enhancement + Emotion-dependent LPP,EEM_eCMR_LPP_EmotionalOnly,Present,Emotion-dependent,13,8241.98828125,16509.9765625,0.0,0.9999064223324391

@@ -44,7 +44,7 @@ from .model_comparison_registry import (
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "work" / "lpp_model_comparison"
+DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "work" / "pooled_model_runs"
 DEFAULT_DATA_PATH = PROJECT_ROOT / FIT_SETTINGS["data_path"]
 
 SCHEMA_VERSION = 1
