@@ -1,221 +1,260 @@
 {
-    "fixed": {
-        "allow_repeated_recalls": 0.0,
-        "learn_after_context_update": 1.0,
-        "lpp_inter_scale": 0.0,
-        "source_recall_drift_rate": 1.0,
-        "phi_emot_modulates_temporal": 0.0
-    },
-    "free": {
-        "encoding_drift_rate": [
-            2.220446049250313e-16,
-            0.9999999999999998
-        ],
-        "start_drift_rate": [
-            2.220446049250313e-16,
-            0.9999999999999998
-        ],
-        "recall_drift_rate": [
-            2.220446049250313e-16,
-            0.9999999999999998
-        ],
-        "shared_support": [
-            2.220446049250313e-16,
-            100.0
-        ],
-        "item_support": [
-            2.220446049250313e-16,
-            100.0
-        ],
-        "learning_rate": [
-            2.220446049250313e-16,
-            0.9999999999999998
-        ],
-        "primacy_scale": [
-            2.220446049250313e-16,
-            100.0
-        ],
-        "primacy_decay": [
-            2.220446049250313e-16,
-            100.0
-        ],
-        "choice_sensitivity": [
-            2.220446049250313e-16,
-            100.0
-        ],
-        "emotion_scale": [
-            2.220446049250313e-16,
-            10.0
-        ],
-        "lpp_main_scale": [
-            0.0,
-            0.21454430108484696
-        ],
-        "source_encoding_drift_rate": [
-            2.220446049250313e-16,
-            0.9999999999999998
-        ],
-        "source_learning_rate": [
-            2.220446049250313e-16,
-            10.0
-        ]
-    },
-    "fitness": [
-        8251.12109375
+  "fixed": {
+    "allow_repeated_recalls": 0.0,
+    "learn_after_context_update": 1.0,
+    "lpp_inter_scale": 0.0,
+    "source_recall_drift_rate": 1.0,
+    "phi_emot_modulates_temporal": 0.0
+  },
+  "free": {
+    "encoding_drift_rate": [
+      2.220446049250313e-16,
+      0.9999999999999998
     ],
-    "fits": {
-        "allow_repeated_recalls": [
-            0.0
-        ],
-        "learn_after_context_update": [
-            1.0
-        ],
-        "lpp_inter_scale": [
-            0.0
-        ],
-        "source_recall_drift_rate": [
-            1.0
-        ],
-        "phi_emot_modulates_temporal": [
-            0.0
-        ],
-        "encoding_drift_rate": [
-            0.000841599190607667
-        ],
-        "start_drift_rate": [
-            0.031218037009239197
-        ],
-        "recall_drift_rate": [
-            0.05141337215900421
-        ],
-        "shared_support": [
-            74.64476776123047
-        ],
-        "item_support": [
-            48.97935104370117
-        ],
-        "learning_rate": [
-            0.2843874394893646
-        ],
-        "primacy_scale": [
-            2.355757474899292
-        ],
-        "primacy_decay": [
-            2.1188735961914062
-        ],
-        "choice_sensitivity": [
-            1.1907942295074463
-        ],
-        "emotion_scale": [
-            7.524982452392578
-        ],
-        "lpp_main_scale": [
-            0.20798726379871368
-        ],
-        "source_encoding_drift_rate": [
-            0.7258358001708984
-        ],
-        "source_learning_rate": [
-            1.0371969938278198
-        ],
-        "subject": [
-            -1
-        ]
+    "start_drift_rate": [
+      2.220446049250313e-16,
+      0.9999999999999998
+    ],
+    "recall_drift_rate": [
+      2.220446049250313e-16,
+      0.9999999999999998
+    ],
+    "shared_support": [
+      2.220446049250313e-16,
+      100.0
+    ],
+    "item_support": [
+      2.220446049250313e-16,
+      100.0
+    ],
+    "learning_rate": [
+      2.220446049250313e-16,
+      0.9999999999999998
+    ],
+    "primacy_scale": [
+      2.220446049250313e-16,
+      100.0
+    ],
+    "primacy_decay": [
+      2.220446049250313e-16,
+      100.0
+    ],
+    "choice_sensitivity": [
+      2.220446049250313e-16,
+      100.0
+    ],
+    "emotion_scale": [
+      2.220446049250313e-16,
+      10.0
+    ],
+    "lpp_main_scale": [
+      0.0,
+      0.21454430108484696
+    ],
+    "source_encoding_drift_rate": [
+      2.220446049250313e-16,
+      0.9999999999999998
+    ],
+    "source_learning_rate": [
+      2.220446049250313e-16,
+      10.0
+    ]
+  },
+  "fitness": [
+    8251.2724609375
+  ],
+  "fits": {
+    "allow_repeated_recalls": [
+      0.0
+    ],
+    "learn_after_context_update": [
+      1.0
+    ],
+    "lpp_inter_scale": [
+      0.0
+    ],
+    "source_recall_drift_rate": [
+      1.0
+    ],
+    "phi_emot_modulates_temporal": [
+      0.0
+    ],
+    "encoding_drift_rate": [
+      0.004926071502268314
+    ],
+    "start_drift_rate": [
+      0.030801603570580482
+    ],
+    "recall_drift_rate": [
+      0.18613764643669128
+    ],
+    "shared_support": [
+      94.45741271972656
+    ],
+    "item_support": [
+      22.82504653930664
+    ],
+    "learning_rate": [
+      0.34881967306137085
+    ],
+    "primacy_scale": [
+      3.9430058002471924
+    ],
+    "primacy_decay": [
+      1.2901067733764648
+    ],
+    "choice_sensitivity": [
+      1.83390474319458
+    ],
+    "emotion_scale": [
+      5.67374849319458
+    ],
+    "lpp_main_scale": [
+      0.15144029259681702
+    ],
+    "source_encoding_drift_rate": [
+      0.1908598095178604
+    ],
+    "source_learning_rate": [
+      3.204422950744629
+    ],
+    "subject": [
+      -1
+    ]
+  },
+  "nit": [
+    82
+  ],
+  "converged": [
+    true
+  ],
+  "hyperparameters": {
+    "bounds": {
+      "encoding_drift_rate": [
+        2.220446049250313e-16,
+        0.9999999999999998
+      ],
+      "start_drift_rate": [
+        2.220446049250313e-16,
+        0.9999999999999998
+      ],
+      "recall_drift_rate": [
+        2.220446049250313e-16,
+        0.9999999999999998
+      ],
+      "shared_support": [
+        2.220446049250313e-16,
+        100.0
+      ],
+      "item_support": [
+        2.220446049250313e-16,
+        100.0
+      ],
+      "learning_rate": [
+        2.220446049250313e-16,
+        0.9999999999999998
+      ],
+      "primacy_scale": [
+        2.220446049250313e-16,
+        100.0
+      ],
+      "primacy_decay": [
+        2.220446049250313e-16,
+        100.0
+      ],
+      "choice_sensitivity": [
+        2.220446049250313e-16,
+        100.0
+      ],
+      "emotion_scale": [
+        2.220446049250313e-16,
+        10.0
+      ],
+      "lpp_main_scale": [
+        0.0,
+        0.21454430108484696
+      ],
+      "source_encoding_drift_rate": [
+        2.220446049250313e-16,
+        0.9999999999999998
+      ],
+      "source_learning_rate": [
+        2.220446049250313e-16,
+        10.0
+      ]
     },
-    "nit": [
-        101
+    "num_steps": 1000,
+    "pop_size": 15,
+    "population_size": 195,
+    "relative_tolerance": 0.0001,
+    "absolute_tolerance": 0.0,
+    "cross_over_rate": 0.9,
+    "diff_w": [
+      0.5,
+      1.0
+    ],
+    "best_of": 3,
+    "init": "latinhypercube",
+    "boundary_handling": "resample",
+    "seed": 0,
+    "nonfinite_penalty": 1e+30
+  },
+  "fit_time": 17682.922871369054,
+  "run_tag": "pooled_evosax_set_likelihood_best_of_3",
+  "data_tag": "TalmiEEG",
+  "data_path": "data/TalmiEEG.h5",
+  "data_sha256": "99d30444c9755fa98ad8a346448708efa5ecac60b00744e6326eb8b8d9ac4439",
+  "trial_query": "data['list_type'] == 0",
+  "model": "EEM_eCMR_LPP_General",
+  "name": "EEM_eCMR_LPP_General_best_of_3",
+  "components": {
+    "mfc_create_fn": "jaxcmr.components.linear_memory.init_mfc",
+    "mcf_create_fn": "jaxcmr.components.linear_memory.init_mcf",
+    "context_create_fn": "jaxcmr.components.context.init",
+    "termination_policy_create_fn": "jaxcmr.components.termination.NoStopTermination"
+  },
+  "fit_algorithm": "jaxcmr.fitting.EvosaxDE",
+  "loss_function": "jaxcmr.loss.set_permutation_likelihood.ExcludeTerminationLikelihoodLoss",
+  "model_factory": "lpp_ecmr.models.full_eeg_ecmr.make_factory",
+  "embedding_path": "",
+  "emotion_feature_path": "",
+  "concat_features": "False",
+  "source_sha256": {
+    "lpp_ecmr/model_comparison_registry.py": "74571d6cc02f70b1a0760148250c5f50f4df17d88e25c9cf5a92312c96fad1fb",
+    "lpp_ecmr/models/learning_strength.py": "cd4cd64afca20aca38e25deff2e358d4563fd303311e43de128ad659142b2eaf",
+    "lpp_ecmr/models/single_eeg_ecmr.py": "41b1d147ff9a3f1e6e479b9f2de3f97c61f21a2fd80dac9e67725dc03f929eed",
+    "lpp_ecmr/models/full_eeg_ecmr.py": "65ea1e6f4d9f7d07d152b3177e3af67887d07bafb50f5d57306a382e2eae3bb9",
+    "jaxcmr/components/context.py": "e7072751d5bd534e713051490fd66e1833d7698da21f03fa1a500e84060a9ee8",
+    "jaxcmr/fitting/evosax.py": "2e6f6d1ce5d534043d78cc3d6afbcebe3711d9ec618ccadeb635e4a2efdb5fc4",
+    "jaxcmr/loss/set_permutation_likelihood.py": "b175b12a00741ac168537938261f07dc001e4cf4fd8b1153986b7ee188a4a4b4"
+  },
+  "restart_selection": {
+    "winner": 2,
+    "fitness": [
+      8253.0498046875,
+      8251.896484375,
+      8251.2724609375
+    ],
+    "iterations": [
+      87,
+      85,
+      82
     ],
     "converged": [
-        true
+      true,
+      true,
+      true
     ],
-    "hyperparameters": {
-        "bounds": {
-            "encoding_drift_rate": [
-                2.220446049250313e-16,
-                0.9999999999999998
-            ],
-            "start_drift_rate": [
-                2.220446049250313e-16,
-                0.9999999999999998
-            ],
-            "recall_drift_rate": [
-                2.220446049250313e-16,
-                0.9999999999999998
-            ],
-            "shared_support": [
-                2.220446049250313e-16,
-                100.0
-            ],
-            "item_support": [
-                2.220446049250313e-16,
-                100.0
-            ],
-            "learning_rate": [
-                2.220446049250313e-16,
-                0.9999999999999998
-            ],
-            "primacy_scale": [
-                2.220446049250313e-16,
-                100.0
-            ],
-            "primacy_decay": [
-                2.220446049250313e-16,
-                100.0
-            ],
-            "choice_sensitivity": [
-                2.220446049250313e-16,
-                100.0
-            ],
-            "emotion_scale": [
-                2.220446049250313e-16,
-                10.0
-            ],
-            "lpp_main_scale": [
-                0.0,
-                0.21454430108484696
-            ],
-            "source_encoding_drift_rate": [
-                2.220446049250313e-16,
-                0.9999999999999998
-            ],
-            "source_learning_rate": [
-                2.220446049250313e-16,
-                10.0
-            ]
-        },
-        "num_steps": 1000,
-        "pop_size": 15,
-        "population_size": 195,
-        "relative_tolerance": 0.0001,
-        "absolute_tolerance": 0.0,
-        "cross_over_rate": 0.9,
-        "diff_w": [
-            0.5,
-            1.0
-        ],
-        "best_of": 3,
-        "init": "latinhypercube",
-        "boundary_handling": "resample",
-        "seed": 0,
-        "nonfinite_penalty": 1e+30
-    },
-    "fit_time": 19446.134471169,
-    "run_tag": "pooled_evosax_set_likelihood_best_of_3",
-    "data_tag": "TalmiEEG",
-    "trial_query": "data['subject'] > -1",
-    "model": "EEM_eCMR_LPP_General",
-    "name": "EEM_eCMR_LPP_General_best_of_3",
-    "components": {
-        "mfc_create_fn": "jaxcmr.components.linear_memory.init_mfc",
-        "mcf_create_fn": "jaxcmr.components.linear_memory.init_mcf",
-        "context_create_fn": "jaxcmr.components.context.init",
-        "termination_policy_create_fn": "jaxcmr.components.termination.NoStopTermination"
-    },
-    "fit_algorithm": "jaxcmr.fitting.EvosaxDE",
-    "loss_function": "jaxcmr.loss.set_permutation_likelihood.ExcludeTerminationLikelihoodLoss",
-    "model_factory": "lpp_ecmr.models.full_eeg_ecmr.make_factory",
-    "embedding_path": "",
-    "emotion_feature_path": "",
-    "feature_column": "6",
-    "concat_features": "False"
+    "fit_time": [
+      5507.831691742002,
+      5121.422305491054,
+      7053.668874135998
+    ],
+    "source_files": [
+      "EEM_eCMR_LPP_General_restart_0.json",
+      "EEM_eCMR_LPP_General_restart_1.json",
+      "EEM_eCMR_LPP_General_restart_2.json"
+    ],
+    "selection_rule": "minimum finite fitness, then lowest restart index"
+  }
 }
