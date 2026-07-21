@@ -323,55 +323,14 @@ and Retrieval (eCMR) (\citeproc{ref-talmi2019retrieved}{Talmi et al.,
 2019}). Like other retrieved-context models
 (\citeproc{ref-howard2002distributed}{Howard \& Kahana, 2002};
 \citeproc{ref-polyn2009context}{Polyn et al., 2009}), eCMR represents
-context as a continuously updated internal state that carries
-information from recently processed events. Studying an item changes
-this state and forms associations in both directions: the item can later
-reinstate aspects of its study context, and the current context can
-later provide retrieval support for the item. During free recall, items
-receiving greater support are more likely to be selected. Recalling an
-item then reinstates aspects of its study context, changing the cue that
-guides the next recall. In the present comparison, stronger
-context-to-item learning could therefore increase an item's probability
-of entering the recalled set. We first specify this common retrieval
-mechanism and then define the learning-strength terms that differed
-across models.
+context as an evolving internal state shaped by recently processed
+events. A studied item changes this state and forms associations in both
+directions: the item can later reinstate its study context, and the
+current context can later support retrieval of the item. Because a
+recalled item reinstates context before the next recall, stronger
+context-to-item learning can change which items enter the recalled set.
 
-Published eCMR distinguishes temporal and source information within the
-context representation. Temporal context represents the evolving
-sequence of recently processed events, whereas source context represents
-non-temporal information about an event---in the present model, whether
-an item was negative or neutral. Recalling an item reinstates both
-components, so its category-related source state can increase support
-for other items associated with similar source information. Published
-eCMR also allows preferential learning to strengthen the associations
-formed by negative items (\citeproc{ref-talmi2019retrieved}{Talmi et
-al., 2019}). All six models retained this source-representation
-mechanism: every model represented negative and neutral source
-information. The comparison varied the learning-strength terms applied
-within that shared representation, so a model without preferential
-emotional learning still distinguished negative and neutral items in
-source context.
-
-The fitted model was an adaptation rather than an unchanged
-implementation of published eCMR. It omitted item-specific semantic
-similarities among the pictures and the published source-switch
-mechanism, in which a transition between negative and neutral categories
-produces additional disruption of temporal context. We omitted that
-mechanism because recall order was unavailable to diagnose
-category-boundary effects and because the present comparison concerned
-learning strength rather than temporal disruption at source transitions.
-
-The implementation also differed from published eCMR in how it combined
-old and new context and in how it converted retrieval support into
-recall choices. We identify those differences when the corresponding
-operations are introduced below. These choices were fixed across all six
-model definitions, so their structural differences concerned the
-learning-strength terms rather than different retrieval architectures.
-
-Within each list \(j\), each studied item \(i\) occupied a unique
-one-hot feature slot \(\mathbf f_i\): one entry was 1 and all remaining
-entries were zero. The complete context state therefore contained the
-temporal and source components introduced above,
+The context representation contained temporal and source components,
 
 \[
 \mathbf c_i=
@@ -381,124 +340,40 @@ temporal and source components introduced above,
 \end{bmatrix}.
 \]
 
-The two components were updated and normalized separately, but together
-formed one context representation rather than independent memory
-systems. Both components included a start-of-list state, and all context
-states and associations were initialized anew for each list.
+Temporal context represented the evolving sequence of events, whereas
+source context represented whether an item was negative or neutral.
+These were components of one context representation rather than separate
+memory systems. All six models represented both source categories;
+models without preferential emotional learning therefore still
+distinguished negative from neutral items.
 
-Items and context interacted through two associative mappings with
-opposite directions. With column-vector notation, the complete
-feature-to-context mapping \(M^{FC}\) transformed an item into
-contextual input, whereas the complete context-to-feature mapping
-\(M^{CF}\) transformed the current context into support for candidate
-items:
-
-\[
-M^{FC}=
-\begin{bmatrix}
-M_T^{FC}\\
-M_S^{FC}
-\end{bmatrix},
-\qquad
-M^{CF}=
-\begin{bmatrix}
-M_T^{CF} & M_S^{CF}
-\end{bmatrix}.
-\]
-
-Core symbols are collected in Supplementary
-Table~\ref{tbl-model-notation}.
-
-Before study, the two associative mappings were initialized differently.
-The temporal block of the initial feature-to-context mapping associated
-each item with its own temporal feature, and the source block associated
-each item with its negative or neutral source feature; both had weight
-\(1-\gamma\). In the initial temporal context-to-feature block, the
-context feature paired with an item supplied support \(\delta\), whereas
-every other item-associated context feature supplied background support
-\(\alpha\). The source context-to-feature block began at zero, so source
-context supported items only through associations learned during study.
-
-When an item was presented, each context component first received
-unit-length input from the corresponding feature-to-context block:
+Within each list, a feature vector \(\mathbf f_i\) uniquely identified
+each studied item \(i\). Two associative mappings connected item
+features and context. The feature-to-context mapping \(M^{FC}\) allowed
+an item to reinstate context, whereas the context-to-feature mapping
+\(M^{CF}\) allowed context to support candidate items. On each study
+trial, the item first generated temporal and source contextual inputs.
+For either component, \(\mathbf c_i^{\mathrm{IN}}\) denotes the input
+generated by item \(i\), and context updated as follows:
 
 \[
-\mathbf u_i^T=\mathcal N\!\left(M_T^{FC}\mathbf f_i\right),
-\qquad
-\mathbf u_i^S=\mathcal N\!\left(M_S^{FC}\mathbf f_i\right),
-\]
-
-where \(\mathcal N(\mathbf v)=\mathbf v/\sqrt{\sum_k v_k^2+\epsilon}\)
-and \(\epsilon\) is machine epsilon. Each preceding context state then
-moved toward its input. Smaller encoding-drift values retained more of
-the preceding state; larger values gave the current item greater
-influence.
-
-The fitted implementation performed this movement with the following
-componentwise integration operator:
-
-\[
-\begin{aligned}
-\boldsymbol\rho(\mathbf c,\mathbf u,\beta)
-&=
-\sqrt{
-\mathbf 1+\beta^2
-\left[
-(\mathbf c\odot\mathbf u)^2-\mathbf 1
-\right]
-}
--
-\beta(\mathbf c\odot\mathbf u),\\
-\mathcal U(\mathbf c,\mathbf u,\beta)
-&=
-\mathcal N\!\left[
-\boldsymbol\rho(\mathbf c,\mathbf u,\beta)\odot\mathbf c
-+
-\beta\mathbf u
-\right].
-\end{aligned}
-\]
-
-Here, \(\odot\), the square, and the square root operate elementwise.
-The retention vector \(\boldsymbol\rho\) controlled how much of each
-dimension of the preceding state remained after the new input was
-incorporated. Temporal and source context were then updated separately:
-
-\[
-\mathbf c_i^T
+\mathbf c_i
 =
-\mathcal U(\mathbf c_{i-1}^T,\mathbf u_i^T,\beta_{\mathrm{enc}}^T),
-\qquad
-\mathbf c_i^S
-=
-\mathcal U(\mathbf c_{i-1}^S,\mathbf u_i^S,\beta_{\mathrm{enc}}^S).
+\rho_i\mathbf c_{i-1}
++\beta\mathbf c_i^{\mathrm{IN}}.
 \]
 
-This componentwise retention-and-renormalization rule differs from the
-scalar retention coefficient in the published CMR and eCMR equations.
+Here, \(\beta\) controlled how strongly the current item changed
+context, and \(\rho_i\) kept context at unit length. Temporal and source
+context used separate encoding-drift parameters. Only after both
+components had been updated did the model learn the item's associations,
+binding the item to a context state it had already helped create.
 
-Both context components were updated before the item's associations were
-learned. The item was therefore bound to temporal and source states that
-it had already helped create, rather than to the states that preceded
-its presentation. This post-update order was held fixed across the
-comparison.
-
-Feature-to-context learning stored the updated state that a later
-presentation or recall of the item could reinstate. The same fitted rate
-\(\gamma\) applied to the temporal and source blocks:
-
-\[
-\Delta M_{T,i}^{FC}
-=
-\gamma\mathbf c_i^T\mathbf f_i^{\mathsf T},
-\qquad
-\Delta M_{S,i}^{FC}
-=
-\gamma\mathbf c_i^S\mathbf f_i^{\mathsf T}.
-\]
-
-Context-to-feature learning stored the reverse associations through
-which context could later support the item:
+Feature-to-context learning stored the updated context that the item
+could later reinstate. Context-to-feature learning determined how
+strongly that context would later support the item. The temporal and
+source blocks of \(M^{CF}\), \(M_T^{CF}\) and \(M_S^{CF}\), were updated
+as follows:
 
 \[
 \Delta M_{T,i}^{CF}
@@ -510,19 +385,15 @@ which context could later support the item:
 S_{ij}^S\mathbf f_i(\mathbf c_i^S)^{\mathsf T}.
 \]
 
-The temporal learning strength \(\phi_i=1+\phi_s\exp[-\phi_d(i-1)]\)
-gave early list positions a temporary advantage: \(\phi_s\) controlled
-its size and \(\phi_d\) controlled its decay. The source learning
-strength \(S_{ij}^S\) contained the same primacy gradient together with
-the emotional-learning and Early-LPP terms defined below. Placing both
-focal predictors on source context-to-item learning gave them one
-directly comparable route to recall, while temporal context-to-item
-learning remained unchanged.
+The primacy gradient \(\phi_i=1+\phi_s\exp[-\phi_d(i-1)]\) temporarily
+strengthened learning for early list positions. The focal
+emotional-learning and Early-LPP multipliers entered only the source
+learning strength \(S_{ij}^S\), allowing them to be compared through the
+same pathway while temporal learning remained unchanged.
 
-At recall onset, \(\beta_{\mathrm{start}}\) shifted both context
-components toward their start-of-list states. The current temporal and
-source states then supplied additive support for each item that had not
-yet been recalled:
+At recall onset, both context components shifted toward their
+start-of-list states. Temporal and source context then provided additive
+support \(a_i\) for each candidate item:
 
 \[
 a_i
@@ -534,71 +405,51 @@ a_i
 \left[M_S^{CF}\mathbf c^S\right]_i.
 \]
 
-The choice-sensitivity parameter \(\tau_c\) converted support into
-choice weights proportional to \(a_i^{\tau_c}\). The implementation
-evaluated these powers in log space and rescaled all weights by a common
-constant to avoid numerical overflow; this rescaling preserved their
-relative values. After machine epsilon was added to each available
-item's weight, let \(q_i\) denote the resulting positive value. The
-probability of the next recalled item was
+Among the studied items not yet recalled, choice sensitivity \(\tau_c\)
+converted this support into the probability of selecting item \(i\)
+next:
 
 \[
 P(R_t=i\mid\mathcal A_t)
 =
-\frac{q_i}{\sum_{k\in\mathcal A_t}q_k},
+\frac{a_i^{\tau_c}}{\sum_{k\in\mathcal A_t}a_k^{\tau_c}},
 \qquad i\in\mathcal A_t,
 \]
 
-where \(\mathcal A_t\) is the set of studied items still available at
-recall step \(t\). Larger \(\tau_c\) made the model more likely to
-select the item with greater support.
+where \(\mathcal A_t\) contains the items still available at recall step
+\(t\). After each selection, the item was removed from this set and
+reinstated its temporal and source context, changing the cue for the
+next recall. This cycle links source learning strength to an item's
+probability of entering the recalled set.
 
-After an item was recalled, temporal context moved toward its retrieved
-temporal input at rate \(\beta_{\mathrm{rec}}^T\), and source context
-fully moved toward its retrieved source input by fixing
-\(\beta_{\mathrm{rec}}^S=1\). The retrieved source input contained both
-the item's category feature and the source state learned during study.
-
-Full source reinstatement was a fixed modeling constraint, not a
-conclusion from the data: without recall order, we treated partial
-source reinstatement as difficult to distinguish from source-learning
-strength and recall-choice sensitivity. The recalled item was then
-removed from the available set, so repeated recalls were disallowed.
-Context-guided selection and reinstatement complete the pathway through
-which source learning strength can change which items enter the recalled
-set.
+The fitted model omitted item-specific semantic similarities and the
+source-switch disruption used in published eCMR; recall order was
+unavailable to diagnose the contributions of semantic similarity and
+source switching to retrieval dynamics. It also fixed source
+reinstatement at its maximum and replaced the published accumulator and
+stopping process with normalized selection among unrecalled items. The
+likelihood consequently conditioned on each list's observed recall count
+rather than predicting when recall stopped. These fixed departures were
+shared across all six models, which differed only in their scaling of
+source learning strength.
 
 \subsubsection{Encoding-strength
 hypotheses}\label{encoding-strength-hypotheses}
 
-Every model estimated a shared source-learning baseline
-\(\omega\phi_i\). The parameter \(\omega\) scaled source learning
-relative to temporal learning, for which the corresponding scale was
-fixed at 1. Estimating \(\omega\) in every model allowed source context
-to contribute even when neither focal mechanism was enabled. The first
-focal term allowed negative items to receive a category-wide
-emotional-learning multiplier on this shared baseline.
+Every model estimated a source-learning baseline \(\omega\phi_i\), where
+\(\omega\) scaled source relative to temporal learning and \(\phi_i\)
+supplied the primacy gradient. Preferential emotional learning
+multiplied this baseline by \(\phi_{\mathrm{emot}}^{e_i}\), where
+\(e_i=1\) for negative items and \(e_i=0\) for neutral items. Models
+without this modulation fixed \(\phi_{\mathrm{emot}}=1\); the remaining
+models estimated it over \((0,10]\), allowing either enhancement or
+attenuation of negative-item learning. Because this category-wide
+multiplier cannot distinguish among negative items, Early LPP supplied
+the item-level variation.
 
-Preferential emotional learning was represented by
-\(\phi_{\mathrm{emot}}^{e_i}\), where \(e_i=1\) for a negative item and
-\(e_i=0\) for a neutral item. The multiplier therefore equaled
-\(\phi_{\mathrm{emot}}\) for negative items and 1 for neutral items.
-Models without the preferential emotional-learning term fixed
-\(\phi_{\mathrm{emot}}=1\), whereas models testing preferential
-emotional learning estimated the multiplier over the range \((0,10]\).
-Values above 1 strengthened source context-to-item learning for negative
-items relative to neutral items, whereas values below 1 attenuated it.
-That range allowed attenuation as well as enhancement of negative-item
-learning; ``preferential emotional learning'' names the directional
-hypothesis, and interpreting the fitted term as enhancement requires an
-estimate above 1. The category-wide emotional-learning multiplier can
-change the average recall difference between negative and neutral items,
-but it cannot distinguish two negative items on the basis of their
-different Early-LPP amplitudes. The Early-LPP terms supplied that
-item-level variation.
-
-For item \(i\) on 20-item study-test list \(j\), the model used
-within-list mean-centered Early LPP,
+Because our modeling target was which items entered each list's recalled
+set, conditional on the observed recall count, we represented Early LPP
+as a within-list deviation:
 
 \[
 z_{ij}
@@ -608,17 +459,16 @@ z_{ij}
 \overline{\mathrm{EarlyLPP}}_j.
 \]
 
-A positive value of \(z_{ij}\) means that an item elicited a larger
-Early LPP than the average item on the same list; a negative value means
-that it elicited a smaller one. This predictor isolates within-list
-variation and removes differences between list means by construction.
-The present models can therefore test whether relatively larger Early
-LPP predicts which items enter a list's recalled set, but not whether
-lists with larger average Early LPP produce more recalls. The preceding
-empirical regression did not separate within-list variation from
-differences among list means and participants. The computational
-coefficient addresses only the within-list relationship and is therefore
-not a numerical counterpart of the empirical regression coefficient.
+Thus, \(z_{ij}\) indicates whether item \(i\) elicited a larger or
+smaller Early LPP than its listmates. The Early-LPP coefficients test
+whether this relative difference predicts entry into the recalled set.
+This centered predictor deliberately excludes between-list mean Early
+LPP; testing whether lists with larger mean Early LPP produce more
+recalls would require retaining the list mean as a separate predictor
+and modeling recall count. Because the preceding empirical regression
+did not separate within- and between-list variation, its Early-LPP
+coefficients are not numerical counterparts of the computational
+Early-LPP coefficients.
 
 Source learning strength was the product of the ordinary source-learning
 baseline, the category-wide emotional-learning multiplier, and an
@@ -638,28 +488,18 @@ S_{ij}^S
 \right].
 \]
 
-The coefficient \(\kappa\) is the General Early-LPP slope on log
-learning strength, and \(\kappa_{\mathrm{emot}}\) is an additional
-negative-item slope. The resulting log-learning slope is \(\kappa\) for
-neutral items and \(\kappa+\kappa_{\mathrm{emot}}\) for negative items.
-At the list mean, where \(z_{ij}=0\), the Early-LPP multiplier equals 1
-and the model recovers its ordinary category-level learning baseline.
-The exponential link guarantees positive learning strength, but
-positivity is not its only implication: the link assumes that a one-unit
-Early-LPP difference produces a proportional rather than a constant
-absolute change in learning. The model comparison tests whether one such
-proportional relationship improves prediction when it applies to both
-categories or only to negative items.
-
-No-LPP models fixed both Early-LPP coefficients at zero. General-LPP
-models estimated \(\kappa\) and fixed \(\kappa_{\mathrm{emot}}=0\),
-applying one slope to negative and neutral items. Emotion-dependent-LPP
-models fixed \(\kappa=0\) and estimated \(\kappa_{\mathrm{emot}}\),
-applying one slope only to negative items. General and Emotion-dependent
-models therefore estimated the same number of parameters and differed
-only in the items to which their single Early-LPP slope applied. The
-empirical interaction motivated this matched comparison, but the model
-comparison determined which mapping better predicted the recalled sets.
+Within the Early-LPP multiplier, \(\kappa\) scaled source learning for
+both negative and neutral items, whereas \(\kappa_{\mathrm{emot}}\)
+added negative-item-specific scaling. The exponential link kept learning
+strength positive and made Early-LPP effects proportional; when
+\(z_{ij}=0\), the Early-LPP multiplier equaled 1 and recovered the
+category-level baseline. No-LPP models fixed both coefficients at zero.
+General-LPP models estimated \(\kappa\) alone, whereas equal-complexity
+Emotion-dependent-LPP models estimated \(\kappa_{\mathrm{emot}}\) alone.
+The empirical Emotion \(\times\) Early-LPP interaction motivated the
+General-versus-Emotion-dependent comparison, which determined whether
+the single Early-LPP coefficient better predicted recalled sets when
+applied to both categories or only to negative items.
 
 \subsubsection{Model-comparison design}\label{model-comparison-design}
 
@@ -703,44 +543,25 @@ learning + Emotion-dependent-LPP model (13) \\
 
 \end{table}
 
-Canonical implementation identifiers corresponding to these manuscript
-labels are reported in Supplementary Table~\ref{tbl-registry-mapping}.
-
-The grid supports the three comparisons introduced at the beginning of
-this section. Within each row, comparing the two columns tests whether
-freeing the emotional-learning multiplier improves prediction while
-holding the Early-LPP mapping fixed. Within each column, comparing an
-Early-LPP model with the No-LPP model tests whether the neural measure
-adds predictive information while holding fixed whether the
-emotional-learning multiplier was estimated. Finally, comparing General
-with Emotion-dependent LPP within either column tests two
-equal-complexity placements of one Early-LPP coefficient. The shared
-architecture in every cell makes these contrasts interpretable.
-
-The grid also implements the substitution test proposed in the original
-motivation for constraining encoding strength with LPP. The General-LPP
-model with the emotional-learning multiplier fixed and the
-Preferential-learning model without LPP each had 12 free parameters.
-Both models added one scaling term to the same source context-to-item
-learning strength: the General-LPP model scaled learning from item-level
-LPP, whereas the Preferential-learning model scaled negative-item
-learning with \(\phi_{\mathrm{emot}}\). Their comparison therefore tests
-whether LPP-derived scaling can replace a free emotional-learning
-multiplier; the equal-complexity Emotion-dependent-LPP model provides a
-second LPP-derived alternative.
+Within each row, the two columns test preferential emotional learning
+while holding the Early-LPP mapping fixed. Within each column, the LPP
+models test whether the neural measure adds information beyond the
+corresponding No-LPP model. The General and Emotion-dependent rows
+compare two equal-complexity placements of one Early-LPP coefficient.
+The 12-parameter General-LPP and Emotion-dependent-LPP models can also
+be compared directly with the 12-parameter Preferential-learning model,
+testing whether LPP-derived scaling can replace a free category-wide
+multiplier.
 
 Table~\ref{tbl-model-parameter-spec} summarizes the parameters and the
-constraints that created the six cells. The eleven common free
-parameters governed temporal and source updating, pre-experimental
-support, associative learning, primacy, and recall choice. Estimating
-the emotional-learning multiplier or either one-slope Early-LPP mapping
-added one free parameter.
+constraints that created the six cells. Eleven common parameters
+governed context updating, associative learning, primacy, and recall
+choice; each optional learning multiplier added one parameter.
 
 \begin{table}
 
-{\caption{{Parameters in the six-model specification. Bounds shown as
-open at zero were implemented with machine epsilon as the positive lower
-bound.}{\label{tbl-model-parameter-spec}}}
+{\caption{{Parameters in the six-model
+specification.}{\label{tbl-model-parameter-spec}}}
 \vspace{-20pt}}
 
 \begin{longtable}[]{@{}
@@ -783,78 +604,39 @@ recall & \((0,1)\) \\
 items & \(1\) (fixed) or \((0,10]\) \\
 \(\kappa\) & General Early-LPP slope on log learning strength & \(0\)
 (fixed) or \([0,0.2145]\) \\
-\(\kappa_{\mathrm{emot}}\) & Emotion-dependent Early-LPP slope increment
-& \(0\) (fixed) or \([0,0.2145]\) \\
+\(\kappa_{\mathrm{emot}}\) & Negative-item Early-LPP slope & \(0\)
+(fixed) or \([0,0.2145]\) \\
 \end{longtable}
 
 \end{table}
 
-The primary grid does not estimate General and emotion-dependent
-Early-LPP coefficients simultaneously. It therefore asks whether one
-coefficient is more useful when shared by both categories or limited to
-negative items; it does not test whether a residual General component is
-exactly zero after an emotion-dependent component is fitted. The same
-learning-strength equation also defines a Full-LPP mapping in which
-\(\kappa\) and \(\kappa_{\mathrm{emot}}\) are estimated together. In
-that mapping, \(\kappa_{\mathrm{emot}}\) is formally an additional
-negative-item slope; when \(\kappa=0\), it supplies the entire
-negative-item slope. We fitted the two source-context Full-LPP variants
-exploratorily, but their best-found solutions did not consistently
-recover the likelihoods of their nested one-slope models. We therefore
-excluded them from the primary comparison and report them separately as
-optimization-incomplete fits.
-
-The comparison also holds source context constant across all six models.
-It can test learning-strength terms within that architecture, but it
+The grid estimates one Early-LPP coefficient at a time and therefore
+does not test for a residual General slope after an Emotion-dependent
+slope is included. It also holds the source-context pathway fixed and
 cannot establish that the predictive Early-LPP relationship is specific
-to source-context rather than temporal-context learning. Having defined
-the alternatives, we next describe the common evidence used to compare
-them.
+to source rather than temporal learning. Having defined the
+alternatives, we next describe the common evidence used to compare them.
 
 \subsubsection{Pooled estimation and
 evaluation}\label{pooled-estimation-and-evaluation}
 
-The modeling dataset matched each of the 6,840 study events to its
-recall outcome and Early-LPP value. As described in the preceding EEG
-methods, each single-trial ERP was first standardized relative to its
-own prestimulus interval, using the mean and standard deviation from
-\(-200\) to 0 ms separately for each electrode. Early LPP was then
-extracted from the prespecified 400--1000 ms window and centroparietal
-electrodes.
+The modeling dataset matched all 6,840 study events to recall outcomes
+and the Early-LPP values described in the preceding EEG methods. Values
+missing for 371 events (5.4\%) were imputed without using recall status:
+first from the same item category on the participant's list, then from
+the complete list, and finally from the dataset-wide category mean. Each
+model used one parameter vector shared across all 342 lists from 38
+participants; the analysis therefore estimates a pooled pattern rather
+than participant-specific mechanisms. Each participant contributed only
+nine lists, too few independent list histories to support stable
+estimation of 11 to 13 parameters.
 
-Early-LPP values were unavailable for 371 events (5.4\%). Before
-within-list centering, these values were imputed in three steps: first
-from available items of the same condition on the same participant's
-list, then from all available items on that list if the
-condition-specific mean was unavailable, and finally from the
-dataset-wide mean for the corresponding condition. Recall status was not
-used in the imputation. This procedure yielded one complete 20-item
-input sequence for each list.
-
-Each model was fitted with one parameter vector shared across all 342
-study-test lists from 38 participants. The pooled analysis asks whether
-one parameterization captures the population-level pattern across the
-full dataset. It does not estimate participant-specific model parameters
-or individual differences. This restriction is important because each
-participant contributed only nine lists, too few independent list
-histories to support stable estimation of 11 to 13 parameters per
-participant.
-
-The available recall records identified which items were recalled, but
-their output order was not available for modeling. This creates a
-problem because eCMR assigns probability to an ordered recall sequence:
-after each recall, the retrieved item changes context and therefore
-changes the probabilities of subsequent recalls. An unordered set of
-\(n_j\) items is compatible with \(n_j!\) possible orders. Enumerating
-all of those orders was impractical, so we approximated the evidence for
-each recalled set using 50 sampled orders.
-
-Let \(\mathcal S_j\) denote the items recalled from list \(j\), let
-\(n_j=|\mathcal S_j|\), let \(\pi_{jk}\) be the \(k\)th sampled ordering
-of those items, and let \(\boldsymbol\theta\) denote a model's parameter
-vector. For each list, the model was supplied with \(n_j\) and evaluated
-on which studied items composed \(\mathcal S_j\). Using \(K=50\) fixed
-sampled orders, the fitted score for the set was
+The records identified each list's recalled items but not their output
+order. Let \(n_j=|\mathcal S_j|\) be the number of items in recalled set
+\(\mathcal S_j\), let \(\pi_{jk}\) be its \(k\)th sampled order, and let
+\(\boldsymbol\theta\) be the model parameters. Because reinstatement
+makes eCMR sequence-dependent, we approximated the evidence for each set
+by averaging the probabilities of \(K=200\) fixed sampled orders:
 
 \[
 \widetilde P(\mathcal S_j\mid\boldsymbol\theta,n_j)
@@ -870,73 +652,35 @@ R_{jt}=\pi_{jk,t}
 \right).
 \]
 
-Each product in this expression is the probability of one possible
-ordered recall sequence; the outer average combines the 50 sampled
-sequences. Multiplying the average by \(n_j!\) would estimate the full
-sum over compatible orders. Because this factor depends only on the
-observed list and not on the model parameters, omitting it adds the same
-constant to every negative log-likelihood (NLL). It therefore does not
-change fitted parameters; after model complexity is considered, it
-likewise does not change differences or rankings under Akaike's
-information criterion (AIC), defined below. The same sampled orders and
-random seed were used for every model, so differences between models
-could not arise from evaluating different order samples.
+Each product is one possible recall sequence and the outer average
+combines the sampled sequences. The omitted factor \(n_j!\) depends only
+on the observed set size, so it adds the same constant to every negative
+log-likelihood (NLL) and does not change parameter estimates or model
+rankings. Every model used the same sampled orders and random seed.
+Because the likelihood also excluded termination, it predicts
+recalled-item identity conditional on the observed number of recalls
+rather than explaining how many items were recalled.
 
-Termination events were excluded from the likelihood. Accordingly, the
-model predicts which items enter the recalled set conditional on the
-number of items the participant recalled from that list. The analysis
-does not explain why that number of items was recalled and does not test
-a process for deciding when recall stops. Stopping may depend on the
-state of retrieval in free recall, but evaluating such a process
-requires a separate, validated termination model. The current likelihood
-keeps the present comparison focused on recalled-item identity.
+We minimized summed NLL with differential evolution
+(\citeproc{ref-storn1997differential}{Storn \& Price, 1997}), using 15
+candidate vectors per free parameter for at most 1,000 generations.
+Three independent starts were run for each model, and the lowest NLL was
+retained. Early-LPP coefficients were constrained to \([0,0.2145]\) in
+accordance with the directional hypothesis; the upper bound permitted a
+tenfold multiplier at the largest observed centered Early LPP. We
+compared best-found solutions using \(\mathrm{AIC}=2\mathrm{NLL}+2p\),
+where \(p\) is the number of free parameters
+(\citeproc{ref-burnham2002model}{Burnham \& Anderson, 2002}).
 
-We minimized the summed negative log of the approximate set scores using
-differential evolution, a population-based parameter search
-(\citeproc{ref-storn1997differential}{Storn \& Price, 1997}). Each
-optimization began with a Latin-hypercube sample that spread its initial
-candidate vectors across the allowed parameter space. The search
-population contained 15 candidate vectors per free parameter, yielding
-165, 180, or 195 candidates for models with 11, 12, or 13 free
-parameters, respectively. The crossover probability was 0.9, the
-differential weight varied between 0.5 and 1.0, and the relative
-convergence tolerance was \(10^{-4}\). Optimization continued for at
-most 1,000 generations and was repeated from three independent starts;
-the lowest NLL found across the three starts was retained.
-
-The Early-LPP coefficients were constrained to be nonnegative in
-accordance with the directional empirical hypothesis. Their upper bound
-of 0.2145 limited either Early-LPP term to a tenfold multiplier at the
-largest observed centered Early LPP. The resulting estimates and
-rankings are conditional on this search budget and these parameter
-ranges.
-
-Lower NLL indicates that a model assigned greater probability to the
-observed recalled sets. We compared the best-found solutions using
-Akaike's information criterion, \(\mathrm{AIC}=2\mathrm{NLL}+2p\), where
-\(p\) is the number of free parameters
-(\citeproc{ref-burnham2002model}{Burnham \& Anderson, 2002}). Lower AIC
-indicates a better trade-off between conditional fit and model
-complexity. AIC establishes whether an optional learning term improved
-prediction enough to offset its additional parameter, but AIC does not
-show which empirical pattern that term reproduced. We therefore paired
-the model comparisons with simulations designed to make the fitted terms
-interpretable.
-
-For each fitted parameter vector, we generated 200 complete simulated
-datasets containing the same 342 study lists and the same item-level
-Early-LPP values as the observed dataset. For each list, we generated
-exactly its observed number of recalled items, matching the conditioning
-used in the likelihood.
-
-We summarized two patterns in each simulated dataset: the
-negative-versus-neutral recall difference and the
-remembered-versus-forgotten difference in within-list centered Early
-LPP. The parameters changed which studied items the model recalled; they
-did not change the observed Early-LPP value attached to an item. These
-summaries were not optimized as separate fitting targets. They are
-therefore explanatory diagnostics of the fitted recalled-set model, not
-independent or out-of-sample validation.
+To interpret the fit differences, we generated 200 complete datasets
+from each fitted model using the observed lists, Early-LPP values, and
+recall counts. We summarized the negative--neutral recall difference and
+the remembered--forgotten Early-LPP difference within each category. The
+Early-LPP diagnostic used the original z-transformed values for
+continuity with the empirical analysis, although within-list-centered
+values modulated learning. These summaries were consequences of which
+items the model recalled, not additional fitting targets, and therefore
+provide explanatory diagnostics rather than out-of-sample validation.
 
 \subsection{Model-comparison results}\label{model-comparison-results}
 
@@ -944,29 +688,33 @@ independent or out-of-sample validation.
 
 The model combining preferential emotional learning with
 Emotion-dependent Early-LPP modulation had the lowest AIC
-(Table~\ref{tbl-model-fit}). Its best-found NLL was 8240.310 with 13
-free parameters, yielding an AIC of 16506.619. The overall ranking
-provides an initial orientation; the three planned comparisons determine
-what the ranking means. We report those comparisons in the order
-introduced above.
+(Table~\ref{tbl-model-fit}). Its best-found NLL was 8241.988 with 13
+free parameters, yielding an AIC of 16509.977; the planned contrasts
+below explain this ranking.
 
 \begin{table}
 
-{\caption{{Pooled fit of the six eCMR model variants. \(p\) is the
-number of free parameters; NLL is the best-found negative log-likelihood
-across three differential-evolution starts; \(\Delta\)AIC is relative to
-the lowest-AIC model.}{\label{tbl-model-fit}}}
+{\caption{{Pooled fit of the six eCMR model variants. The first two
+columns identify which learning mechanisms were available for
+estimation; they do not indicate whether either mechanism improved fit.
+\(p\) is the number of free parameters; NLL is the best-found negative
+log-likelihood across three differential-evolution starts; \(\Delta\)AIC
+is relative to the lowest-AIC model. Bold values identify the
+best-fitting model.}{\label{tbl-model-fit}}}
 \vspace{-20pt}}
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedleft\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedleft\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedleft\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedleft\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+  >{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2105}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1579}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1579}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1579}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1579}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1579}}@{}}
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-Model
+\begin{minipage}[b]{\linewidth}\centering
+Emotion-based learning boost
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+LPP-based learning boost
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
 \(p\)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
@@ -980,160 +728,111 @@ AIC
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-Source-context baseline & 11 & 8313.531 & 16649.063 & 142.443 \\
-General-LPP model & 12 & 8300.740 & 16625.480 & 118.861 \\
-Emotion-dependent-LPP model & 12 & 8280.693 & 16585.387 & 78.768 \\
-Preferential-learning model & 12 & 8255.712 & 16535.424 & 28.805 \\
-Preferential learning + General-LPP model & 13 & 8251.121 & 16528.242 &
-21.623 \\
-\textbf{Preferential learning + Emotion-dependent-LPP model} &
-\textbf{13} & \textbf{8240.310} & \textbf{16506.619} & \textbf{0.000} \\
+No & None & 11 & 8312.401 & 16646.803 & 136.826 \\
+No & All items & 12 & 8300.416 & 16624.832 & 114.855 \\
+No & Negative items only & 12 & 8283.055 & 16590.109 & 80.133 \\
+Yes & None & 12 & 8257.154 & 16538.309 & 28.332 \\
+Yes & All items & 13 & 8251.272 & 16528.545 & 18.568 \\
+Yes & Negative items only & 13 & \textbf{8241.988} & \textbf{16509.977}
+& \textbf{0.000} \\
 \end{longtable}
 
 \end{table}
 
-The fit statistics show whether a term improved conditional prediction,
-whereas the simulations show what empirical pattern the fitted term
-produced. Figure~\ref{fig-model-diagnostics} displays the observed
-benchmarks and four predictions selected from the six models to isolate
-the three planned contrasts. For preferential emotional learning, the
-figure compares the Emotion-dependent-LPP model with and without a free
-emotional-learning multiplier. For the added contribution of Early LPP,
-it compares preferential emotional learning alone with a model that also
-included Emotion-dependent LPP. For the placement of the Early-LPP
-slope, it compares models that combined preferential emotional learning
-with either General or Emotion-dependent LPP. The left panels show the
-category-level recall pattern. The right panels show the item-level
-Early-LPP pattern separately for negative and neutral items. All six
-models remain in the numerical tables even though four representative
-predictions are sufficient to display the contrast logic.
+The fit statistics compare conditional prediction, whereas the
+simulations show which empirical patterns accompanied the fit
+differences. The figures contrast the observed data with preferential
+emotional learning alone, Emotion-dependent Early-LPP modulation alone,
+and their combination; the tables report all six models.
+
+\subsubsection{Contribution of preferential emotional
+learning}\label{contribution-of-preferential-emotional-learning}
+
+Freeing the emotional-learning multiplier lowered AIC under every
+Early-LPP specification: by 108.494 points with no LPP, by 96.287 points
+with General LPP, and by 80.133 points with Emotion-dependent LPP. The
+fitted multiplier exceeded 1 in all three models. Across all six models,
+those with preferential emotional learning reproduced the observed
+negative-minus-neutral recall difference (predicted 0.119--0.140;
+observed 0.124), whereas models without it produced differences of only
+0.000--0.019 (Figure~\ref{fig-model-recall-rates}).
 
 \begin{figure}
 
-\caption{\label{fig-model-diagnostics}Observed benchmarks and
-predictions from four of the six pooled source-context models. Left:
-overall recall rates by category. Right: mean within-list centered Early
-LPP by memory status and category. Observed error bars are 95\%
-participant-cluster bootstrap intervals. Predicted error bars are
-central 95\% intervals across 200 simulated datasets and show simulation
-variability, not parameter-estimation uncertainty. Simulations used each
-list's observed recall count. The Early-LPP-by-memory-status pattern is
-a derived diagnostic, not a separately fitted target or out-of-sample
-validation.}
+\caption{\label{fig-model-recall-rates}Observed and model-predicted
+recall rates for negative and neutral items. Brackets show the
+negative-minus-neutral difference. Observed error bars are 95\%
+participant-cluster bootstrap confidence intervals; predicted error bars
+are central 95\% intervals across 200 complete simulated datasets.}
 
 \centering{
 
-\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{work/lpp_model_results/diagnostic_figure.png}
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{work/lpp_model_prediction_grids/matched_models_recall_rate_figure.png}
 
 }
 
 \end{figure}%
 
-\subsubsection{Contribution of preferential emotional
-learning}\label{contribution-of-preferential-emotional-learning}
-
-The first comparison asks whether preferential learning of negative
-items improves prediction of which items are recalled. Freeing the
-emotional-learning multiplier lowered AIC under every Early-LPP
-specification: by 113.639 points with no LPP, by 97.238 points with
-General LPP, and by 78.768 points with Emotion-dependent LPP. The fitted
-multiplier exceeded 1 in all three models, so the estimated term
-enhanced rather than attenuated negative-item learning. The recall-rate
-panels explain this consistent advantage. Models with preferential
-emotional learning produced negative-minus-neutral recall differences
-between 0.118 and 0.134, close to the observed difference of 0.124;
-models without preferential emotional learning produced differences
-between 0.001 and 0.019. Because every model represented negative and
-neutral source features, this result concerns preferential emotional
-learning rather than the mere presence of category information.
-Preferential emotional learning supplied category-level recall
-structure, leaving the item-level contribution of Early LPP as the next
-question.
-
 \subsubsection{Contribution of Early
 LPP}\label{contribution-of-early-lpp}
 
-The second comparison asks whether Early LPP adds predictive information
-beyond a model with no EEG input. Without preferential emotional
-learning, General LPP lowered AIC by 23.582 points and Emotion-dependent
-LPP lowered it by 63.676 points relative to the source-context baseline.
-With preferential emotional learning, the corresponding AIC improvements
-were 7.182 and 28.805 points. Early LPP therefore improved conditional
-prediction when the emotional-learning multiplier was fixed and when it
-was estimated.
+Without preferential emotional learning, General LPP lowered AIC by
+21.971 points and Emotion-dependent LPP lowered it by 56.693 points
+relative to the source-context baseline. With preferential emotional
+learning, the corresponding AIC improvements were 9.764 and 28.332
+points. Thus, Early LPP improved conditional prediction whether the
+emotional-learning multiplier was fixed or estimated.
 
-The equal-complexity substitution comparisons asked a different question
-and produced a different result. The Preferential-learning model had an
-AIC 90.057 points lower than the General-LPP model and 49.963 points
-lower than the Emotion-dependent-LPP model; all three models had 12 free
-parameters. Within the fitted specification and parameter ranges,
-neither LPP-derived scaling rule matched the free emotional-learning
-multiplier, even though Early LPP improved prediction when added to
-models with or without that multiplier. This pattern favors
-complementarity over substitution.
+The Preferential-learning model had an AIC 86.523 points lower than the
+General-LPP model and 51.801 points lower than the Emotion-dependent-LPP
+model; all three models had 12 free parameters. Neither LPP mapping
+therefore replaced the category-wide multiplier, even though both added
+predictive information to models with or without it.
 
-The Early-LPP panels identify the additional pattern captured by
-Early-LPP modulation. In the observed data, remembered items had a 0.403
-larger mean centered Early LPP than forgotten items within the negative
-category, whereas the corresponding neutral-item difference was 0.021.
-Models without Early-LPP modulation produced little
-remembered-versus-forgotten separation in either category. Because the
-Early-LPP values themselves remained fixed, remembered--forgotten
-differences arose only when a model preferentially recalled items with
-larger values. Early-LPP modulation therefore supplied item-level
-information that the category-wide emotional-learning multiplier did not
-contain. Because both Early-LPP mappings added information, the final
-comparison asks where their single slope should apply.
+In the observed data, remembered items had a 0.455 larger mean Early-LPP
+z score than forgotten items within the negative category, whereas the
+corresponding neutral-item difference was 0.035. Models without
+Early-LPP modulation produced little remembered-versus-forgotten
+separation in either category. Because simulations kept each item's
+Early-LPP value fixed, the separation in
+Figure~\ref{fig-model-early-lpp} arose only when a model preferentially
+recalled items with larger values. Early-LPP modulation therefore
+supplied item-level information absent from the category-wide
+multiplier.
+
+\begin{figure}
+
+\caption{\label{fig-model-early-lpp}Observed and model-predicted
+original z-transformed Early LPP by item category and memory status.
+Brackets show remembered-minus-forgotten differences within each
+category. Observed error bars are 95\% participant-bootstrap confidence
+intervals; predicted error bars are central 95\% intervals across 200
+complete simulated datasets.}
+
+\centering{
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{work/lpp_model_prediction_grids/matched_models_early_lpp_figure.png}
+
+}
+
+\end{figure}%
 
 \subsubsection{General versus Emotion-dependent Early
 LPP}\label{general-versus-emotion-dependent-early-lpp}
 
-The third comparison contrasts one slope shared across categories with
-one slope limited to negative items. The two alternatives had equal
-numbers of parameters, so their AIC difference reflected fit rather than
-a difference in the complexity penalty. Emotion-dependent LPP lowered
-AIC by 40.094 points relative to General LPP when preferential emotional
-learning was absent and by 21.623 points when preferential emotional
-learning was present. The simulations clarify why: General LPP separated
-remembered and forgotten items in both categories, whereas
-Emotion-dependent LPP concentrated the separation among negative items,
-as in the observed pattern. When the models were each given one
-Early-LPP coefficient, that coefficient was therefore more useful when
-applied to negative items.
-
-This comparison is conditional on the declared parameter ranges. In the
-model combining preferential emotional learning with General LPP,
-\(\hat\kappa=0.208\), or 97\% of its upper bound of 0.2145, and no
-wider-bound sensitivity analysis was conducted. We therefore cannot
-establish whether the Emotion-dependent mapping would remain preferred
-under a wider Early-LPP bound. The supported conclusion is narrower:
-within the declared range and equal-complexity comparison, the
-Emotion-dependent mapping predicted the recalled sets better.
-
-A second near-bound estimate cautions against interpreting the
-General-LPP coefficients in isolation. In the General-LPP fit with the
-emotional-learning multiplier fixed, the source-learning scale
-approached its upper bound: \(\hat\omega=9.047\) on the range
-\((0,10]\). This pattern suggests that the source-learning scale and the
-General Early-LPP coefficient may compensate for one another.
-
-The focal fitted parameters in Table~\ref{tbl-focal-parameters} show
-that the preferred model used both proposed mechanisms. The preferred
-model, which combined preferential emotional learning with
-Emotion-dependent LPP, estimated a source-learning scale of 0.930, an
-emotional-learning multiplier of 1.946, and an emotion-dependent
-log-learning slope of 0.128. The source-learning scale, context drift,
-and choice sensitivity were estimated jointly with these terms, so
-isolated parameter magnitudes should not be assigned direct
-psychological meanings or compared across models without considering the
-complete parameter vector.
+Emotion-dependent LPP lowered AIC by 34.723 points relative to General
+LPP when preferential emotional learning was absent and by 18.568 points
+when preferential emotional learning was present. Because the
+alternatives had equal numbers of parameters, these AIC differences
+reflected fit rather than complexity penalties.
 
 \begin{table}
 
-{\caption{{Fitted source-learning scale and parameters governing
-preferential emotional learning and Early-LPP modulation. Fixed entries
-are the values that disable the corresponding optional
-mechanism.}{\label{tbl-focal-parameters}}}
+{\caption{{Observed and model-predicted recall-rate and original-z
+Early-LPP contrasts. Parentheses give prediction minus observed;
+predictions are means across 200 complete simulated datasets. The
+Early-LPP contrasts were not separately
+fitted.}{\label{tbl-model-diagnostic-effects}}}
 \vspace{-20pt}}
 
 \begin{longtable}[]{@{}
@@ -1144,175 +843,71 @@ mechanism.}{\label{tbl-focal-parameters}}}
   >{\raggedleft\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
-Model
+eCMR specification
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-\(\omega\)
+Recall rate: Negative \(-\) Neutral
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-\(\phi_{\mathrm{emot}}\)
+Early LPP: Remembered \(-\) Forgotten, Negative items
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-\(\kappa\)
+Early LPP: Remembered \(-\) Forgotten, Neutral items
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-\(\kappa_{\mathrm{emot}}\)
+Early LPP: Negative items (Remembered \(-\) Forgotten) \(-\) Neutral
+items (Remembered \(-\) Forgotten)
 \end{minipage} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-Source-context baseline & 0.226 & 1 (fixed) & 0 (fixed) & 0 (fixed) \\
-General-LPP model & 9.047 & 1 (fixed) & 0.060 & 0 (fixed) \\
-Emotion-dependent-LPP model & 1.385 & 1 (fixed) & 0 (fixed) & 0.184 \\
-Preferential-learning model & 1.452 & 1.504 & 0 (fixed) & 0 (fixed) \\
-Preferential learning + General-LPP model & 1.037 & 7.525 & 0.208 & 0
-(fixed) \\
-Preferential learning + Emotion-dependent-LPP model & 0.930 & 1.946 & 0
-(fixed) & 0.128 \\
+\textbf{Observed data} & \textbf{0.124} & \textbf{0.455} &
+\textbf{0.035} & \textbf{0.420} \\
+Baseline & 0.000 \emph{(−0.124)} & 0.029 \emph{(−0.425)} & 0.009
+\emph{(−0.026)} & 0.020 \emph{(−0.400)} \\
+All-item LPP boost & 0.006 \emph{(−0.117)} & 0.240 \emph{(−0.215)} &
+0.207 \emph{(+0.172)} & 0.033 \emph{(−0.387)} \\
+Negative-item LPP boost & 0.019 \emph{(−0.105)} & 0.560 \emph{(+0.105)}
+& 0.020 \emph{(−0.015)} & 0.539 \emph{(+0.120)} \\
+Emotion-based boost & 0.126 \emph{(+0.002)} & 0.028 \emph{(−0.426)} &
+0.010 \emph{(−0.024)} & 0.018 \emph{(−0.402)} \\
+Emotion-based + all-item LPP boosts & 0.140 \emph{(+0.016)} & 0.330
+\emph{(−0.125)} & 0.066 \emph{(+0.031)} & 0.264 \emph{(−0.156)} \\
+Emotion-based + negative-item LPP boosts & 0.119 \emph{(−0.004)} & 0.447
+\emph{(−0.007)} & 0.024 \emph{(−0.011)} & 0.424 \emph{(+0.004)} \\
 \end{longtable}
 
 \end{table}
 
-The exploratory Full-LPP fits did not resolve whether a residual General
-component remained. Their original best-of-three solutions failed a
-basic optimization check: their NLLs were 3.265 and 1.294 points above
-their nested Emotion-dependent models without and with preferential
-emotional learning, respectively. Evaluating each nested parameter
-vector through the corresponding Full likelihood at \(\kappa=0\)
-reproduced the parent NLL exactly. We therefore excluded the Full
-variants from the six-model ranking, report both the original and
-embedded-parent evaluations in Supplementary
-Table~\ref{tbl-full-lpp-summary}, and do not use them to infer whether a
-residual General component remains.
+General LPP separated remembered and forgotten items in both categories,
+whereas Emotion-dependent LPP concentrated the separation among negative
+items. With preferential emotional learning, the predicted difference
+between the negative-item and neutral-item remembered--forgotten
+Early-LPP contrasts was 0.264 under General LPP and 0.424 under
+Emotion-dependent LPP, compared with 0.420 observed. The General
+Early-LPP coefficient was below its upper bound (\(\hat\kappa=0.151\) of
+0.2145), so the preference for Emotion-dependent LPP was not
+attributable to the General coefficient pressing against its declared
+bound.
+
+The preferred model combined preferential emotional learning with
+Emotion-dependent Early-LPP modulation. It estimated a source-learning
+scale of 2.669, an emotional-learning multiplier of 1.577, and an
+emotion-dependent log-learning slope of 0.115. Because these parameters
+were estimated jointly with the remaining model parameters, their
+isolated magnitudes should not be assigned direct psychological
+meanings.
 
 \subsubsection{Summary and scope}\label{summary-and-scope}
 
 Taken together, the comparisons support complementary roles for
 preferential emotional learning and Early-LPP modulation. The
-emotional-learning multiplier reproduced the higher recall rate for
-negative than neutral items. The item-level Early-LPP multiplier
-distinguished which negative items were recalled. The preferred
-specification combined preferential emotional learning with
-Emotion-dependent LPP. It implements the proposed pathway from Early LPP
-through source context-to-item learning strength to the conditional
-probability of entering the recalled set, while also reproducing the
-emotional-memory advantage. The comparison thereby implements the
-original proposal to use an independent neural measure to constrain the
-same source-learning pathway governed at the category level by
-\(\phi_{\mathrm{emot}}\). The results show that LPP-derived scaling
-complemented, rather than replaced, the fitted emotional-learning
-multiplier.
-
-The conclusion is deliberately narrower than a general account of
-emotional memory. It concerns within-list variation in Early LPP and
-recalled-item identity conditional on the observed recall count, using
-one parameter vector shared across participants.
-
-The analysis does not explain total recall or stopping and does not
-estimate effects of between-list mean Early LPP. It also does not
-characterize participant-specific mechanisms, compare source with
-temporal implementations, or identify Early LPP uniquely with attention,
-arousal, or stimulus significance. Those questions require different
-data or additional models rather than stronger interpretation of the
-present comparison.
-
-Finally, the numerical conclusions are conditional on the 50-order
-recalled-set approximation, the declared parameter bounds, and the
-differential-evolution search. The mechanistic conclusions concern the
-stated eCMR adaptation, including its componentwise context update and
-its omission of semantic similarity and source-switch disruption. Within
-those limits, a category-wide emotional-learning multiplier and an
-emotion-dependent item-level neural multiplier accounted for
-complementary structure in the observed recalled sets.
+category-wide multiplier reproduced the negative-item recall advantage,
+whereas Emotion-dependent Early LPP distinguished which negative items
+were recalled. Their combination was preferred, implementing the
+proposed pathway from Early LPP through source learning strength to the
+conditional probability of entering the recalled set. LPP-derived
+scaling therefore complemented rather than replaced preferential
+emotional learning.
 
 \section{Supplementary material}\label{supplementary-material}
-
-\subsection{Model-label mapping}\label{model-label-mapping}
-
-\begin{table}
-
-{\caption{{Mapping between the manuscript-facing labels and the
-executable model registry.}{\label{tbl-registry-mapping}}}
-\vspace{-20pt}}
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
-\toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-Manuscript label
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Canonical registry identifier
-\end{minipage} \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-Source-context baseline & \texttt{CategoryOnly\_eCMR} \\
-General-LPP model & \texttt{CategoryOnly\_eCMR\_LPP\_General} \\
-Emotion-dependent-LPP model &
-\texttt{CategoryOnly\_eCMR\_LPP\_EmotionalOnly} \\
-Preferential-learning model & \texttt{EEM\_eCMR} \\
-Preferential learning + General-LPP model &
-\texttt{EEM\_eCMR\_LPP\_General} \\
-Preferential learning + Emotion-dependent-LPP model &
-\texttt{EEM\_eCMR\_LPP\_EmotionalOnly} \\
-\end{longtable}
-
-\end{table}
-
-\subsection{Core notation}\label{core-notation}
-
-Table~\ref{tbl-model-notation} collects the formal objects that recur
-across the specification. The fitted parameters and their roles are
-listed separately in Table~\ref{tbl-model-parameter-spec}.
-
-\begin{table}
-
-{\caption{{Core notation used in the model specification and
-recalled-set likelihood.}{\label{tbl-model-notation}}}
-\vspace{-20pt}}
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
-\toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-Symbol
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Meaning
-\end{minipage} \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\(i\), \(j\), \(t\) & Studied item, study-test list, and recall-output
-position, respectively \\
-\(\mathbf f_i\) & One-hot feature vector identifying studied item
-\(i\) \\
-\(\mathbf c\), \(\mathbf c^T\), \(\mathbf c^S\) & Complete context state
-and its temporal and source components \\
-\(\mathbf u_i^T\), \(\mathbf u_i^S\) & Temporal and source contextual
-input generated by item \(i\) \\
-\(M^{FC}\), \(M^{CF}\) & Complete feature-to-context and
-context-to-feature associative mappings \\
-\(M_T^{FC}\), \(M_S^{FC}\), \(M_T^{CF}\), \(M_S^{CF}\) & Temporal and
-source blocks of the two associative mappings \\
-\(\phi_i\) & Serial-position-dependent primacy multiplier for item
-\(i\) \\
-\(S_{ij}^S\) & Completed source context-to-item learning strength for
-item \(i\) on list \(j\) \\
-\(e_i\) & Negative-item indicator: 1 for negative and 0 for neutral \\
-\(z_{ij}\) & Within-list mean-centered Early LPP for item \(i\) on list
-\(j\) \\
-\(a_i\), \(q_i\) & Context-derived support for item \(i\) and its
-positive choice weight \\
-\(\mathcal A_t\) & Studied items still available at recall position
-\(t\) \\
-\(\mathcal S_j\), \(n_j\) & Observed recalled set from list \(j\) and
-its size \\
-\(\boldsymbol\theta\) & Complete fitted parameter vector for one
-model \\
-\end{longtable}
-
-\end{table}
 
 \subsection{Complete pooled parameter
 estimates}\label{complete-pooled-parameter-estimates}
@@ -1392,137 +987,29 @@ F
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\(\beta_{\mathrm{enc}}^{T}\) & 0.86396 & 0.73472 & 0.75960 & 0.83243 &
-0.00084 & 0.80907 \\
-\(\beta_{\mathrm{enc}}^{S}\) & 0.18153 & 0.02849 & 0.11016 & 0.04012 &
-0.72584 & 0.08675 \\
-\(\beta_{\mathrm{start}}\) & 0.97321 & 0.98771 & 0.99999 & 0.99999 &
-0.03122 & 0.99999 \\
-\(\beta_{\mathrm{rec}}^{T}\) & 0.70721 & 0.67079 & 0.14344 & 0.18358 &
-0.05141 & 0.15337 \\
+\(\beta_{\mathrm{enc}}^{T}\) & 0.71851 & 0.74573 & 0.75492 & 0.82721 &
+0.0049261 & 0.7364 \\
+\(\beta_{\mathrm{enc}}^{S}\) & 0.060535 & 0.034311 & 0.017177 & 0.056109
+& 0.19086 & 0.059001 \\
+\(\beta_{\mathrm{start}}\) & 0.99726 & 0.99987 & 0.99998 & 1 & 0.030802
+& 0.99996 \\
+\(\beta_{\mathrm{rec}}^{T}\) & 0.42503 & 0.094411 & 0.17007 & 0.096094 &
+0.18614 & 0.10575 \\
 \(\beta_{\mathrm{rec}}^{S}\) & {[}1{]} & {[}1{]} & {[}1{]} & {[}1{]} &
 {[}1{]} & {[}1{]} \\
-\(\alpha\) & 0.24130 & 3.53733 & 1.69400 & 3.81835 & 74.64477 &
-1.85902 \\
-\(\delta\) & 68.959 & 28.732 & 39.126 & 18.541 & 48.979 & 27.334 \\
-\(\gamma\) & 0.79003 & 0.46162 & 0.13427 & 0.25922 & 0.28439 &
-0.21391 \\
-\(\phi_s\) & 28.721 & 0.48668 & 0.19390 & 0.02896 & 2.35576 & 0.22806 \\
-\(\phi_d\) & 2.20620 & 1.38064 & 4.43143 & 1.40662 & 2.11887 &
-57.41072 \\
-\(\tau_c\) & 0.19046 & 2.17085 & 1.75392 & 3.32237 & 1.19079 &
-1.57723 \\
-\(\omega\) & 0.22586 & 9.04693 & 1.38513 & 1.45162 & 1.03720 &
-0.92996 \\
-\(\phi_{\mathrm{emot}}\) & {[}1{]} & {[}1{]} & {[}1{]} & 1.50441 &
-7.52498 & 1.94591 \\
-\(\kappa\) & {[}0{]} & 0.05973 & {[}0{]} & {[}0{]} & 0.20799 &
+\(\alpha\) & 0.30498 & 20.437 & 6.2235 & 10.59 & 94.457 & 5.8256 \\
+\(\delta\) & 23.84 & 65.123 & 31.432 & 64.685 & 22.825 & 58.887 \\
+\(\gamma\) & 0.2887 & 0.54427 & 0.30069 & 0.32279 & 0.34882 & 0.28719 \\
+\(\phi_s\) & 1.3389 & 0.14933 & 0.16018 & 0.31836 & 3.943 & 0.33536 \\
+\(\phi_d\) & 82.54 & 2.0841 & 22.287 & 44.051 & 1.2901 & 76.191 \\
+\(\tau_c\) & 0.64638 & 5.0889 & 3.6255 & 2.5134 & 1.8339 & 1.9979 \\
+\(\omega\) & 1.8797 & 6.0171 & 5.8759 & 2.4608 & 3.2044 & 2.6692 \\
+\(\phi_{\mathrm{emot}}\) & {[}1{]} & {[}1{]} & {[}1{]} & 1.6302 & 5.6737
+& 1.5774 \\
+\(\kappa\) & {[}0{]} & 0.032287 & {[}0{]} & {[}0{]} & 0.15144 &
 {[}0{]} \\
-\(\kappa_{\mathrm{emot}}\) & {[}0{]} & {[}0{]} & 0.18410 & {[}0{]} &
-{[}0{]} & 0.12805 \\
-\end{longtable}
-
-\end{table}
-
-\subsection{Exploratory Full-LPP fits}\label{exploratory-full-lpp-fits}
-
-Table~\ref{tbl-full-lpp-summary} reports the original optimizer outputs
-and the explicitly evaluated nested-parent candidates. Because a model
-cannot fit worse than a nested model at the optimum, the nesting
-violations indicate incomplete optimization rather than evidence that
-the General slope harmed fit. With the same population-size factor used
-in the primary analysis, the 13- and 14-parameter Full models used 195
-and 210 candidate vectors, respectively. The embedded-parent candidate
-was the best evaluated Full-LPP solution in each case, and its AIC
-continues to count the additional Full-model parameter. Neither
-candidate is treated as a demonstrated maximum-likelihood solution.
-
-\begin{table}
-
-{\caption{{Exploratory Full-LPP evaluations. The original Full solutions
-are the best outputs from three differential-evolution starts. The
-embedded-parent candidates set \(\kappa=0\) and use the parameter vector
-from the corresponding Emotion-dependent
-model.}{\label{tbl-full-lpp-summary}}}
-\vspace{-20pt}}
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedleft\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedleft\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedleft\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedleft\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedleft\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedleft\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}@{}}
-\toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-Preferential emotional learning
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-Full-model \(p\)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-Original Full NLL
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-Original Full AIC
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-NLL above nested model
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-Embedded-parent NLL
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-Best-evaluated Full AIC
-\end{minipage} \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-Absent & 13 & 8283.958 & 16593.916 & 3.265 & 8280.693 & 16587.387 \\
-Present & 14 & 8241.604 & 16511.207 & 1.294 & 8240.310 & 16508.619 \\
-\end{longtable}
-
-\end{table}
-
-Table~\ref{tbl-full-lpp-parameters} reports the original optimizer
-parameter estimates. These values are retained for transparency, not
-interpreted individually. Parameter roles and fitted ranges are defined
-in Table~\ref{tbl-model-parameter-spec}.
-
-\begin{table}
-
-{\caption{{Original parameter estimates from the two
-optimization-incomplete exploratory Full-LPP
-fits.}{\label{tbl-full-lpp-parameters}}}
-\vspace{-20pt}}
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedleft\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedleft\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
-\toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-Parameter
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-Emotional-learning multiplier fixed at 1
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-Emotional-learning multiplier estimated
-\end{minipage} \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\(\beta_{\mathrm{enc}}^{T}\) & 0.63919 & 0.75269 \\
-\(\beta_{\mathrm{enc}}^{S}\) & 0.048073 & 0.090636 \\
-\(\beta_{\mathrm{start}}\) & 0.99928 & 0.99992 \\
-\(\beta_{\mathrm{rec}}^{T}\) & 0.19682 & 0.14939 \\
-\(\beta_{\mathrm{rec}}^{S}\) & 1 (fixed) & 1 (fixed) \\
-\(\alpha\) & 6.4214 & 7.5665 \\
-\(\delta\) & 29.362 & 61.357 \\
-\(\gamma\) & 0.48335 & 0.26261 \\
-\(\phi_s\) & 0.29664 & 0.73550 \\
-\(\phi_d\) & 1.0567 & 0.85239 \\
-\(\tau_c\) & 3.1391 & 1.7813 \\
-\(\omega\) & 6.9497 & 3.5453 \\
-\(\phi_{\mathrm{emot}}\) & 1 (fixed) & 1.7823 \\
-\(\kappa\) & 0.001684 & 0.006867 \\
-\(\kappa_{\mathrm{emot}}\) & 0.10562 & 0.11559 \\
+\(\kappa_{\mathrm{emot}}\) & {[}0{]} & {[}0{]} & 0.099237 & {[}0{]} &
+{[}0{]} & 0.11542 \\
 \end{longtable}
 
 \end{table}

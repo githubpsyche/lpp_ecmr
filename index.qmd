@@ -196,7 +196,7 @@ Eleven common parameters governed context updating, associative learning, primac
 | $\omega$ | Source learning relative to temporal learning | $(0,10]$ |
 | $\phi_{\mathrm{emot}}$ | Emotional-learning multiplier for negative items | $1$ (fixed) or $(0,10]$ |
 | $\kappa$ | General Early-LPP slope on log learning strength | $0$ (fixed) or $[0,0.2145]$ |
-| $\kappa_{\mathrm{emot}}$ | Additional negative-item Early-LPP slope; when $\kappa=0$, the entire negative-item slope | $0$ (fixed) or $[0,0.2145]$ |
+| $\kappa_{\mathrm{emot}}$ | Negative-item Early-LPP slope | $0$ (fixed) or $[0,0.2145]$ |
 
 : Parameters in the six-model specification. {#tbl-model-parameter-spec}
 
@@ -213,7 +213,7 @@ Each participant contributed only nine lists, too few independent list histories
 
 The records identified each list's recalled items but not their output order.
 Let $n_j=|\mathcal S_j|$ be the number of items in recalled set $\mathcal S_j$, let $\pi_{jk}$ be its $k$th sampled order, and let $\boldsymbol\theta$ be the model parameters.
-Because reinstatement makes eCMR sequence-dependent, we approximated the evidence for each set by averaging the probabilities of $K=50$ fixed sampled orders:
+Because reinstatement makes eCMR sequence-dependent, we approximated the evidence for each set by averaging the probabilities of $K=200$ fixed sampled orders:
 
 $$
 \widetilde P(\mathcal S_j\mid\boldsymbol\theta,n_j)
@@ -249,16 +249,16 @@ These summaries were consequences of which items the model recalled, not additio
 ### Overall comparison
 
 The model combining preferential emotional learning with Emotion-dependent Early-LPP modulation had the lowest AIC (@tbl-model-fit).
-Its best-found NLL was 8240.310 with 13 free parameters, yielding an AIC of 16506.619; the planned contrasts below explain this ranking.
+Its best-found NLL was 8241.988 with 13 free parameters, yielding an AIC of 16509.977; the planned contrasts below explain this ranking.
 
 | Emotion-based learning boost | LPP-based learning boost | $p$ | NLL | AIC | $\Delta$AIC |
 |:--:|:--|--:|--:|--:|--:|
-| No | None | 11 | 8313.531 | 16649.062 | 142.443 |
-| No | All items | 12 | 8300.740 | 16625.480 | 118.861 |
-| No | Negative items only | 12 | 8280.693 | 16585.387 | 78.768 |
-| Yes | None | 12 | 8255.712 | 16535.424 | 28.805 |
-| Yes | All items | 13 | 8251.121 | 16528.242 | 21.623 |
-| Yes | Negative items only | 13 | **8240.310** | **16506.619** | **0.000** |
+| No | None | 11 | 8312.401 | 16646.803 | 136.826 |
+| No | All items | 12 | 8300.416 | 16624.832 | 114.855 |
+| No | Negative items only | 12 | 8283.055 | 16590.109 | 80.133 |
+| Yes | None | 12 | 8257.154 | 16538.309 | 28.332 |
+| Yes | All items | 13 | 8251.272 | 16528.545 | 18.568 |
+| Yes | Negative items only | 13 | **8241.988** | **16509.977** | **0.000** |
 
 : Pooled fit of the six eCMR model variants. The first two columns identify which learning mechanisms were available for estimation; they do not indicate whether either mechanism improved fit. $p$ is the number of free parameters; NLL is the best-found negative log-likelihood across three differential-evolution starts; $\Delta$AIC is relative to the lowest-AIC model. Bold values identify the best-fitting model. {#tbl-model-fit}
 
@@ -267,21 +267,19 @@ The figures contrast the observed data with preferential emotional learning alon
 
 ### Contribution of preferential emotional learning
 
-Freeing the emotional-learning multiplier lowered AIC under every Early-LPP specification: by 113.639 points with no LPP, by 97.238 points with General LPP, and by 78.768 points with Emotion-dependent LPP.
+Freeing the emotional-learning multiplier lowered AIC under every Early-LPP specification: by 108.494 points with no LPP, by 96.287 points with General LPP, and by 80.133 points with Emotion-dependent LPP.
 The fitted multiplier exceeded 1 in all three models.
-In @fig-model-recall-rates, models with preferential emotional learning reproduced the observed negative-minus-neutral recall difference (predicted 0.118--0.134; observed 0.124), whereas models without it produced differences of only 0.001--0.019.
+Across all six models, those with preferential emotional learning reproduced the observed negative-minus-neutral recall difference (predicted 0.119--0.140; observed 0.124), whereas models without it produced differences of only 0.000--0.019 (@fig-model-recall-rates).
 
 ![Observed and model-predicted recall rates for negative and neutral items. Brackets show the negative-minus-neutral difference. Observed error bars are 95% participant-cluster bootstrap confidence intervals; predicted error bars are central 95% intervals across 200 complete simulated datasets.](work/lpp_model_prediction_grids/matched_models_recall_rate_figure.png){#fig-model-recall-rates width="100%" fig-alt="Four panels compare negative and neutral recall rates. Observed data show higher recall for negative items. LPP-based learning for negative items alone produces little category difference, whereas the emotion-based learning boost alone and the combined model reproduce the observed negative-item advantage."}
 
-Because every model represented both source categories, the reproduced negative-item recall advantage reflects preferential emotional learning rather than the presence of category information alone.
-
 ### Contribution of Early LPP
 
-Without preferential emotional learning, General LPP lowered AIC by 23.582 points and Emotion-dependent LPP lowered it by 63.676 points relative to the source-context baseline.
-With preferential emotional learning, the corresponding AIC improvements were 7.182 and 28.805 points.
+Without preferential emotional learning, General LPP lowered AIC by 21.971 points and Emotion-dependent LPP lowered it by 56.693 points relative to the source-context baseline.
+With preferential emotional learning, the corresponding AIC improvements were 9.764 and 28.332 points.
 Thus, Early LPP improved conditional prediction whether the emotional-learning multiplier was fixed or estimated.
 
-The Preferential-learning model had an AIC 90.057 points lower than the General-LPP model and 49.963 points lower than the Emotion-dependent-LPP model; all three models had 12 free parameters.
+The Preferential-learning model had an AIC 86.523 points lower than the General-LPP model and 51.801 points lower than the Emotion-dependent-LPP model; all three models had 12 free parameters.
 Neither LPP mapping therefore replaced the category-wide multiplier, even though both added predictive information to models with or without it.
 
 In the observed data, remembered items had a 0.455 larger mean Early-LPP z score than forgotten items within the negative category, whereas the corresponding neutral-item difference was 0.035.
@@ -293,27 +291,27 @@ Early-LPP modulation therefore supplied item-level information absent from the c
 
 ### General versus Emotion-dependent Early LPP
 
-Emotion-dependent LPP lowered AIC by 40.094 points relative to General LPP when preferential emotional learning was absent and by 21.623 points when preferential emotional learning was present.
+Emotion-dependent LPP lowered AIC by 34.723 points relative to General LPP when preferential emotional learning was absent and by 18.568 points when preferential emotional learning was present.
 Because the alternatives had equal numbers of parameters, these AIC differences reflected fit rather than complexity penalties.
 
 | eCMR specification | Recall rate: Negative $-$ Neutral | Early LPP: Remembered $-$ Forgotten, Negative items | Early LPP: Remembered $-$ Forgotten, Neutral items | Early LPP: Negative items (Remembered $-$ Forgotten) $-$ Neutral items (Remembered $-$ Forgotten) |
 |:--|--:|--:|--:|--:|
 | **Observed data** | **0.124** | **0.455** | **0.035** | **0.420** |
-| Baseline | 0.001 *(−0.123)* | 0.029 *(−0.425)* | 0.015 *(−0.020)* | 0.014 *(−0.406)* |
-| All-item LPP boost | 0.007 *(−0.117)* | 0.260 *(−0.194)* | 0.214 *(+0.179)* | 0.046 *(−0.374)* |
-| Negative-item LPP boost | 0.019 *(−0.105)* | 0.524 *(+0.069)* | 0.022 *(−0.013)* | 0.502 *(+0.083)* |
-| Emotion-based boost | 0.118 *(−0.006)* | 0.030 *(−0.425)* | 0.008 *(−0.027)* | 0.021 *(−0.398)* |
-| Emotion-based + all-item LPP boosts | 0.134 *(+0.010)* | 0.372 *(−0.082)* | 0.076 *(+0.041)* | 0.297 *(−0.123)* |
-| Emotion-based + negative-item LPP boosts | 0.130 *(+0.006)* | 0.395 *(−0.059)* | 0.015 *(−0.020)* | 0.380 *(−0.040)* |
+| Baseline | 0.000 *(−0.124)* | 0.029 *(−0.425)* | 0.009 *(−0.026)* | 0.020 *(−0.400)* |
+| All-item LPP boost | 0.006 *(−0.117)* | 0.240 *(−0.215)* | 0.207 *(+0.172)* | 0.033 *(−0.387)* |
+| Negative-item LPP boost | 0.019 *(−0.105)* | 0.560 *(+0.105)* | 0.020 *(−0.015)* | 0.539 *(+0.120)* |
+| Emotion-based boost | 0.126 *(+0.002)* | 0.028 *(−0.426)* | 0.010 *(−0.024)* | 0.018 *(−0.402)* |
+| Emotion-based + all-item LPP boosts | 0.140 *(+0.016)* | 0.330 *(−0.125)* | 0.066 *(+0.031)* | 0.264 *(−0.156)* |
+| Emotion-based + negative-item LPP boosts | 0.119 *(−0.004)* | 0.447 *(−0.007)* | 0.024 *(−0.011)* | 0.424 *(+0.004)* |
 
 : Observed and model-predicted recall-rate and original-z Early-LPP contrasts. Parentheses give prediction minus observed; predictions are means across 200 complete simulated datasets. The Early-LPP contrasts were not separately fitted. {#tbl-model-diagnostic-effects}
 
 General LPP separated remembered and forgotten items in both categories, whereas Emotion-dependent LPP concentrated the separation among negative items.
-With preferential emotional learning, the predicted difference between the negative-item and neutral-item remembered--forgotten Early-LPP contrasts was 0.297 under General LPP and 0.380 under Emotion-dependent LPP, compared with 0.420 observed.
-The General Early-LPP coefficient $\kappa$ approached its upper bound ($\hat\kappa=0.208$ of 0.2145), and no wider-bound sensitivity was conducted; the preference for Emotion-dependent LPP is therefore conditional on the declared range.
+With preferential emotional learning, the predicted difference between the negative-item and neutral-item remembered--forgotten Early-LPP contrasts was 0.264 under General LPP and 0.424 under Emotion-dependent LPP, compared with 0.420 observed.
+The General Early-LPP coefficient was below its upper bound ($\hat\kappa=0.151$ of 0.2145), so the preference for Emotion-dependent LPP was not attributable to the General coefficient pressing against its declared bound.
 
 The preferred model combined preferential emotional learning with Emotion-dependent Early-LPP modulation.
-It estimated a source-learning scale of 0.930, an emotional-learning multiplier of 1.946, and an emotion-dependent log-learning slope of 0.128.
+It estimated a source-learning scale of 2.669, an emotional-learning multiplier of 1.577, and an emotion-dependent log-learning slope of 0.115.
 Because these parameters were estimated jointly with the remaining model parameters, their isolated magnitudes should not be assigned direct psychological meanings.
 
 ### Summary and scope
@@ -322,10 +320,6 @@ Taken together, the comparisons support complementary roles for preferential emo
 The category-wide multiplier reproduced the negative-item recall advantage, whereas Emotion-dependent Early LPP distinguished which negative items were recalled.
 Their combination was preferred, implementing the proposed pathway from Early LPP through source learning strength to the conditional probability of entering the recalled set.
 LPP-derived scaling therefore complemented rather than replaced preferential emotional learning.
-
-This conclusion concerns within-list Early-LPP variation and recalled-item identity conditional on observed recall count, using one parameter vector across participants.
-The analysis does not explain stopping, between-list LPP effects, participant-specific mechanisms, or whether LPP acts specifically through source rather than temporal learning.
-The numerical ranking is also conditional on the sampled-order approximation, declared bounds, and optimization search.
 
 # Supplementary material {.appendix}
 
@@ -346,20 +340,20 @@ The numerical ranking is also conditional on the sampled-order approximation, de
 
 | Parameter | A | B | C | D | E | F |
 |:--|--:|--:|--:|--:|--:|--:|
-| $\beta_{\mathrm{enc}}^{T}$ | 0.86396 | 0.73472 | 0.75960 | 0.83243 | 0.00084 | 0.80907 |
-| $\beta_{\mathrm{enc}}^{S}$ | 0.18153 | 0.02849 | 0.11016 | 0.04012 | 0.72584 | 0.08675 |
-| $\beta_{\mathrm{start}}$ | 0.97321 | 0.98771 | 0.99999 | 0.99999 | 0.03122 | 0.99999 |
-| $\beta_{\mathrm{rec}}^{T}$ | 0.70721 | 0.67079 | 0.14344 | 0.18358 | 0.05141 | 0.15337 |
+| $\beta_{\mathrm{enc}}^{T}$ | 0.71851 | 0.74573 | 0.75492 | 0.82721 | 0.0049261 | 0.7364 |
+| $\beta_{\mathrm{enc}}^{S}$ | 0.060535 | 0.034311 | 0.017177 | 0.056109 | 0.19086 | 0.059001 |
+| $\beta_{\mathrm{start}}$ | 0.99726 | 0.99987 | 0.99998 | 1 | 0.030802 | 0.99996 |
+| $\beta_{\mathrm{rec}}^{T}$ | 0.42503 | 0.094411 | 0.17007 | 0.096094 | 0.18614 | 0.10575 |
 | $\beta_{\mathrm{rec}}^{S}$ | [1] | [1] | [1] | [1] | [1] | [1] |
-| $\alpha$ | 0.24130 | 3.53733 | 1.69400 | 3.81835 | 74.64477 | 1.85902 |
-| $\delta$ | 68.959 | 28.732 | 39.126 | 18.541 | 48.979 | 27.334 |
-| $\gamma$ | 0.79003 | 0.46162 | 0.13427 | 0.25922 | 0.28439 | 0.21391 |
-| $\phi_s$ | 28.721 | 0.48668 | 0.19390 | 0.02896 | 2.35576 | 0.22806 |
-| $\phi_d$ | 2.20620 | 1.38064 | 4.43143 | 1.40662 | 2.11887 | 57.41072 |
-| $\tau_c$ | 0.19046 | 2.17085 | 1.75392 | 3.32237 | 1.19079 | 1.57723 |
-| $\omega$ | 0.22586 | 9.04693 | 1.38513 | 1.45162 | 1.03720 | 0.92996 |
-| $\phi_{\mathrm{emot}}$ | [1] | [1] | [1] | 1.50441 | 7.52498 | 1.94591 |
-| $\kappa$ | [0] | 0.05973 | [0] | [0] | 0.20799 | [0] |
-| $\kappa_{\mathrm{emot}}$ | [0] | [0] | 0.18410 | [0] | [0] | 0.12805 |
+| $\alpha$ | 0.30498 | 20.437 | 6.2235 | 10.59 | 94.457 | 5.8256 |
+| $\delta$ | 23.84 | 65.123 | 31.432 | 64.685 | 22.825 | 58.887 |
+| $\gamma$ | 0.2887 | 0.54427 | 0.30069 | 0.32279 | 0.34882 | 0.28719 |
+| $\phi_s$ | 1.3389 | 0.14933 | 0.16018 | 0.31836 | 3.943 | 0.33536 |
+| $\phi_d$ | 82.54 | 2.0841 | 22.287 | 44.051 | 1.2901 | 76.191 |
+| $\tau_c$ | 0.64638 | 5.0889 | 3.6255 | 2.5134 | 1.8339 | 1.9979 |
+| $\omega$ | 1.8797 | 6.0171 | 5.8759 | 2.4608 | 3.2044 | 2.6692 |
+| $\phi_{\mathrm{emot}}$ | [1] | [1] | [1] | 1.6302 | 5.6737 | 1.5774 |
+| $\kappa$ | [0] | 0.032287 | [0] | [0] | 0.15144 | [0] |
+| $\kappa_{\mathrm{emot}}$ | [0] | [0] | 0.099237 | [0] | [0] | 0.11542 |
 
 : Best-found pooled parameter estimates for the six primary models. Values are rounded for presentation; square brackets identify fixed values. Parameter roles and fitted ranges are reported in @tbl-model-parameter-spec. {#tbl-model-parameters}
