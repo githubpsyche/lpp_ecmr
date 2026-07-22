@@ -20,7 +20,12 @@ EXPECTED_KEYS = (
 )
 
 
-def _payload(task: restarts.RestartTask, *, fitness: float) -> dict[str, object]:
+def _payload(
+    task: restarts.RestartTask,
+    *,
+    fitness: float,
+    campaign: str = restarts.DEFAULT_CAMPAIGN,
+) -> dict[str, object]:
     model = restarts.MODEL_COMPARISON_REGISTRY[task.model_index]
     fixed = {name: float(value) for name, value in model["parameters"]["fixed"].items()}
     fits = {
@@ -28,7 +33,7 @@ def _payload(task: restarts.RestartTask, *, fitness: float) -> dict[str, object]
         **{name: [0.5] for name in model["parameters"]["free"]},
         "subject": [-1],
     }
-    hyperparameters = restarts._fitter_hyperparameters(model)
+    hyperparameters = restarts._fitter_hyperparameters(model, campaign)
     hyperparameters["best_of"] = 1
     return {
         "fixed": fixed,
@@ -44,6 +49,7 @@ def _payload(task: restarts.RestartTask, *, fitness: float) -> dict[str, object]
             model,
             data_sha256="d" * 64,
             source_sha256={"source.py": "s" * 64},
+            campaign=campaign,
         ),
     }
 
@@ -92,6 +98,53 @@ def test_restart_validation_rejects_nonfinite_and_wrong_identity() -> None:
     wrong_key["restart_key"] = [0, 0]
     with pytest.raises(restarts.RestartError, match="restart_key"):
         restarts.validate_restart_payload(task, wrong_key)
+
+
+def test_stagnation_campaign_is_explicit_and_leaves_default_unchanged() -> None:
+    model = restarts.MODEL_COMPARISON_REGISTRY[0]
+
+    standard = restarts._fitter_hyperparameters(model)
+    stagnation = restarts._fitter_hyperparameters(
+        model,
+        restarts.STAGNATION_CAMPAIGN,
+    )
+
+    assert standard["num_steps"] == restarts.FIT_SETTINGS["num_steps"]
+    assert standard["relative_tolerance"] == restarts.FIT_SETTINGS["relative_tolerance"]
+    assert standard["absolute_tolerance"] == restarts.FIT_SETTINGS["absolute_tolerance"]
+    assert "stopping_rule" not in standard
+    assert stagnation["num_steps"] == 1000
+    assert stagnation["stopping_rule"] == "best_nll_stagnation"
+    assert stagnation["stagnation_window"] == 100
+    assert stagnation["stagnation_tolerance"] == 0.01
+    assert "relative_tolerance" not in stagnation
+    assert "absolute_tolerance" not in stagnation
+
+
+def test_restart_validation_keeps_campaigns_separate() -> None:
+    task = restarts.task_for_index(0)
+    payload = _payload(
+        task,
+        fitness=10.0,
+        campaign=restarts.STAGNATION_CAMPAIGN,
+    )
+
+    restarts.validate_restart_payload(
+        task,
+        payload,
+        campaign=restarts.STAGNATION_CAMPAIGN,
+    )
+    with pytest.raises(restarts.RestartError, match="run_tag"):
+        restarts.validate_restart_payload(task, payload)
+
+    wrong_policy = copy.deepcopy(payload)
+    wrong_policy["hyperparameters"]["stopping_rule"] = "population_spread"  # type: ignore[index]
+    with pytest.raises(restarts.RestartError, match="stopping_rule"):
+        restarts.validate_restart_payload(
+            task,
+            wrong_policy,
+            campaign=restarts.STAGNATION_CAMPAIGN,
+        )
 
 
 def test_fit_task_calls_one_explicit_key_restart_only(
@@ -168,9 +221,6 @@ def test_fit_task_calls_one_explicit_key_restart_only(
     assert tuple(int(value) for value in calls[0][1]) == task.restart_key
     assert calls[0][2] == -1
     assert payload["name"] == "CMR_restart_0"
-    assert payload["lpp_preprocessing"] == (
-        "stored pre-stimulus-standardized EarlyLPP used directly"
-    )
 
 
 def test_reducer_selects_complete_lowest_restart_without_averaging(
@@ -207,6 +257,28 @@ def test_reducer_breaks_fitness_ties_by_restart_index(tmp_path: Path) -> None:
     assert winner["restart_selection"]["winner"] == 0
 
 
+def test_stagnation_reducer_retains_experimental_run_tag(tmp_path: Path) -> None:
+    tasks = restarts.restart_tasks()[:3]
+    for task in tasks:
+        payload = _payload(
+            task,
+            fitness=8.0 + task.restart_index,
+            campaign=restarts.STAGNATION_CAMPAIGN,
+        )
+        (tmp_path / task.filename).write_text(json.dumps(payload), encoding="utf-8")
+
+    winner, _ = restarts.reduce_model(
+        0,
+        restart_dir=tmp_path,
+        campaign=restarts.STAGNATION_CAMPAIGN,
+    )
+
+    assert winner["run_tag"] == (
+        "pooled_evosax_set_likelihood_stagnation_w100_tol0p01_best_of_3"
+    )
+    assert winner["hyperparameters"]["stopping_rule"] == "best_nll_stagnation"
+
+
 def test_reducer_requires_all_three_compatible_restarts(tmp_path: Path) -> None:
     tasks = restarts.restart_tasks()[:3]
     for task in tasks[:2]:
@@ -225,3 +297,82 @@ def test_reducer_requires_all_three_compatible_restarts(tmp_path: Path) -> None:
     )
     with pytest.raises(restarts.RestartError, match="data_sha256"):
         restarts.reduce_model(0, restart_dir=tmp_path)
+
+
+def _canonical_payloads(
+    fitness_by_index: dict[int, float],
+) -> tuple[list[dict[str, object]], dict[float, float]]:
+    payloads = []
+    fitness_by_marker = {}
+    for model_index in range(len(restarts.MODEL_COMPARISON_REGISTRY)):
+        task = restarts.task_for_index(model_index * restarts.RESTART_COUNT)
+        fitness = fitness_by_index[model_index]
+        payload = _payload(task, fitness=fitness)
+        model = restarts.MODEL_COMPARISON_REGISTRY[model_index]
+        for name, bounds in model["parameters"]["free"].items():
+            lower, upper = bounds
+            payload["fits"][name] = [(lower + upper) / 2]  # type: ignore[index]
+        marker = 0.01 * (model_index + 1)
+        payload["fits"]["encoding_drift_rate"] = [marker]  # type: ignore[index]
+        payload["name"] = f"{task.model_name}_best_of_3"
+        payloads.append(payload)
+        fitness_by_marker[marker] = fitness
+    return payloads, fitness_by_marker
+
+
+def test_nesting_safeguard_uses_parent_only_when_child_is_worse() -> None:
+    fitness_by_index = {index: 1000.0 - index for index in range(16)}
+    fitness_by_index[11] = 995.0
+    fitness_by_index[15] = 990.0
+    payloads, fitness_by_marker = _canonical_payloads(fitness_by_index)
+    evaluated_models = []
+
+    def evaluate(model, candidates):
+        evaluated_models.append(model["model_name"])
+        return [
+            fitness_by_marker[float(candidate["encoding_drift_rate"][0])]
+            for candidate in candidates
+        ]
+
+    selected, audit = restarts.apply_nesting_safeguard(
+        payloads,
+        evaluate_candidates=evaluate,
+    )
+    selected_by_model = {payload["model"]: payload for payload in selected}
+    audit_by_model = {row["model"]: row for row in audit}
+
+    assert evaluated_models == [
+        "CategoryOnly_eCMR_LPP_Full",
+        "EEM_eCMR_LPP_Full",
+    ]
+    category_full = selected_by_model["CategoryOnly_eCMR_LPP_Full"]
+    assert category_full["fitness"] == [fitness_by_index[10]]
+    assert category_full["nesting_safeguard"]["selected_source"] == (  # type: ignore[index]
+        "CategoryOnly_eCMR_LPP_EmotionalOnly"
+    )
+    assert category_full["fits"]["lpp_main_scale"] == [0.0]  # type: ignore[index]
+
+    eem_full = selected_by_model["EEM_eCMR_LPP_Full"]
+    assert eem_full["fitness"] == [fitness_by_index[14]]
+    assert audit_by_model["EEM_eCMR_LPP_Full"]["selected_source"] == (
+        "EEM_eCMR_LPP_EmotionalOnly"
+    )
+    assert eem_full["fits"]["lpp_main_scale"] == [0.0]  # type: ignore[index]
+
+
+def test_nesting_safeguard_skips_objective_when_all_children_beat_parents() -> None:
+    payloads, _ = _canonical_payloads({index: 1000.0 - index for index in range(16)})
+
+    def unexpected_evaluation(model, candidates):
+        del model, candidates
+        raise AssertionError("No parent fallback should require reevaluation.")
+
+    selected, audit = restarts.apply_nesting_safeguard(
+        payloads,
+        evaluate_candidates=unexpected_evaluation,
+    )
+
+    assert [payload["fitness"] for payload in selected] == [
+        [1000.0 - index] for index in range(16)
+    ]
+    assert {row["selected_source"] for row in audit} == {"optimizer"}

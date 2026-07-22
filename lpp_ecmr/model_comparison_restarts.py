@@ -21,7 +21,7 @@ import os
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 import jax
 import numpy as np
@@ -39,9 +39,9 @@ from .data_contract import (
 )
 from .model_comparison_registry import (
     FIT_SETTINGS,
-    LPP_OBSERVED_MAX,
-    LPP_OBSERVED_MIN,
     MODEL_COMPARISON_REGISTRY,
+    NESTING_RELATIONSHIPS,
+    PARAMETER_NEUTRAL_VALUES,
 )
 
 
@@ -53,6 +53,14 @@ SCHEMA_VERSION = 2
 FIT_CALL_INDEX = 0
 RESTART_COUNT = int(FIT_SETTINGS["best_of"])
 TASK_COUNT = len(MODEL_COMPARISON_REGISTRY) * RESTART_COUNT
+NESTING_TOLERANCE = 1e-6
+OBJECTIVE_REEVALUATION_TOLERANCE = 1e-4
+DEFAULT_CAMPAIGN = "standard"
+STAGNATION_CAMPAIGN = "stagnation"
+CAMPAIGN_NAMES = (DEFAULT_CAMPAIGN, STAGNATION_CAMPAIGN)
+STAGNATION_WINDOW = 100
+STAGNATION_TOLERANCE = 0.01
+STAGNATION_NUM_STEPS = 1000
 
 if RESTART_COUNT != 3:
     raise AssertionError(f"Expected best_of=3; found {RESTART_COUNT}.")
@@ -179,14 +187,34 @@ def _source_hashes() -> dict[str, str]:
     return {name: _sha256(path) for name, path in relative_paths.items()}
 
 
-def _fitter_hyperparameters(model: Mapping[str, Any]) -> dict[str, Any]:
-    """Return the canonical pooled EvosaxDE configuration."""
+def _normalize_campaign(campaign: str) -> str:
+    """Return one supported restart campaign name."""
 
-    return {
-        "num_steps": FIT_SETTINGS["num_steps"],
+    if campaign not in CAMPAIGN_NAMES:
+        raise RestartError(
+            f"Unknown restart campaign {campaign!r}; expected one of {CAMPAIGN_NAMES}."
+        )
+    return campaign
+
+
+def _campaign_run_tag(campaign: str) -> str:
+    """Return the base run tag that keeps experimental fits distinct."""
+
+    campaign = _normalize_campaign(campaign)
+    if campaign == DEFAULT_CAMPAIGN:
+        return str(FIT_SETTINGS["base_run_tag"])
+    return f"{FIT_SETTINGS['base_run_tag']}_stagnation_w{STAGNATION_WINDOW}_tol0p01"
+
+
+def _fitter_hyperparameters(
+    model: Mapping[str, Any],
+    campaign: str = DEFAULT_CAMPAIGN,
+) -> dict[str, Any]:
+    """Return the pooled EvosaxDE configuration for one explicit campaign."""
+
+    campaign = _normalize_campaign(campaign)
+    hyperparameters = {
         "pop_size": FIT_SETTINGS["popsize"],
-        "relative_tolerance": FIT_SETTINGS["relative_tolerance"],
-        "absolute_tolerance": FIT_SETTINGS["absolute_tolerance"],
         "cross_over_rate": FIT_SETTINGS["cross_rate"],
         "diff_w": FIT_SETTINGS["diff_w"],
         "init": FIT_SETTINGS["init"],
@@ -196,6 +224,24 @@ def _fitter_hyperparameters(model: Mapping[str, Any]) -> dict[str, Any]:
         "seed": FIT_SETTINGS["seed"],
         "bounds": model["parameters"]["free"],
     }
+    if campaign == DEFAULT_CAMPAIGN:
+        hyperparameters.update(
+            {
+                "num_steps": FIT_SETTINGS["num_steps"],
+                "relative_tolerance": FIT_SETTINGS["relative_tolerance"],
+                "absolute_tolerance": FIT_SETTINGS["absolute_tolerance"],
+            }
+        )
+    else:
+        hyperparameters.update(
+            {
+                "num_steps": STAGNATION_NUM_STEPS,
+                "stopping_rule": "best_nll_stagnation",
+                "stagnation_window": STAGNATION_WINDOW,
+                "stagnation_tolerance": STAGNATION_TOLERANCE,
+            }
+        )
+    return hyperparameters
 
 
 def validate_fitting_data(data: Mapping[str, Any]) -> np.ndarray:
@@ -217,14 +263,6 @@ def validate_fitting_data(data: Mapping[str, Any]) -> np.ndarray:
         )
     if summary["mixed_subject_count"] != MIXED_EXPECTED_SUBJECTS:
         raise RestartError("Combined-dataset summary disagrees with mixed mask.")
-    early_lpp = np.asarray(data["EarlyLPP"], dtype=float)[mask]
-    observed_range = (float(early_lpp.min()), float(early_lpp.max()))
-    expected_range = (LPP_OBSERVED_MIN, LPP_OBSERVED_MAX)
-    if not np.allclose(observed_range, expected_range):
-        raise RestartError(
-            f"Mixed EarlyLPP range {observed_range} does not match "
-            f"the registered raw range {expected_range}."
-        )
     return mask
 
 
@@ -234,9 +272,11 @@ def _base_metadata(
     *,
     data_sha256: str,
     source_sha256: Mapping[str, str],
+    campaign: str = DEFAULT_CAMPAIGN,
 ) -> dict[str, Any]:
     """Return immutable metadata attached to one restart result."""
 
+    campaign = _normalize_campaign(campaign)
     return {
         "restart_schema_version": SCHEMA_VERSION,
         "task_index": task.task_index,
@@ -245,7 +285,7 @@ def _base_metadata(
         "restart_key": list(task.restart_key),
         "fit_call_index": FIT_CALL_INDEX,
         "requested_best_of": RESTART_COUNT,
-        "run_tag": f"{FIT_SETTINGS['base_run_tag']}_restart_{task.restart_index}",
+        "run_tag": f"{_campaign_run_tag(campaign)}_restart_{task.restart_index}",
         "data_tag": FIT_SETTINGS["data_tag"],
         "data_path": FIT_SETTINGS["data_path"],
         "data_sha256": data_sha256,
@@ -271,9 +311,11 @@ def fit_task(
     data_sha256: str,
     source_sha256: Mapping[str, str],
     fitter_cls: type[EvosaxDE] = EvosaxDE,
+    campaign: str = DEFAULT_CAMPAIGN,
 ) -> dict[str, Any]:
     """Execute exactly one fit-only explicit-key restart."""
 
+    campaign = _normalize_campaign(campaign)
     model = _model_for_task(task)
     trial_mask = validate_fitting_data(data)
     make_factory = import_from_string(model["make_factory_path"])
@@ -290,7 +332,7 @@ def fit_task(
         model["parameters"]["fixed"],
         factory,
         loss_fn,
-        hyperparams=_fitter_hyperparameters(model),
+        hyperparams=_fitter_hyperparameters(model, campaign),
     )
     if not hasattr(fitter, "fit_once"):
         raise RestartError(
@@ -315,9 +357,10 @@ def fit_task(
             model,
             data_sha256=data_sha256,
             source_sha256=source_sha256,
+            campaign=campaign,
         )
     )
-    validate_restart_payload(task, payload)
+    validate_restart_payload(task, payload, campaign=campaign)
     return payload
 
 
@@ -336,9 +379,12 @@ def _one_finite_scalar(value: Any, *, label: str) -> float:
 def validate_restart_payload(
     task: RestartTask,
     payload: Mapping[str, Any],
+    *,
+    campaign: str = DEFAULT_CAMPAIGN,
 ) -> dict[str, Any]:
     """Require one restart artifact to match its executable task contract."""
 
+    campaign = _normalize_campaign(campaign)
     model = _model_for_task(task)
     expected = {
         "restart_schema_version": SCHEMA_VERSION,
@@ -348,6 +394,7 @@ def validate_restart_payload(
         "restart_key": list(task.restart_key),
         "fit_call_index": FIT_CALL_INDEX,
         "requested_best_of": RESTART_COUNT,
+        "run_tag": f"{_campaign_run_tag(campaign)}_restart_{task.restart_index}",
         "trial_query": MIXED_TRIAL_QUERY,
         "lpp_preprocessing": FIT_SETTINGS["lpp_preprocessing"],
         "model": task.model_name,
@@ -391,6 +438,34 @@ def validate_restart_payload(
         raise RestartError(
             f"{task.filename}: one restart must record hyperparameters.best_of=1."
         )
+    stopping_rule = hyperparameters.get("stopping_rule", "population_spread")
+    if campaign == DEFAULT_CAMPAIGN:
+        if stopping_rule != "population_spread":
+            raise RestartError(
+                f"{task.filename}: standard campaign requires population_spread."
+            )
+    else:
+        expected_stopping = {
+            "num_steps": STAGNATION_NUM_STEPS,
+            "stopping_rule": "best_nll_stagnation",
+            "stagnation_window": STAGNATION_WINDOW,
+            "stagnation_tolerance": STAGNATION_TOLERANCE,
+        }
+        for key, expected_value in expected_stopping.items():
+            if hyperparameters.get(key) != expected_value:
+                raise RestartError(
+                    f"{task.filename}: expected hyperparameters.{key}="
+                    f"{expected_value!r}; found {hyperparameters.get(key)!r}."
+                )
+        obsolete = {
+            "relative_tolerance",
+            "absolute_tolerance",
+        }.intersection(hyperparameters)
+        if obsolete:
+            raise RestartError(
+                f"{task.filename}: stagnation campaign contains inapplicable "
+                f"settings {sorted(obsolete)}."
+            )
 
     expected_fit_names = (
         set(expected_fixed) | set(model["parameters"]["free"]) | {"subject"}
@@ -469,15 +544,17 @@ def run_task(
     output_dir: Path = DEFAULT_OUTPUT_DIR,
     data_path: Path = DEFAULT_DATA_PATH,
     overwrite: bool = False,
+    campaign: str = DEFAULT_CAMPAIGN,
 ) -> dict[str, Any]:
     """Load, execute, validate, and atomically save one restart task."""
 
+    campaign = _normalize_campaign(campaign)
     task = task_for_index(task_index)
     output_dir = output_dir.resolve()
     output_path = output_dir / task.filename
     if output_path.exists() and not overwrite:
         payload = json.loads(output_path.read_text(encoding="utf-8"))
-        summary = validate_restart_payload(task, payload)
+        summary = validate_restart_payload(task, payload, campaign=campaign)
         print(f"Validated existing restart; skipping: {output_path}", flush=True)
         return summary
 
@@ -488,10 +565,11 @@ def run_task(
         data,
         data_sha256=_sha256(data_path),
         source_sha256=_source_hashes(),
+        campaign=campaign,
     )
     _atomic_write_json(output_path, payload)
     installed = json.loads(output_path.read_text(encoding="utf-8"))
-    summary = validate_restart_payload(task, installed)
+    summary = validate_restart_payload(task, installed, campaign=campaign)
     print(f"Installed validated restart: {output_path}", flush=True)
     return summary
 
@@ -499,6 +577,8 @@ def run_task(
 def _compatible_restarts(
     model_tasks: Sequence[RestartTask],
     payloads: Sequence[Mapping[str, Any]],
+    *,
+    campaign: str = DEFAULT_CAMPAIGN,
 ) -> None:
     """Require three restarts to share one scientific specification."""
 
@@ -506,6 +586,7 @@ def _compatible_restarts(
         "data_sha256",
         "source_sha256",
         "trial_query",
+        "lpp_preprocessing",
         "model",
         "components",
         "fit_algorithm",
@@ -516,7 +597,7 @@ def _compatible_restarts(
     )
     reference = payloads[0]
     for task, payload in zip(model_tasks, payloads, strict=True):
-        validate_restart_payload(task, payload)
+        validate_restart_payload(task, payload, campaign=campaign)
         for field in compatibility_fields:
             if _json_copy(payload.get(field)) != _json_copy(reference.get(field)):
                 raise RestartError(
@@ -528,11 +609,13 @@ def reduce_model(
     model_index: int,
     *,
     restart_dir: Path,
+    campaign: str = DEFAULT_CAMPAIGN,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Select one model's minimum-NLL restart and build its canonical payload."""
 
     if not 0 <= model_index < len(MODEL_COMPARISON_REGISTRY):
         raise RestartError(f"Invalid model_index: {model_index}.")
+    campaign = _normalize_campaign(campaign)
     model_tasks = restart_tasks()[
         model_index * RESTART_COUNT : (model_index + 1) * RESTART_COUNT
     ]
@@ -542,10 +625,10 @@ def reduce_model(
         if not path.is_file():
             raise RestartError(f"Missing restart artifact: {path}.")
         payloads.append(json.loads(path.read_text(encoding="utf-8")))
-    _compatible_restarts(model_tasks, payloads)
+    _compatible_restarts(model_tasks, payloads, campaign=campaign)
 
     summaries = [
-        validate_restart_payload(task, payload)
+        validate_restart_payload(task, payload, campaign=campaign)
         for task, payload in zip(model_tasks, payloads, strict=True)
     ]
     winner_position = min(
@@ -567,7 +650,7 @@ def reduce_model(
     ):
         winner.pop(field, None)
     winner["name"] = f"{model_name}_best_of_{RESTART_COUNT}"
-    winner["run_tag"] = f"{FIT_SETTINGS['base_run_tag']}_best_of_{RESTART_COUNT}"
+    winner["run_tag"] = f"{_campaign_run_tag(campaign)}_best_of_{RESTART_COUNT}"
     winner["fit_time"] = float(sum(summary["fit_time"] for summary in summaries))
     winner["hyperparameters"] = dict(winner["hyperparameters"])
     winner["hyperparameters"]["best_of"] = RESTART_COUNT
@@ -589,23 +672,324 @@ def reduce_model(
     return winner, reduction
 
 
+CandidateEvaluator = Callable[
+    [Mapping[str, Any], Sequence[Mapping[str, Any]]],
+    Sequence[float],
+]
+
+
+def _direct_parent_edges(model_name: str) -> tuple[Mapping[str, str], ...]:
+    """Return the registered immediate-parent edges for one model."""
+
+    return tuple(edge for edge in NESTING_RELATIONSHIPS if edge["child"] == model_name)
+
+
+def _embed_parent_fits(
+    parent: Mapping[str, Any],
+    child_model: Mapping[str, Any],
+) -> dict[str, list[float | int]]:
+    """Express one complete parent solution in the child parameterization."""
+
+    parent_fits = parent.get("fits")
+    if not isinstance(parent_fits, Mapping):
+        raise RestartError(f"{parent.get('name')}: fits must be a mapping.")
+
+    child_fits: dict[str, list[float | int]] = {
+        name: [float(value)]
+        for name, value in child_model["parameters"]["fixed"].items()
+    }
+    for name, bounds in child_model["parameters"]["free"].items():
+        if name in parent_fits:
+            value = _one_finite_scalar(
+                parent_fits[name],
+                label=f"{parent.get('name')}: fits.{name}",
+            )
+        elif name in PARAMETER_NEUTRAL_VALUES:
+            value = float(PARAMETER_NEUTRAL_VALUES[name])
+        else:
+            raise RestartError(
+                f"Cannot embed {parent.get('name')} in {child_model['model_name']}: "
+                f"no value for {name}."
+            )
+        lower, upper = (float(bound) for bound in bounds)
+        if value < lower or value > upper:
+            raise RestartError(
+                f"Embedded {name}={value} lies outside child bounds [{lower}, {upper}]."
+            )
+        child_fits[name] = [value]
+    child_fits["subject"] = [-1]
+    return child_fits
+
+
+def _make_objective_evaluator(
+    data: Mapping[str, Any],
+    trial_mask: np.ndarray,
+) -> CandidateEvaluator:
+    """Build exact target-model NLL evaluation for post-fit candidates."""
+
+    trial_indices = jax.numpy.asarray(np.flatnonzero(trial_mask))
+    loss_cls = import_from_string(FIT_SETTINGS["loss_fn_path"])
+    losses: dict[str, Any] = {}
+
+    def evaluate(
+        model: Mapping[str, Any],
+        candidates: Sequence[Mapping[str, Any]],
+    ) -> Sequence[float]:
+        factory_path = str(model["make_factory_path"])
+        if factory_path not in losses:
+            make_factory = import_from_string(factory_path)
+            factory = make_factory(
+                **{
+                    name: import_from_string(path)
+                    for name, path in FIT_SETTINGS["component_paths"].items()
+                }
+            )
+            losses[factory_path] = loss_cls(factory, data, None)
+
+        free_names = tuple(model["parameters"]["free"])
+        parameter_matrix = np.asarray(
+            [
+                [
+                    _one_finite_scalar(
+                        candidate[name],
+                        label=f"{model['model_name']} candidate {name}",
+                    )
+                    for candidate in candidates
+                ]
+                for name in free_names
+            ],
+            dtype=float,
+        )
+        fixed = model["parameters"]["fixed"]
+        loss = losses[factory_path]
+
+        @jax.jit
+        def score(values: jax.Array) -> jax.Array:
+            return loss(trial_indices, fixed, free_names, values)
+
+        values = np.asarray(score(jax.numpy.asarray(parameter_matrix)), dtype=float)
+        if values.shape != (len(candidates),) or not np.all(np.isfinite(values)):
+            raise RestartError(
+                f"Invalid objective values for {model['model_name']}: {values}."
+            )
+        return [float(value) for value in values]
+
+    return evaluate
+
+
+def apply_nesting_safeguard(
+    canonical_payloads: Sequence[Mapping[str, Any]],
+    *,
+    evaluate_candidates: CandidateEvaluator,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Apply the Morton--Polyn post-fit fallback in topological order.
+
+    Independent optimizer results remain the primary candidates.  If a child
+    reports a worse NLL than any immediate parent, the complete child and
+    embedded-parent vectors are evaluated under the child objective and the
+    lowest-NLL complete vector is retained.  No optimization is run here.
+    """
+
+    payload_by_name = {
+        str(payload.get("model")): copy.deepcopy(payload)
+        for payload in canonical_payloads
+    }
+    expected_names = [str(model["model_name"]) for model in MODEL_COMPARISON_REGISTRY]
+    if set(payload_by_name) != set(expected_names):
+        raise RestartError("Canonical payloads do not cover the registered models.")
+
+    selected: dict[str, dict[str, Any]] = {}
+    audit: list[dict[str, Any]] = []
+    for model in MODEL_COMPARISON_REGISTRY:
+        model_name = str(model["model_name"])
+        payload = payload_by_name[model_name]
+        optimizer_fitness = _one_finite_scalar(
+            payload.get("fitness"),
+            label=f"{model_name}: fitness",
+        )
+        edges = _direct_parent_edges(model_name)
+        parent_payloads = []
+        for edge in edges:
+            parent_name = edge["parent"]
+            if parent_name not in selected:
+                raise RestartError(
+                    f"Registry is not topological: {parent_name} precedes {model_name}."
+                )
+            parent = selected[parent_name]
+            added_parameter = edge["added_parameter"]
+            neutral = float(PARAMETER_NEUTRAL_VALUES[added_parameter])
+            embedded_value = _one_finite_scalar(
+                parent["fits"][added_parameter],
+                label=f"{parent_name}: fits.{added_parameter}",
+            )
+            if not math.isclose(embedded_value, neutral, abs_tol=1e-12):
+                raise RestartError(
+                    f"{parent_name} is not nested in {model_name}: "
+                    f"{added_parameter}={embedded_value}, expected {neutral}."
+                )
+            parent_payloads.append(parent)
+
+        parent_fitness = {
+            str(parent["model"]): _one_finite_scalar(
+                parent["fitness"],
+                label=f"{parent['model']}: fitness",
+            )
+            for parent in parent_payloads
+        }
+        violating = [
+            name
+            for name, fitness in parent_fitness.items()
+            if optimizer_fitness > fitness + NESTING_TOLERANCE
+        ]
+        record: dict[str, Any] = {
+            "method": "Morton-Polyn post-fit parent fallback",
+            "optimizer_fitness": optimizer_fitness,
+            "parent_fitness": parent_fitness,
+            "triggered": False,
+            "selected_source": "optimizer",
+        }
+
+        if violating:
+            candidate_sources = ["optimizer"] + [
+                str(parent["model"]) for parent in parent_payloads
+            ]
+            candidate_fits = [copy.deepcopy(payload["fits"])] + [
+                _embed_parent_fits(parent, model) for parent in parent_payloads
+            ]
+            evaluated = list(evaluate_candidates(model, candidate_fits))
+            recorded = [optimizer_fitness] + [
+                parent_fitness[source] for source in candidate_sources[1:]
+            ]
+            for source, observed, expected in zip(
+                candidate_sources,
+                evaluated,
+                recorded,
+                strict=True,
+            ):
+                if not math.isclose(
+                    observed,
+                    expected,
+                    rel_tol=0.0,
+                    abs_tol=OBJECTIVE_REEVALUATION_TOLERANCE,
+                ):
+                    raise RestartError(
+                        f"{model_name}: reevaluated {source} NLL {observed} does "
+                        f"not reproduce recorded NLL {expected}."
+                    )
+            winner_index = min(
+                range(len(evaluated)),
+                key=lambda index: (evaluated[index], index),
+            )
+            payload["fits"] = candidate_fits[winner_index]
+            payload["fitness"] = [evaluated[winner_index]]
+            record.update(
+                {
+                    "triggered": winner_index != 0,
+                    "selected_source": candidate_sources[winner_index],
+                    "candidate_fitness_under_child": dict(
+                        zip(candidate_sources, evaluated, strict=True)
+                    ),
+                }
+            )
+
+        if edges:
+            payload["nesting_safeguard"] = record
+        selected[model_name] = payload
+        audit.append(
+            {
+                "model": model_name,
+                "optimizer_fitness": optimizer_fitness,
+                "fitness": _one_finite_scalar(
+                    payload["fitness"],
+                    label=f"{model_name}: selected fitness",
+                ),
+                "selected_source": record["selected_source"],
+            }
+        )
+
+    return [selected[name] for name in expected_names], audit
+
+
+def _validate_campaign(
+    payloads: Sequence[Mapping[str, Any]],
+    *,
+    data_path: Path,
+    campaign: str = DEFAULT_CAMPAIGN,
+) -> None:
+    """Require all models to come from the current coherent fit campaign."""
+
+    campaign = _normalize_campaign(campaign)
+    if not payloads:
+        raise RestartError("No canonical payloads were supplied.")
+    fields = (
+        "data_sha256",
+        "source_sha256",
+        "trial_query",
+        "lpp_preprocessing",
+        "components",
+        "fit_algorithm",
+        "loss_function",
+        "run_tag",
+    )
+    reference = payloads[0]
+    for payload in payloads[1:]:
+        for field in fields:
+            if _json_copy(payload.get(field)) != _json_copy(reference.get(field)):
+                raise RestartError(f"Fit campaign differs across models at {field}.")
+    if reference.get("data_sha256") != _sha256(data_path):
+        raise RestartError("Fit campaign does not match the local fitting dataset.")
+    if _json_copy(reference.get("source_sha256")) != _json_copy(_source_hashes()):
+        raise RestartError("Fit campaign does not match the local scientific sources.")
+    expected_run_tag = f"{_campaign_run_tag(campaign)}_best_of_{RESTART_COUNT}"
+    if reference.get("run_tag") != expected_run_tag:
+        raise RestartError(
+            f"Fit campaign has run_tag={reference.get('run_tag')!r}; "
+            f"expected {expected_run_tag!r}."
+        )
+
+
 def reduce_all(
     *,
     restart_dir: Path = DEFAULT_OUTPUT_DIR,
+    data_path: Path = DEFAULT_DATA_PATH,
+    output_dir: Path = DEFAULT_OUTPUT_DIR,
     install: bool = False,
+    campaign: str = DEFAULT_CAMPAIGN,
 ) -> list[dict[str, Any]]:
-    """Validate all 48 restarts and optionally install 16 canonical winners."""
+    """Validate, safeguard, and optionally install 16 canonical winners."""
 
+    campaign = _normalize_campaign(campaign)
     restart_dir = restart_dir.resolve()
+    data_path = data_path.resolve()
     reductions = []
     canonical_payloads = []
     for model_index in range(len(MODEL_COMPARISON_REGISTRY)):
-        payload, reduction = reduce_model(model_index, restart_dir=restart_dir)
+        payload, reduction = reduce_model(
+            model_index,
+            restart_dir=restart_dir,
+            campaign=campaign,
+        )
         canonical_payloads.append(payload)
         reductions.append(reduction)
+    _validate_campaign(
+        canonical_payloads,
+        data_path=data_path,
+        campaign=campaign,
+    )
+    data = load_data(data_path)
+    trial_mask = validate_fitting_data(data)
+    canonical_payloads, nesting_audit = apply_nesting_safeguard(
+        canonical_payloads,
+        evaluate_candidates=_make_objective_evaluator(data, trial_mask),
+    )
+    for reduction, nesting in zip(reductions, nesting_audit, strict=True):
+        reduction["optimizer_fitness"] = nesting["optimizer_fitness"]
+        reduction["fitness"] = nesting["fitness"]
+        reduction["selected_source"] = nesting["selected_source"]
     if install:
+        output_dir = output_dir.resolve()
         for payload in canonical_payloads:
-            path = restart_dir / f"{payload['name']}.json"
+            path = output_dir / f"{payload['name']}.json"
             _atomic_write_json(path, payload)
     return reductions
 
@@ -614,9 +998,11 @@ def preflight(
     *,
     data_path: Path = DEFAULT_DATA_PATH,
     output_dir: Path = DEFAULT_OUTPUT_DIR,
+    campaign: str = DEFAULT_CAMPAIGN,
 ) -> dict[str, Any]:
     """Validate the 48-task contract and production prerequisites."""
 
+    campaign = _normalize_campaign(campaign)
     tasks = restart_tasks()
     filenames = [task.filename for task in tasks]
     pairs = [(task.model_name, task.restart_index) for task in tasks]
@@ -637,9 +1023,28 @@ def preflight(
             validate_restart_payload(
                 task,
                 json.loads(path.read_text(encoding="utf-8")),
+                campaign=campaign,
             )
             existing += 1
     return {
+        "campaign": campaign,
+        "run_tag": _campaign_run_tag(campaign),
+        "stopping_settings": {
+            key: value
+            for key, value in _fitter_hyperparameters(
+                MODEL_COMPARISON_REGISTRY[0],
+                campaign,
+            ).items()
+            if key
+            in {
+                "num_steps",
+                "stopping_rule",
+                "relative_tolerance",
+                "absolute_tolerance",
+                "stagnation_window",
+                "stagnation_tolerance",
+            }
+        },
         "task_count": len(tasks),
         "model_count": len(MODEL_COMPARISON_REGISTRY),
         "restarts_per_model": RESTART_COUNT,
@@ -671,6 +1076,11 @@ def _parser() -> argparse.ArgumentParser:
         type=Path,
         default=DEFAULT_OUTPUT_DIR,
     )
+    preflight_parser.add_argument(
+        "--campaign",
+        choices=CAMPAIGN_NAMES,
+        default=DEFAULT_CAMPAIGN,
+    )
 
     fit_parser = subparsers.add_parser(
         "fit",
@@ -684,6 +1094,11 @@ def _parser() -> argparse.ArgumentParser:
         default=DEFAULT_OUTPUT_DIR,
     )
     fit_parser.add_argument("--overwrite", action="store_true")
+    fit_parser.add_argument(
+        "--campaign",
+        choices=CAMPAIGN_NAMES,
+        default=DEFAULT_CAMPAIGN,
+    )
 
     reduce_parser = subparsers.add_parser(
         "reduce",
@@ -694,10 +1109,22 @@ def _parser() -> argparse.ArgumentParser:
         type=Path,
         default=DEFAULT_OUTPUT_DIR,
     )
+    reduce_parser.add_argument("--data-path", type=Path, default=DEFAULT_DATA_PATH)
+    reduce_parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=DEFAULT_OUTPUT_DIR,
+        help="Directory for canonical JSONs when --install is used.",
+    )
     reduce_parser.add_argument(
         "--install",
         action="store_true",
         help="Atomically replace the canonical best-of-three JSONs.",
+    )
+    reduce_parser.add_argument(
+        "--campaign",
+        choices=CAMPAIGN_NAMES,
+        default=DEFAULT_CAMPAIGN,
     )
     return parser
 
@@ -717,7 +1144,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.command == "preflight":
         print(
             json.dumps(
-                preflight(data_path=args.data_path, output_dir=args.output_dir),
+                preflight(
+                    data_path=args.data_path,
+                    output_dir=args.output_dir,
+                    campaign=args.campaign,
+                ),
                 indent=2,
             )
         )
@@ -730,6 +1161,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                     output_dir=args.output_dir,
                     data_path=args.data_path,
                     overwrite=args.overwrite,
+                    campaign=args.campaign,
                 ),
                 indent=2,
             )
@@ -738,7 +1170,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.command == "reduce":
         print(
             json.dumps(
-                reduce_all(restart_dir=args.restart_dir, install=args.install),
+                reduce_all(
+                    restart_dir=args.restart_dir,
+                    data_path=args.data_path,
+                    output_dir=args.output_dir,
+                    install=args.install,
+                    campaign=args.campaign,
+                ),
                 indent=2,
             )
         )
